@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b111a" />
+  <title>Stratis Avagianos — Full-Stack Developer</title>
+  <meta name="description" content="Stratis Avagianos — Full-Stack Developer from Piraeus, Greece. Frontend, backend, APIs, and infrastructure." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- soft ambient (subtle, not loud) -->
+  <div class="ambient" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <header class="navWrap">
+    <nav class="nav neu" id="nav">
+      <a class="brand" href="#top" aria-label="Go to top">
+        <span class="brandDot" aria-hidden="true"></span>
+        <span class="brandName">STRATIS</span>
+        <span class="brandTag">full-stack</span>
+      </a>
+
+      <button class="navToggle neuBtn" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="navLinks" id="navLinks">
+        <a class="navLink" href="#skills">Skills</a>
+        <a class="navLink" href="#projects">Projects</a>
+        <a class="navLink" href="#future">Future</a>
+        <a class="navLink" href="#seminars">Seminars</a>
+        <a class="navLink" href="#arcade">Arcade</a>
+        <a class="navLink" href="#contact">Contact</a>
+
+        <a class="resumeBtn neuBtn neuBtn--accent" href="assets/resume.pdf" download>
+          Download Resume
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <main id="top" class="page">
+    <section class="hero">
+      <div class="container heroGrid">
+        <div class="heroLeft">
+          <div class="chipRow">
+            <span class="chip neuInset">Piraeus, Greece</span>
+            <span class="chip neuInset">APIs • UI • Infra</span>
+          </div>
+
+          <h1 class="h1">
+            Efstratios <span class="quote">“</span><span class="accent">Stratis</span><span class="quote">”</span>
+            Avagianos
+          </h1>
+
+          <p class="lead">
+            Full-Stack Developer who builds calm, usable interfaces — backed by practical APIs and infrastructure
+            that keeps working when reality gets spicy.
+          </p>
+
+          <div class="heroActions">
+            <a class="neuBtn neuBtn--accent" href="#projects">View Projects</a>
+            <a class="neuBtn" href="mailto:stratosav1999@gmail.com">Email</a>
+            <a class="neuBtn" href="https://github.com/ava1313" target="_blank" rel="noreferrer">GitHub</a>
+            <a class="neuBtn" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
+          </div>
+
+          <div class="miniRow">
+            <div class="mini neu">
+              <div class="miniK">Core</div>
+              <div class="miniV">Frontend • Backend • Hosting</div>
+            </div>
+            <div class="mini neu">
+              <div class="miniK">Extras</div>
+              <div class="miniV">Unity • Three.js • Graphics</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="heroRight">
+          <div class="avatarCard neu depth" data-depth="10">
+            <a class="avatar" href="#contact" aria-label="Go to contact">
+              <img src="assets/profile.jpg" alt="Photo of Stratis Avagianos">
+              <span class="sheen" aria-hidden="true"></span>
+            </a>
+            <div class="avatarText">
+              <div class="avatarTitle">Hi. I’m Stratis.</div>
+              <div class="avatarSub">Hover / tap the avatar.</div>
+            </div>
+          </div>
+
+          <div class="status neu depth" data-depth="6">
+            <div class="statusRow">
+              <span class="statusK">Role</span>
+              <span class="statusV">Full-Stack Dev</span>
+            </div>
+            <div class="statusRow">
+              <span class="statusK">Hosting</span>
+              <span class="statusV">NGINX • Reverse proxy • DDNS</span>
+            </div>
+            <div class="statusRow">
+              <span class="statusK">Currently</span>
+              <span class="statusV">Just Finished Army</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scrollHint">
+        <span class="mouse" aria-hidden="true"></span>
+        <span>Scroll</span>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+<section class="section" id="skills">
+  <div class="container">
+    <div class="sectionHead">
+      <h2 class="h2">Skills</h2>
+      <p class="sub">
+        Categorized, readable, and tactile. No “look at my rainbow bars” energy.
+      </p>
+    </div>
+
+    <div class="grid2">
+
+      <!-- FRONTEND -->
+      <article class="card neu reveal depth" data-depth="8">
+        <h3 class="h3">Frontend</h3>
+        <p class="muted">HTML • CSS • JavaScript • React • Angular • Three.js</p>
+
+        <div class="skillList">
+          <div class="skill"><span>HTML</span><span class="dots" data-level="5"></span></div>
+          <div class="skill"><span>CSS</span><span class="dots" data-level="5"></span></div>
+          <div class="skill"><span>JavaScript</span><span class="dots" data-level="5"></span></div>
+          <div class="skill"><span>React</span><span class="dots" data-level="4"></span></div>
+          <div class="skill"><span>Angular</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Three.js</span><span class="dots" data-level="3"></span></div>
+        </div>
+      </article>
+
+      <!-- BACKEND & APIs -->
+      <article class="card neu reveal depth" data-depth="10">
+        <h3 class="h3">Backend & APIs</h3>
+        <p class="muted">Node.js • PHP • Python • API Integration • Firebase</p>
+
+        <div class="skillList">
+          <div class="skill"><span>Node.js</span><span class="dots" data-level="4"></span></div>
+          <div class="skill"><span>APIs</span><span class="dots" data-level="4"></span></div>
+          <div class="skill"><span>Firebase (Firestore & Auth)</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>PHP</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Python</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Kotlin</span><span class="dots" data-level="2"></span></div>
+        </div>
+      </article>
+
+      <!-- INFRA & TOOLS -->
+      <article class="card neu reveal depth" data-depth="7">
+        <h3 class="h3">Infra & Tools</h3>
+        <p class="muted">Hosting • DevOps basics • CMS</p>
+
+        <div class="pillRow">
+          <span class="pill neuInset">NGINX</span>
+          <span class="pill neuInset">Reverse Proxy</span>
+          <span class="pill neuInset">Raspberry Pi Hosting</span>
+          <span class="pill neuInset">Docker</span>
+          <span class="pill neuInset">WordPress</span>
+          <span class="pill neuInset">Git / GitHub</span>
+        </div>
+      </article>
+
+      <!-- EMBEDDED / ELECTRONICS -->
+      <article class="card neu reveal depth" data-depth="8">
+        <h3 class="h3">Embedded / Electronics</h3>
+        <p class="muted">Microcontrollers • Hardware basics • Prototyping</p>
+
+        <div class="skillList">
+          <div class="skill"><span>ESP32</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Microcontroller Programming</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Soldering & Prototyping</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Sensors / GPIO</span><span class="dots" data-level="3"></span></div>
+        </div>
+      </article>
+
+      <!-- CREATIVE / GAME / CROSS-PLATFORM -->
+      <article class="card neu reveal depth" data-depth="9">
+        <h3 class="h3">Creative / Game</h3>
+        <p class="muted">Games • Visuals • Cross-platform UI</p>
+
+        <div class="skillList">
+          <div class="skill"><span>Unity</span><span class="dots" data-level="4"></span></div>
+          <div class="skill"><span>C#</span><span class="dots" data-level="4"></span></div>
+          <div class="skill"><span>Flutter</span><span class="dots" data-level="3"></span></div>
+          <div class="skill"><span>Photoshop / Graphics</span><span class="dots" data-level="3"></span></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+    <!-- PROJECTS -->
+<section class="section" id="projects">
+  <div class="container">
+    <div class="sectionHead">
+      <h2 class="h2">Projects</h2>
+      <p class="sub">
+        Real systems, real constraints. Each project solves a concrete problem.
+      </p>
+    </div>
+
+    <div class="stack">
+
+      <!-- PROJECT 1: EMERGENCY BUTTON -->
+      <article class="project neu reveal depth" data-depth="12">
+        <div class="projectTop">
+          <h3 class="h3">Emergency Button (ESP32 + Companion App)</h3>
+          <span class="badge neuInset">embedded / mobile</span>
+        </div>
+
+        <p class="muted">
+          A Wi-Fi connected emergency button designed for elderly users who cannot reliably use smartphones.
+          With a single physical press, the device sends instant alarm notifications to predefined contacts.
+        </p>
+
+        <p class="muted">
+          The system is built around an ESP32 microcontroller and includes two physical buttons,
+          a status LED, and a battery-powered circuit. Communication is handled over Wi-Fi,
+          allowing alerts to be triggered immediately without any complex user interaction.
+        </p>
+
+        <p class="muted">
+          A companion Android application, developed in Android Studio, manages user accounts,
+          authentication, and real-time communication using Firebase.
+          Firebase is used both for device-to-app messaging and as the primary database.
+        </p>
+
+        <p class="muted">
+          The enclosure was custom-designed by me in Fusion 360 and manufactured using a 3D printer.
+          A planned improvement is the integration of a fall-detection sensor to automatically trigger alerts.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">ESP32</span>
+          <span class="pill neuInset">Firebase</span>
+          <span class="pill neuInset">Android Studio</span>
+          <span class="pill neuInset">Embedded Systems</span>
+          <span class="pill neuInset">3D Printing</span>
+        </div>
+
+        <div class="actions">
+          <a class="link" href="#contact">Request details</a>
+        </div>
+      </article>
+
+      <!-- PROJECT 2: SELF-HOSTED INFRA -->
+      <article class="project neu reveal depth" data-depth="10">
+        <div class="projectTop">
+          <h3 class="h3">Self-Hosted Infrastructure (Raspberry Pi)</h3>
+          <span class="badge neuInset">infrastructure</span>
+        </div>
+
+        <p class="muted">
+          A personal self-hosted environment running multiple websites and services on a Raspberry Pi.
+          The setup uses Docker containers for service isolation and NGINX as both a web server and reverse proxy.
+        </p>
+
+        <p class="muted">
+          This project provided hands-on experience with real deployment constraints,
+          including networking, port management, service separation, and long-term reliability.
+          All configuration and maintenance is handled manually without managed hosting services.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Raspberry Pi</span>
+          <span class="pill neuInset">NGINX</span>
+          <span class="pill neuInset">Docker</span>
+          <span class="pill neuInset">Reverse Proxy</span>
+          <span class="pill neuInset">Self-Hosting</span>
+        </div>
+      </article>
+
+      <!-- PROJECT 3: GAMIFICATION -->
+      <article class="project neu reveal depth" data-depth="9">
+        <div class="projectTop">
+          <h3 class="h3">Real-Time App Gamification</h3>
+          <span class="badge neuInset">unity / real-time</span>
+        </div>
+
+        <p class="muted">
+          A gamification layer built in Unity that reacts dynamically to real-time data streams.
+          The application consumes live JSON data and updates visuals and behavior based on incoming values.
+        </p>
+
+        <p class="muted">
+          Instead of static dashboards, this project explores how live information
+          can be communicated through motion, feedback, and interactive systems.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Unity</span>
+          <span class="pill neuInset">C#</span>
+          <span class="pill neuInset">JSON</span>
+          <span class="pill neuInset">Real-Time Data</span>
+        </div>
+      </article>
+
+      <!-- PROJECT 4: WAKE MY PC -->
+      <article class="project neu reveal depth" data-depth="11">
+        <div class="projectTop">
+          <h3 class="h3">Wake My PC (Remote Power Control)</h3>
+          <span class="badge neuInset">automation</span>
+        </div>
+
+        <p class="muted">
+          A remote automation system that allows my PC to be powered on from anywhere in the world.
+          A Telegram bot command (<code>/wake</code>) is sent to a service running on my Raspberry Pi,
+          which then triggers the PC startup sequence.
+        </p>
+
+        <p class="muted">
+          This project combines messaging APIs, networking, and automation logic
+          to solve a practical everyday problem: remote access without physical presence.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Telegram Bot</span>
+          <span class="pill neuInset">Raspberry Pi</span>
+          <span class="pill neuInset">Networking</span>
+          <span class="pill neuInset">Automation</span>
+        </div>
+      </article>
+
+      <!-- PROJECT 5: CYBER SECURITY APP -->
+      <article class="project neu reveal depth" data-depth="10">
+        <div class="projectTop">
+          <h3 class="h3">Cyber-Security Parenting App</h3>
+          <span class="badge neuInset">university project</span>
+        </div>
+
+        <p class="muted">
+          A group university project (team of three) focused on protecting children from harmful online communication.
+          The app monitors incoming Telegram messages and detects aggressive or dangerous content.
+        </p>
+
+        <p class="muted">
+          When such content is detected, the system immediately alerts the parent
+          through a companion application and forwards the message for review.
+          The system uses AI-based text analysis for real-time classification.
+        </p>
+
+        <p class="muted">
+          Backend services are containerized using Docker, while the front-end is built with Flutter.
+          The project emphasized collaboration, security awareness, and real-time processing.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Flutter</span>
+          <span class="pill neuInset">Docker</span>
+          <span class="pill neuInset">AI / NLP</span>
+          <span class="pill neuInset">Cyber Security</span>
+          <span class="pill neuInset">Team Project</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+    <!-- FUTURE PROJECTS -->
+<section class="section" id="future">
+  <div class="container">
+    <div class="sectionHead">
+      <h2 class="h2">Future Projects</h2>
+      <p class="sub">
+        Concepts currently in planning. Focused ideas with clear technical direction.
+      </p>
+    </div>
+
+    <div class="grid2">
+
+      <!-- FUTURE PROJECT 1 -->
+      <article class="card neu reveal depth" data-depth="9">
+        <h3 class="h3">Daily Drawing Challenge (Flutter Game)</h3>
+
+        <p class="muted">
+          A mobile game built with Flutter and developed in Android Studio.
+          Once per day, players receive a notification with a drawing subject
+          and must quickly create and submit their drawing within a limited time window.
+        </p>
+
+        <p class="muted">
+          Drawings are shared on daily leaderboards where players can vote for each other.
+          Scores are calculated based on speed and community votes,
+          with monthly rankings and rewards for top performers.
+        </p>
+
+        <p class="muted">
+          The project focuses on real-time interaction, competitive gameplay,
+          and community-driven content.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Flutter</span>
+          <span class="pill neuInset">Android Studio</span>
+          <span class="pill neuInset">Notifications</span>
+          <span class="pill neuInset">Gamification</span>
+          <span class="pill neuInset">Leaderboards</span>
+        </div>
+      </article>
+
+      <!-- FUTURE PROJECT 2 -->
+      <article class="card neu reveal depth" data-depth="10">
+        <h3 class="h3">Infinite Procedural World Generation (Unity Plugin)</h3>
+
+        <p class="muted">
+          A Unity plugin focused on infinite, procedural, and realistic world generation.
+          The goal is to generate large-scale environments dynamically,
+          without predefined maps or visible repetition.
+        </p>
+
+        <p class="muted">
+          The system will emphasize terrain realism, biome variation,
+          and performance-efficient generation suitable for real-time applications
+          such as games or simulations.
+        </p>
+
+        <p class="muted">
+          This project explores procedural algorithms, optimization techniques,
+          and modular plugin design within the Unity ecosystem.
+        </p>
+
+        <div class="metaRow">
+          <span class="pill neuInset">Unity</span>
+          <span class="pill neuInset">Procedural Generation</span>
+          <span class="pill neuInset">C#</span>
+          <span class="pill neuInset">Optimization</span>
+          <span class="pill neuInset">Game Systems</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+    <!-- SEMINARS -->
+    <section class="section" id="seminars">
+      <div class="container">
+        <div class="sectionHead">
+          <h2 class="h2">Seminars & Certificates</h2>
+          <p class="sub">Proof I finish quests.</p>
+        </div>
+
+        <div class="timeline neu reveal depth" data-depth="10">
+          <div class="tItem">
+            <div class="tDot" aria-hidden="true"></div>
+            <div>
+              <div class="tTop">
+                <strong>Vellum Certified Game Developer with Unity</strong>
+                <span class="tMeta">08/2022 – 10/2022</span>
+              </div>
+              <div class="muted">Unity fundamentals, systems thinking, and shipping a playable build.</div>
+            </div>
+          </div>
+
+          <div class="tItem">
+            <div class="tDot" aria-hidden="true"></div>
+            <div>
+              <div class="tTop">
+                <strong>Michigan Certificate of Proficiency</strong>
+                <span class="tMeta">05/2021</span>
+              </div>
+              <div class="muted">English proficiency certification.</div>
+            </div>
+          </div>
+
+          <div class="tItem">
+            <div class="tDot" aria-hidden="true"></div>
+            <div>
+              <div class="tTop">
+                <strong>Computer Science — Athens University of Economics and Business</strong>
+                <span class="tMeta">09/2017 – Present</span>
+              </div>
+              <div class="muted">CS foundations + real projects in parallel. Product-minded learning.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="langRow">
+          <div class="lang neuInset">Greek: 100%</div>
+          <div class="lang neuInset">English: ~80%</div>
+          <div class="lang neuInset">German: ~40%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUTURE SEMINARS -->
+<section class="section" id="future-seminars">
+  <div class="container">
+    <div class="sectionHead">
+      <h2 class="h2">Planned Seminars & Learning</h2>
+      <p class="sub">Structured learning paths I plan to complete next.</p>
+    </div>
+
+    <div class="timeline neu reveal depth" data-depth="9">
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>Python Programming (Advanced)</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Advanced Python concepts, clean architecture, performance, and real-world problem solving.
+          </div>
+        </div>
+      </div>
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>Databases & Data Modeling</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Relational and NoSQL databases, indexing strategies, query optimization, and schema design.
+          </div>
+        </div>
+      </div>
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>Data Analysis & Visualization</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Data processing, analysis workflows, and clear visual communication of insights.
+          </div>
+        </div>
+      </div>
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>.NET Framework & C# Backend Development</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Backend development with .NET, API design, application structure, and performance considerations.
+          </div>
+        </div>
+      </div>
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>Cloud Computing Fundamentals</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Cloud infrastructure concepts, deployment models, scalability, and cost-aware architecture.
+          </div>
+        </div>
+      </div>
+
+      <div class="tItem">
+        <div class="tDot" aria-hidden="true"></div>
+        <div>
+          <div class="tTop">
+            <strong>DevOps & CI/CD Pipelines</strong>
+            <span class="tMeta">Planned</span>
+          </div>
+          <div class="muted">
+            Continuous integration, automated deployments, container workflows, and monitoring basics.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="langRow">
+      <div class="lang neuInset">Platform: Coursera</div>
+      <div class="lang neuInset">Focus: Practical & Applied</div>
+      <div class="lang neuInset">Goal: Production-ready skills</div>
+    </div>
+  </div>
+</section>
+
+    <!-- ARCADE (one calm game) -->
+    <section class="section" id="arcade">
+      <div class="container">
+        <div class="sectionHead">
+          <h2 class="h2">Arcade</h2>
+          <p class="sub">One small toy. Optional. Quiet. (Because restraint is a superpower.)</p>
+        </div>
+
+        <div class="arcade neu reveal depth" data-depth="10">
+          <div class="arcadeHead">
+            <div>
+              <h3 class="h3">Orbit Dots</h3>
+              <p class="muted">Move your mouse (or finger). The dots orbit your pointer with gentle physics.</p>
+            </div>
+            <button class="neuBtn" id="orbitReset">Reset</button>
+          </div>
+          <canvas class="canvas neuInset" id="orbit" width="900" height="320" aria-label="Orbit dots canvas"></canvas>
+        </div>
+
+        <div class="interests neuInset">
+          Interests: Fishing • Hiking • Gaming • Soccer • Painting • Scuba Diving • Photography • Videography
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="sectionHead">
+          <h2 class="h2">About & Contact</h2>
+          <p class="sub">If you want to collaborate or hire me, message me. Simple.</p>
+        </div>
+
+        <div class="grid2">
+          <article class="card neu reveal depth" data-depth="8">
+            <h3 class="h3">About</h3>
+            <p class="muted">
+              I’m Stratis — full-stack dev with a frontend eye and backend pragmatism.
+              I’ve built WordPress sites professionally and I enjoy custom builds where UX + performance matter.
+            </p>
+
+            <div class="contactList">
+              <a class="contactItem neuInset" href="mailto:stratosav1999@gmail.com">stratosav1999@gmail.com</a>
+              <a class="contactItem neuInset" href="tel:+306971951090">+30 697 195 1090</a>
+              <a class="contactItem neuInset" href="http://avagianos.ddns.net" target="_blank" rel="noreferrer">avagianos.ddns.net</a>
+              <a class="contactItem neuInset" href="https://github.com/ava1313" target="_blank" rel="noreferrer">github.com/ava1313</a>
+              <a class="contactItem neuInset" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
+            </div>
+          </article>
+
+          <article class="card neu reveal depth" data-depth="10">
+            <h3 class="h3">Message</h3>
+            <p class="muted">This opens your email client (no backend needed for GitHub Pages).</p>
+
+            <form class="form" id="contactForm">
+              <label>
+                <span>Name</span>
+                <input class="input neuInset" id="cName" autocomplete="name" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input class="input neuInset" id="cEmail" type="email" autocomplete="email" required />
+              </label>
+              <label>
+                <span>Message</span>
+                <textarea class="input neuInset" id="cMsg" rows="5" required></textarea>
+              </label>
+
+              <div class="formRow">
+                <button class="neuBtn neuBtn--accent" type="submit">Open Email</button>
+                <button class="neuBtn" type="button" id="copyEmail">Copy Email</button>
+              </div>
+
+              <div class="formHint" id="formHint" aria-live="polite"></div>
+            </form>
+          </article>
+        </div>
+
+        <footer class="footer">
+          <span>© <span id="year"></span> Efstratios (Stratis) Avagianos • GitHub Pages</span>
+          <a class="link" href="#top">Back to top</a>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
