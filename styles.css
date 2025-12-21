@@ -639,3 +639,70 @@ label span{display:block; margin-bottom: 6px; font-size: 12px; color: rgba(231,2
   opacity: 0.7;
   white-space: nowrap;
 }
+/* =========================
+   TIMELINE — MOBILE FIX
+   ========================= */
+
+@media (max-width: 768px) {
+
+  .timeline {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .tItem {
+    grid-template-columns: 10px 1fr;
+    gap: 1rem;
+    padding: 1.4rem 0;
+  }
+
+  .tItem:not(:last-child)::after {
+    left: 4px;
+    top: 32px;
+    bottom: -32px;
+  }
+
+  .tDot {
+    width: 10px;
+    height: 10px;
+    margin-top: 8px;
+  }
+
+  .tTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .tMeta {
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  .timeline .muted {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+}
+
+/* =========================
+   EXTRA SMALL DEVICES
+   ========================= */
+
+@media (max-width: 420px) {
+
+  .timeline {
+    padding: 1.25rem 1rem;
+  }
+
+  .tItem {
+    gap: 0.8rem;
+  }
+
+  .tTop strong {
+    font-size: 0.95rem;
+  }
+
+  .timeline .muted {
+    font-size: 0.9rem;
+  }
+}
