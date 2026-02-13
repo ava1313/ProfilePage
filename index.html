@@ -12,7 +12,6 @@
       --ink:#fff7ff;
       --muted:rgba(255,247,255,.78);
       --glass:rgba(255,255,255,.08);
-      --glass2:rgba(255,255,255,.12);
       --stroke:rgba(255,255,255,.18);
       --pink:#ff4fa3;
       --rose:#ff2b6a;
@@ -67,13 +66,12 @@
       opacity:.45;
     }
 
-    /* --- Header --- */
+    /* --- Header (logo only) --- */
     header{
       position:fixed; left:0; right:0; top:0;
       z-index:20;
       padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
+      display:flex; align-items:center; justify-content:flex-start;
       background: linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,0));
       backdrop-filter: blur(6px);
     }
@@ -92,47 +90,6 @@
     }
     .brand b{letter-spacing:.2px}
     .brand span{color:var(--muted); font-size:12.5px}
-
-    .controls{
-      display:flex; align-items:center; gap:10px;
-    }
-    .btn{
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.08);
-      color:var(--ink);
-      padding:10px 12px;
-      border-radius:999px;
-      display:inline-flex; align-items:center; gap:8px;
-      transition: transform .12s ease, background .2s ease, border .2s ease;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
-    .btn:active{ transform: translateY(0px) scale(.99);}
-    .tiny{
-      font-size:12px;
-      opacity:.9;
-    }
-    .progress{
-      width:140px;
-      height:10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      overflow:hidden;
-      display:none;
-    }
-    .progress > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, var(--rose), var(--pink), var(--violet));
-      border-radius:999px;
-      box-shadow: 0 0 18px rgba(255,79,163,.5);
-    }
-    @media (min-width: 720px){
-      .progress{display:block;}
-    }
 
     /* --- Main layout --- */
     main{ position:relative; z-index:2; }
@@ -195,12 +152,8 @@
       line-height:1.06;
       letter-spacing:-.6px;
     }
-    h1{
-      font-size: clamp(34px, 4.6vw, 64px);
-    }
-    h2{
-      font-size: clamp(26px, 3.3vw, 44px);
-    }
+    h1{ font-size: clamp(34px, 4.6vw, 64px); }
+    h2{ font-size: clamp(26px, 3.3vw, 44px); }
     p{
       margin: 10px 0;
       line-height:1.6;
@@ -301,10 +254,7 @@
       transition: opacity .9s ease, transform .9s ease;
       will-change: opacity, transform;
     }
-    .reveal.on{
-      opacity:1;
-      transform: translateY(0);
-    }
+    .reveal.on{ opacity:1; transform: translateY(0); }
 
     /* --- Big heart divider --- */
     .divider{
@@ -337,14 +287,27 @@
       align-items:center;
       margin-top: 8px;
     }
+    .btn{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition: transform .12s ease, background .2s ease, border .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
+    .btn:active{ transform: translateY(0px) scale(.99);}
+    .tiny{ font-size:12px; opacity:.9; }
+
     .primary{
       background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
       border-color: rgba(255,79,163,.38);
     }
     .primary:hover{ border-color: rgba(255,79,163,.55); }
-    .ghost{
-      background: rgba(255,255,255,.07);
-    }
+    .ghost{ background: rgba(255,255,255,.07); }
 
     .toast{
       position: fixed;
@@ -416,6 +379,9 @@
 </head>
 
 <body>
+  <!-- Autoplay background song (song.mp3 in same folder). Loops forever. -->
+  <audio id="bgm" src="song.mp3" preload="auto" loop></audio>
+
   <div class="ambient" aria-hidden="true">
     <div class="grain"></div>
     <div class="glow-orb" id="orb1" style="--x: -40px; --y: -20px;"></div>
@@ -431,16 +397,6 @@
         <b>Για τη Ντίνα</b>
         <span>Η ιστορία μας, με κύλιση ✨</span>
       </div>
-    </div>
-
-    <div class="controls">
-      <div class="progress" aria-label="Πρόοδος κύλισης">
-        <i id="bar"></i>
-      </div>
-      <div class="btn tiny" id="musicBtn" title="Μικρό ρομαντικό ηχητικό εφέ (χωρίς μουσικό κομμάτι)">
-        🔊 <span id="musicLabel">Ήχος: OFF</span>
-      </div>
-      <div class="btn tiny" id="topBtn" title="Πίσω στην αρχή">⬆️ Αρχή</div>
     </div>
   </header>
 
@@ -653,16 +609,6 @@
     }, { threshold: 0.18 });
     $$('.reveal').forEach(el=> io.observe(el));
 
-    // ---- Scroll progress
-    const bar = $('#bar');
-    const onScroll = () => {
-      const h = document.documentElement;
-      const p = (h.scrollTop) / (h.scrollHeight - h.clientHeight);
-      bar.style.width = `${Math.max(0, Math.min(1, p)) * 100}%`;
-    };
-    document.addEventListener('scroll', onScroll, {passive:true});
-    onScroll();
-
     // ---- Parallax-ish orbs
     const orb1 = $('#orb1');
     const orb2 = $('#orb2');
@@ -712,13 +658,10 @@
       el.innerHTML = heartSvg(fill);
 
       hearts.appendChild(el);
-      // Cleanup
       setTimeout(()=> el.remove(), (d*1000)+200);
     }
 
-    // Spawn gently over time
     let heartTimer = setInterval(spawnHeart, 550);
-    // Start with a few
     for(let i=0;i<10;i++) setTimeout(spawnHeart, i*120);
 
     // ---- Toast helper
@@ -730,11 +673,6 @@
       clearTimeout(toastT);
       toastT = setTimeout(()=> toast.classList.remove('on'), 2600);
     }
-
-    // ---- Buttons
-    $('#topBtn').addEventListener('click', ()=> {
-      window.scrollTo({top:0, behavior:'smooth'});
-    });
 
     // Shy "NO" button that runs away a bit
     const noBtn = $('#noBtn');
@@ -795,11 +733,9 @@
       showToast('✨ Λίγη παραπάνω μαγεία, επειδή… Ντίνα!');
     });
 
-    const yesBtn = $('#yesBtn');
-    yesBtn.addEventListener('click', ()=>{
+    $('#yesBtn').addEventListener('click', ()=>{
       confettiBurst();
       showToast('💖 ΝΤΙΝΑ, ΕΙΣΑΙ ΤΟ “ΝΑΙ” ΜΟΥ.');
-      // make hearts momentarily faster
       clearInterval(heartTimer);
       heartTimer = setInterval(spawnHeart, 220);
       setTimeout(()=>{
@@ -808,68 +744,30 @@
       }, 3500);
     });
 
-    // ---- Tiny romantic sound (no copyrighted music)
-    // WebAudio: soft chime
-    let audioOn = false;
-    let audioCtx = null;
+    // ---- Background music: try autoplay on load, loop forever.
+    // Note: Some browsers block autoplay until a user gesture.
+    const bgm = document.getElementById('bgm');
 
-    function chime(){
-      if(!audioOn) return;
-      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const now = audioCtx.currentTime;
-
-      const o1 = audioCtx.createOscillator();
-      const o2 = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-
-      o1.type = 'sine';
-      o2.type = 'triangle';
-      o1.frequency.setValueAtTime(659.25, now); // E5
-      o2.frequency.setValueAtTime(987.77, now); // B5
-
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
-
-      o1.connect(g); o2.connect(g);
-      g.connect(audioCtx.destination);
-
-      o1.start(now);
-      o2.start(now + 0.02);
-      o1.stop(now + 0.95);
-      o2.stop(now + 0.95);
+    async function tryPlayBgm(){
+      try{
+        bgm.volume = 0.85;   // adjust if you want softer (0.4-0.7)
+        bgm.loop = true;
+        await bgm.play();
+      }catch(err){
+        // Autoplay may be blocked. Start on first user interaction.
+        const resume = async () => {
+          try { await bgm.play(); } catch(e) {}
+          window.removeEventListener('pointerdown', resume);
+          window.removeEventListener('keydown', resume);
+          window.removeEventListener('touchstart', resume);
+        };
+        window.addEventListener('pointerdown', resume, { once:true });
+        window.addEventListener('keydown', resume, { once:true });
+        window.addEventListener('touchstart', resume, { once:true, passive:true });
+      }
     }
 
-    const musicBtn = $('#musicBtn');
-    const musicLabel = $('#musicLabel');
-
-    musicBtn.addEventListener('click', async ()=>{
-      audioOn = !audioOn;
-      musicLabel.textContent = audioOn ? 'Ήχος: ON' : 'Ήχος: OFF';
-      showToast(audioOn ? '🔊 Έτοιμο. Μικρή “καμπανούλα” σε κάθε μαγεία.' : '🔇 Ο ήχος απενεργοποιήθηκε.');
-      if(audioOn) {
-        // Resume context on gesture
-        try{
-          if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          await audioCtx.resume();
-          chime();
-        }catch(e){}
-      }
-    });
-
-    // Play chime on key moments
-    ['confettiBtn','yesBtn','topBtn'].forEach(id=>{
-      const el = $('#'+id);
-      if(el) el.addEventListener('click', chime);
-    });
-
-    // Chime when entering new chapters (subtle)
-    const chapterIO = new IntersectionObserver((entries)=>{
-      for(const e of entries){
-        if(e.isIntersecting) chime();
-      }
-    }, { threshold: 0.6 });
-    $$('.chapter').forEach(sec=> chapterIO.observe(sec));
+    window.addEventListener('load', tryPlayBgm);
   </script>
 </body>
 </html>
