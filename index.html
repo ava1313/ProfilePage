@@ -1,770 +1,875 @@
 <!doctype html>
-<html lang="en">
+<html lang="el">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b111a" />
-  <title>Stratis Avagianos — Full-Stack Developer</title>
-  <meta name="description" content="Stratis Avagianos — Full-Stack Developer from Piraeus, Greece. Frontend, backend, APIs, and infrastructure." />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Για τη Ντίνα 💘</title>
+  <style>
+    :root{
+      --bg0:#07030f;
+      --bg1:#120521;
+      --bg2:#240a2f;
+      --ink:#fff7ff;
+      --muted:rgba(255,247,255,.78);
+      --glass:rgba(255,255,255,.08);
+      --glass2:rgba(255,255,255,.12);
+      --stroke:rgba(255,255,255,.18);
+      --pink:#ff4fa3;
+      --rose:#ff2b6a;
+      --violet:#a85bff;
+      --gold:#ffd6a5;
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+      --blur: blur(14px);
+      --radius: 24px;
+    }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(255,79,163,.18), transparent 60%),
+        radial-gradient(1000px 700px at 80% 30%, rgba(168,91,255,.16), transparent 55%),
+        radial-gradient(800px 650px at 50% 90%, rgba(255,214,165,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 45%, var(--bg2));
+      overflow-x:hidden;
+    }
 
-  <link rel="stylesheet" href="styles.css" />
+    /* --- Ambient layers --- */
+    .ambient{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:0;
+      overflow:hidden;
+    }
+    .grain{
+      position:absolute; inset:-40%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      transform:rotate(6deg);
+      mix-blend-mode:overlay;
+      opacity:.28;
+    }
+    .glow-orb{
+      position:absolute;
+      width:520px; height:520px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,79,163,.40), rgba(168,91,255,.10) 55%, transparent 70%);
+      filter: blur(22px);
+      opacity:.55;
+      transform: translate3d(var(--x), var(--y), 0);
+      transition: transform .2s ease-out;
+    }
+    .glow-orb.two{
+      width:640px; height:640px;
+      background: radial-gradient(circle at 60% 40%, rgba(255,214,165,.24), rgba(255,43,106,.10) 52%, transparent 72%);
+      opacity:.45;
+    }
+
+    /* --- Header --- */
+    header{
+      position:fixed; left:0; right:0; top:0;
+      z-index:20;
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      background: linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,0));
+      backdrop-filter: blur(6px);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      box-shadow: 0 10px 40px rgba(0,0,0,.22);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, var(--gold), var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,163,.65);
+    }
+    .brand b{letter-spacing:.2px}
+    .brand span{color:var(--muted); font-size:12.5px}
+
+    .controls{
+      display:flex; align-items:center; gap:10px;
+    }
+    .btn{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition: transform .12s ease, background .2s ease, border .2s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
+    .btn:active{ transform: translateY(0px) scale(.99);}
+    .tiny{
+      font-size:12px;
+      opacity:.9;
+    }
+    .progress{
+      width:140px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      display:none;
+    }
+    .progress > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--rose), var(--pink), var(--violet));
+      border-radius:999px;
+      box-shadow: 0 0 18px rgba(255,79,163,.5);
+    }
+    @media (min-width: 720px){
+      .progress{display:block;}
+    }
+
+    /* --- Main layout --- */
+    main{ position:relative; z-index:2; }
+    .chapter{
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 110px 16px 64px;
+    }
+    .card{
+      width:min(980px, 100%);
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--blur);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(800px 240px at 20% 0%, rgba(255,79,163,.22), transparent 60%),
+        radial-gradient(700px 260px at 90% 10%, rgba(168,91,255,.18), transparent 55%),
+        radial-gradient(900px 500px at 30% 120%, rgba(255,214,165,.10), transparent 55%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .inner{
+      position:relative;
+      padding: 28px 22px;
+    }
+    @media(min-width: 860px){
+      .inner{ padding: 44px 46px; }
+    }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 12px;
+      border-radius:999px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .kicker i{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(135deg, var(--rose), var(--violet));
+      box-shadow: 0 0 18px rgba(168,91,255,.55);
+      display:inline-block;
+    }
+
+    h1,h2{
+      margin: 16px 0 10px;
+      line-height:1.06;
+      letter-spacing:-.6px;
+    }
+    h1{
+      font-size: clamp(34px, 4.6vw, 64px);
+    }
+    h2{
+      font-size: clamp(26px, 3.3vw, 44px);
+    }
+    p{
+      margin: 10px 0;
+      line-height:1.6;
+      color:var(--muted);
+      font-size: clamp(15.5px, 1.5vw, 18px);
+    }
+    .lead{
+      color: rgba(255,247,255,.92);
+      font-size: clamp(16.5px, 1.8vw, 20px);
+      line-height:1.65;
+      margin-top: 14px;
+      max-width: 62ch;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+    @media(min-width: 900px){
+      .grid{ grid-template-columns: 1.25fr .9fr; gap: 18px; }
+    }
+
+    .pillbox{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      border-radius: 18px;
+      padding: 14px 14px;
+    }
+    .list{
+      display:grid;
+      gap:10px;
+      margin: 10px 0 0;
+      padding:0;
+      list-style:none;
+    }
+    .list li{
+      display:flex; gap:10px;
+      align-items:flex-start;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .badge{
+      flex:0 0 auto;
+      width:30px;height:30px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(255,79,163,.35), rgba(168,91,255,.22));
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      font-size: 15px;
+    }
+    .muted{ color: var(--muted); }
+
+    .quote{
+      margin-top: 16px;
+      padding: 14px 14px;
+      border-left: 3px solid rgba(255,79,163,.6);
+      background: rgba(255,255,255,.05);
+      border-radius: 16px;
+    }
+
+    /* --- Scroll hint --- */
+    .scrollHint{
+      display:flex; align-items:center; gap:10px;
+      margin-top: 22px;
+      color: rgba(255,247,255,.8);
+      font-size: 13px;
+    }
+    .mouse{
+      width:22px; height:34px;
+      border-radius: 999px;
+      border:1.6px solid rgba(255,255,255,.45);
+      position:relative;
+      opacity:.9;
+    }
+    .mouse::after{
+      content:"";
+      position:absolute; left:50%; top:8px;
+      width:4px; height:4px; border-radius:50%;
+      background: rgba(255,255,255,.85);
+      transform: translateX(-50%);
+      animation: wheel 1.35s infinite ease-in-out;
+    }
+    @keyframes wheel{
+      0%{ transform: translate(-50%,0); opacity: .9;}
+      60%{ transform: translate(-50%,10px); opacity: .35;}
+      100%{ transform: translate(-50%,0); opacity: .9;}
+    }
+
+    /* --- Reveal on scroll --- */
+    .reveal{
+      opacity:0;
+      transform: translateY(22px);
+      transition: opacity .9s ease, transform .9s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.on{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* --- Big heart divider --- */
+    .divider{
+      height: 90px;
+      display:grid;
+      place-items:center;
+      opacity:.9;
+      margin: 10px 0 -10px;
+    }
+    .divider .heart{
+      width: 34px; height: 34px;
+      filter: drop-shadow(0 10px 18px rgba(255,79,163,.42));
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.1); }
+    }
+
+    /* --- Final interactive area --- */
+    .final{
+      display:grid;
+      gap:14px;
+      margin-top: 18px;
+    }
+    .choiceRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-top: 8px;
+    }
+    .primary{
+      background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
+      border-color: rgba(255,79,163,.38);
+    }
+    .primary:hover{ border-color: rgba(255,79,163,.55); }
+    .ghost{
+      background: rgba(255,255,255,.07);
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      z-index: 50;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.42);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      transition: opacity .25s ease, transform .25s ease;
+      color: rgba(255,247,255,.92);
+      font-size: 13px;
+      max-width: min(92vw, 680px);
+      text-align:center;
+    }
+    .toast.on{
+      opacity:1;
+      transform: translateX(-50%) translateY(0px);
+    }
+
+    /* --- Floating hearts --- */
+    .hearts{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:1;
+      overflow:hidden;
+    }
+    .h{
+      position:absolute;
+      left: var(--lx);
+      top: 110%;
+      width: var(--s);
+      height: var(--s);
+      opacity: var(--o);
+      transform: translateZ(0);
+      animation: floatUp var(--d) linear infinite;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.25));
+    }
+    @keyframes floatUp{
+      0% { transform: translate3d(0,0,0) rotate(0deg); }
+      100% { transform: translate3d(var(--dx), -135vh, 0) rotate(var(--r)); }
+    }
+
+    /* --- Footer --- */
+    footer{
+      padding: 30px 16px 46px;
+      text-align:center;
+      color: rgba(255,247,255,.7);
+      font-size: 12.5px;
+      z-index:2;
+      position:relative;
+    }
+    footer b{ color: rgba(255,247,255,.92); }
+
+    /* Reduce motion accessibility */
+    @media (prefers-reduced-motion: reduce){
+      .reveal{transition:none}
+      .mouse::after{animation:none}
+      .divider .heart{animation:none}
+      .h{animation:none; display:none;}
+      .glow-orb{transition:none}
+    }
+  </style>
 </head>
+
 <body>
-  <!-- soft ambient (subtle, not loud) -->
-  <div class="ambient" aria-hidden="true"></div>
+  <div class="ambient" aria-hidden="true">
+    <div class="grain"></div>
+    <div class="glow-orb" id="orb1" style="--x: -40px; --y: -20px;"></div>
+    <div class="glow-orb two" id="orb2" style="--x: 40px; --y: 140px;"></div>
+  </div>
 
-  <!-- NAV -->
-  <header class="navWrap">
-    <nav class="nav neu" id="nav">
-      <a class="brand" href="#top" aria-label="Go to top">
-        <span class="brandDot" aria-hidden="true"></span>
-        <span class="brandName">STRATIS</span>
-        <span class="brandTag">full-stack</span>
-      </a>
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
 
-      <button class="navToggle neuBtn" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-
-      <div class="navLinks" id="navLinks">
-        <a class="navLink" href="#skills">Skills</a>
-        <a class="navLink" href="#projects">Projects</a>
-        <a class="navLink" href="#future">Future</a>
-        <a class="navLink" href="#seminars">Seminars</a>
-        <a class="navLink" href="#arcade">Arcade</a>
-        <a class="navLink" href="#contact">Contact</a>
-
-        <a class="resumeBtn neuBtn neuBtn--accent" href="assets/resume.pdf" download>
-          Download Resume
-        </a>
+  <header>
+    <div class="brand">
+      <span class="dot"></span>
+      <div style="display:flex;flex-direction:column;line-height:1.05">
+        <b>Για τη Ντίνα</b>
+        <span>Η ιστορία μας, με κύλιση ✨</span>
       </div>
-    </nav>
+    </div>
+
+    <div class="controls">
+      <div class="progress" aria-label="Πρόοδος κύλισης">
+        <i id="bar"></i>
+      </div>
+      <div class="btn tiny" id="musicBtn" title="Μικρό ρομαντικό ηχητικό εφέ (χωρίς μουσικό κομμάτι)">
+        🔊 <span id="musicLabel">Ήχος: OFF</span>
+      </div>
+      <div class="btn tiny" id="topBtn" title="Πίσω στην αρχή">⬆️ Αρχή</div>
+    </div>
   </header>
 
-  <!-- HERO -->
-  <main id="top" class="page">
-    <section class="hero">
-      <div class="container heroGrid">
-        <div class="heroLeft">
-          <div class="chipRow">
-            <span class="chip neuInset">Piraeus, Greece</span>
-            <span class="chip neuInset">APIs • UI • Infra</span>
-          </div>
-
-          <h1 class="h1">
-            Efstratios <span class="quote">“</span><span class="accent">Stratis</span><span class="quote">”</span>
-            Avagianos
-          </h1>
-
+  <main>
+    <!-- CHAPTER 1 -->
+    <section class="chapter">
+      <div class="card">
+        <div class="inner reveal">
+          <div class="kicker"><i></i> 14 Φεβρουαρίου • Για σένα</div>
+          <h1>Ντίνα…<br/>σου έφτιαξα κάτι μικρό, αλλά αληθινό 💘</h1>
           <p class="lead">
-            Full-Stack Developer who builds calm, usable interfaces — backed by practical APIs and infrastructure
-            that keeps working when reality gets spicy.
+            Δεν είναι απλώς μια σελίδα. Είναι ένας περίπατος μέσα σε αυτό που νιώθω όταν σε σκέφτομαι:
+            ζεστό, φωτεινό, και λίγο… μαγικό.
           </p>
 
-          <div class="heroActions">
-            <a class="neuBtn neuBtn--accent" href="#projects">View Projects</a>
-            <a class="neuBtn" href="mailto:stratosav1999@gmail.com">Email</a>
-            <a class="neuBtn" href="https://github.com/ava1313" target="_blank" rel="noreferrer">GitHub</a>
-            <a class="neuBtn" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
+          <div class="scrollHint">
+            <span class="mouse" aria-hidden="true"></span>
+            <span>Κύλησε προς τα κάτω για να ξεκινήσει η ιστορία.</span>
           </div>
-
-          <div class="miniRow">
-            <div class="mini neu">
-              <div class="miniK">Core</div>
-              <div class="miniV">Frontend • Backend • Hosting</div>
-            </div>
-            <div class="mini neu">
-              <div class="miniK">Extras</div>
-              <div class="miniV">Unity • Three.js • Graphics</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="heroRight">
-          <div class="avatarCard neu depth" data-depth="10">
-            <a class="avatar" href="#contact" aria-label="Go to contact">
-              <img src="assets/profile.jpg" alt="Photo of me">
-              <span class="sheen" aria-hidden="true"></span>
-            </a>
-            <div class="avatarText">
-              <div class="avatarTitle">Hi. I’m Ava.</div>
-              <div class="avatarSub">Hover / tap the avatar.</div>
-            </div>
-          </div>
-
-          <div class="status neu depth" data-depth="6">
-            <div class="statusRow">
-              <span class="statusK">Role</span>
-              <span class="statusV">Full-Stack Dev</span>
-            </div>
-            <div class="statusRow">
-              <span class="statusK">Hosting</span>
-              <span class="statusV">NGINX • Reverse proxy • DDNS</span>
-            </div>
-            <div class="statusRow">
-              <span class="statusK">Currently</span>
-              <span class="statusV">Just Finished Army</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="scrollHint">
-        <span class="mouse" aria-hidden="true"></span>
-        <span>Scroll</span>
-      </div>
-    </section>
-
-    <!-- SKILLS -->
-<section class="section" id="skills">
-  <div class="container">
-    <div class="sectionHead">
-      <h2 class="h2">Skills</h2>
-      <p class="sub">
-        Categorized, readable, and tactile. No “look at my rainbow bars” energy.
-      </p>
-    </div>
-
-    <div class="grid2">
-
-      <!-- FRONTEND -->
-      <article class="card neu reveal depth" data-depth="8">
-        <h3 class="h3">Frontend</h3>
-        <p class="muted">HTML • CSS • JavaScript • React • Angular • Three.js</p>
-
-        <div class="skillList">
-          <div class="skill"><span>HTML</span><span class="dots" data-level="5"></span></div>
-          <div class="skill"><span>CSS</span><span class="dots" data-level="5"></span></div>
-          <div class="skill"><span>JavaScript</span><span class="dots" data-level="5"></span></div>
-          <div class="skill"><span>React</span><span class="dots" data-level="4"></span></div>
-          <div class="skill"><span>Angular</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Three.js</span><span class="dots" data-level="3"></span></div>
-        </div>
-      </article>
-
-      <!-- BACKEND & APIs -->
-      <article class="card neu reveal depth" data-depth="10">
-        <h3 class="h3">Backend & APIs</h3>
-        <p class="muted">Node.js • PHP • Python • API Integration • Firebase</p>
-
-        <div class="skillList">
-          <div class="skill"><span>Node.js</span><span class="dots" data-level="4"></span></div>
-          <div class="skill"><span>APIs</span><span class="dots" data-level="4"></span></div>
-          <div class="skill"><span>Firebase (Firestore & Auth)</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>PHP</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Python</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Kotlin</span><span class="dots" data-level="2"></span></div>
-        </div>
-      </article>
-
-      
-
-      <!-- EMBEDDED / ELECTRONICS -->
-      <article class="card neu reveal depth" data-depth="8">
-        <h3 class="h3">Embedded / Electronics</h3>
-        <p class="muted">Microcontrollers • Hardware basics • Prototyping</p>
-
-        <div class="skillList">
-          <div class="skill"><span>ESP32</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Microcontroller Programming</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Soldering & Prototyping</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Sensors / GPIO</span><span class="dots" data-level="3"></span></div>
-        </div>
-      </article>
-
-      <!-- CREATIVE / GAME / CROSS-PLATFORM -->
-      <article class="card neu reveal depth" data-depth="9">
-        <h3 class="h3">Creative / Game</h3>
-        <p class="muted">Games • Visuals • Cross-platform UI</p>
-
-        <div class="skillList">
-          <div class="skill"><span>Unity</span><span class="dots" data-level="4"></span></div>
-          <div class="skill"><span>C#</span><span class="dots" data-level="4"></span></div>
-          <div class="skill"><span>Flutter</span><span class="dots" data-level="3"></span></div>
-          <div class="skill"><span>Photoshop / Graphics</span><span class="dots" data-level="3"></span></div>
-        </div>
-      </article>
-      <!-- INFRA & TOOLS -->
-      <article class="card neu reveal depth" data-depth="7">
-        <h3 class="h3">Infra & Tools</h3>
-        <p class="muted">Hosting • DevOps basics • CMS</p>
-
-        <div class="pillRow">
-          <span class="pill neuInset">NGINX</span>
-          <span class="pill neuInset">Reverse Proxy</span>
-          <span class="pill neuInset">Raspberry Pi Hosting</span>
-          <span class="pill neuInset">Docker</span>
-          <span class="pill neuInset">WordPress</span>
-          <span class="pill neuInset">Git / GitHub</span>
-        </div>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-<!-- WORK EXPERIENCE -->
-<section class="section" id="experience">
-  <div class="container">
-    <div class="sectionHead">
-      <h2 class="h2">Work Experience</h2>
-      <p class="sub">
-        Real-world roles that shaped how I work, communicate, and ship.
-      </p>
-    </div>
-
-    <div class="timeline neu reveal depth" data-depth="10">
-
-      <!-- DARc -->
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Front-End Developer — Darc</strong>
-            <span class="tMeta">04/2023 – 02/2025 · Aigaleo, Attiki, Greece</span>
-          </div>
-          <div class="muted">
-            Built and maintained client websites using WordPress, focusing on clean UI,
-            responsiveness, performance, and real production constraints.
-            Worked directly with designers and stakeholders.
-          </div>
-        </div>
-      </div>
-
-      <!-- BLACK ICE -->
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Assistant Accountant — Black Ice Inc</strong>
-            <span class="tMeta">02/2022 – 10/2022 · Igoumenitsa, Thesprotia, Greece</span>
-          </div>
-          <div class="muted">
-            Supported accounting operations, handled records, and worked with structured data.
-            Built precision, responsibility, and attention to detail.
-          </div>
-        </div>
-      </div>
-
-      <!-- SALES -->
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Sales Assistant — Black Ice Inc</strong>
-            <span class="tMeta">02/2022 – 10/2022 · Igoumenitsa, Thesprotia, Greece</span>
-          </div>
-          <div class="muted">
-            Customer-facing role focused on communication, problem solving,
-            and handling pressure in real-time environments.
-          </div>
-        </div>
-      </div>
-
-      <!-- WAITER -->
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Waiter — Balloni Beach Bar</strong>
-            <span class="tMeta">06/2021 – 08/2021 · Thermi, Lesvos, Greece</span>
-          </div>
-          <div class="muted">
-            High-paced hospitality work. Built resilience, multitasking ability,
-            and strong interpersonal skills under pressure.
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-    <!-- PROJECTS -->
-<section class="section" id="projects">
-  <div class="container">
-    <div class="sectionHead">
-      <h2 class="h2">Projects</h2>
-      <p class="sub">
-        Real systems, real constraints. Each project solves a concrete problem.
-      </p>
-    </div>
-
-    <div class="stack">
-
-      <!-- PROJECT 1: EMERGENCY BUTTON -->
-      <article class="project neu reveal depth" data-depth="12">
-        <div class="projectTop">
-          <h3 class="h3">Emergency Button (ESP32 + Companion App)</h3>
-          <span class="badge neuInset">embedded / mobile</span>
-        </div>
-
-        <p class="muted">
-          A Wi-Fi connected emergency button designed for elderly users who cannot reliably use smartphones.
-          With a single physical press, the device sends instant alarm notifications to predefined contacts.
-        </p>
-
-        <p class="muted">
-          The system is built around an ESP32 microcontroller and includes two physical buttons,
-          a status LED, and a battery-powered circuit. Communication is handled over Wi-Fi,
-          allowing alerts to be triggered immediately without any complex user interaction.
-        </p>
-
-        <p class="muted">
-          A companion Android application, developed in Android Studio, manages user accounts,
-          authentication, and real-time communication using Firebase.
-          Firebase is used both for device-to-app messaging and as the primary database.
-        </p>
-
-        <p class="muted">
-          The enclosure was custom-designed by me in Fusion 360 and manufactured using a 3D printer.
-          A planned improvement is the integration of a fall-detection sensor to automatically trigger alerts.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">ESP32</span>
-          <span class="pill neuInset">Firebase</span>
-          <span class="pill neuInset">Android Studio</span>
-          <span class="pill neuInset">Embedded Systems</span>
-          <span class="pill neuInset">3D Printing</span>
-        </div>
-
-        <div class="actions">
-          <a class="link" href="#contact">Request details</a>
-        </div>
-      </article>
-
-      <!-- PROJECT 2: SELF-HOSTED INFRA -->
-      <article class="project neu reveal depth" data-depth="10">
-        <div class="projectTop">
-          <h3 class="h3">Self-Hosted Infrastructure (Raspberry Pi)</h3>
-          <span class="badge neuInset">infrastructure</span>
-        </div>
-
-        <p class="muted">
-          A personal self-hosted environment running multiple websites and services on a Raspberry Pi.
-          The setup uses Docker containers for service isolation and NGINX as both a web server and reverse proxy.
-        </p>
-
-        <p class="muted">
-          This project provided hands-on experience with real deployment constraints,
-          including networking, port management, service separation, and long-term reliability.
-          All configuration and maintenance is handled manually without managed hosting services.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Raspberry Pi</span>
-          <span class="pill neuInset">NGINX</span>
-          <span class="pill neuInset">Docker</span>
-          <span class="pill neuInset">Reverse Proxy</span>
-          <span class="pill neuInset">Self-Hosting</span>
-        </div>
-      </article>
-
-      <!-- PROJECT 3: GAMIFICATION -->
-      <article class="project neu reveal depth" data-depth="9">
-        <div class="projectTop">
-          <h3 class="h3">Real-Time App Gamification</h3>
-          <span class="badge neuInset">unity / real-time</span>
-        </div>
-
-        <p class="muted">
-          A gamification layer built in Unity that reacts dynamically to real-time data streams.
-          The application consumes live JSON data and updates visuals and behavior based on incoming values.
-        </p>
-
-        <p class="muted">
-          Instead of static dashboards, this project explores how live information
-          can be communicated through motion, feedback, and interactive systems.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Unity</span>
-          <span class="pill neuInset">C#</span>
-          <span class="pill neuInset">JSON</span>
-          <span class="pill neuInset">Real-Time Data</span>
-        </div>
-      </article>
-
-      <!-- PROJECT 4: WAKE MY PC -->
-      <article class="project neu reveal depth" data-depth="11">
-        <div class="projectTop">
-          <h3 class="h3">Wake My PC (Remote Power Control)</h3>
-          <span class="badge neuInset">automation</span>
-        </div>
-
-        <p class="muted">
-          A remote automation system that allows my PC to be powered on from anywhere in the world.
-          A Telegram bot command (<code>/wake</code>) is sent to a service running on my Raspberry Pi,
-          which then triggers the PC startup sequence.
-        </p>
-
-        <p class="muted">
-          This project combines messaging APIs, networking, and automation logic
-          to solve a practical everyday problem: remote access without physical presence.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Telegram Bot</span>
-          <span class="pill neuInset">Raspberry Pi</span>
-          <span class="pill neuInset">Networking</span>
-          <span class="pill neuInset">Automation</span>
-        </div>
-      </article>
-
-      <!-- PROJECT 5: CYBER SECURITY APP -->
-      <article class="project neu reveal depth" data-depth="10">
-        <div class="projectTop">
-          <h3 class="h3">Cyber-Security Parenting App</h3>
-          <span class="badge neuInset">university project</span>
-        </div>
-
-        <p class="muted">
-          A group university project (team of three) focused on protecting children from harmful online communication.
-          The app monitors incoming Telegram messages and detects aggressive or dangerous content.
-        </p>
-
-        <p class="muted">
-          When such content is detected, the system immediately alerts the parent
-          through a companion application and forwards the message for review.
-          The system uses AI-based text analysis for real-time classification.
-        </p>
-
-        <p class="muted">
-          Backend services are containerized using Docker, while the front-end is built with Flutter.
-          The project emphasized collaboration, security awareness, and real-time processing.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Flutter</span>
-          <span class="pill neuInset">Docker</span>
-          <span class="pill neuInset">AI / NLP</span>
-          <span class="pill neuInset">Cyber Security</span>
-          <span class="pill neuInset">Team Project</span>
-        </div>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-
-    <!-- FUTURE PROJECTS -->
-<section class="section" id="future">
-  <div class="container">
-    <div class="sectionHead">
-      <h2 class="h2">Future Projects</h2>
-      <p class="sub">
-        Concepts currently in planning. Focused ideas with clear technical direction.
-      </p>
-    </div>
-
-    <div class="grid2">
-
-      <!-- FUTURE PROJECT 1 -->
-      <article class="card neu reveal depth" data-depth="9">
-        <h3 class="h3">Daily Drawing Challenge (Flutter Game)</h3>
-
-        <p class="muted">
-          A mobile game built with Flutter and developed in Android Studio.
-          Once per day, players receive a notification with a drawing subject
-          and must quickly create and submit their drawing within a limited time window.
-        </p>
-
-        <p class="muted">
-          Drawings are shared on daily leaderboards where players can vote for each other.
-          Scores are calculated based on speed and community votes,
-          with monthly rankings and rewards for top performers.
-        </p>
-
-        <p class="muted">
-          The project focuses on real-time interaction, competitive gameplay,
-          and community-driven content.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Flutter</span>
-          <span class="pill neuInset">Android Studio</span>
-          <span class="pill neuInset">Notifications</span>
-          <span class="pill neuInset">Gamification</span>
-          <span class="pill neuInset">Leaderboards</span>
-        </div>
-      </article>
-
-      <!-- FUTURE PROJECT 2 -->
-      <article class="card neu reveal depth" data-depth="10">
-        <h3 class="h3">Infinite Procedural World Generation (Unity Plugin)</h3>
-
-        <p class="muted">
-          A Unity plugin focused on infinite, procedural, and realistic world generation.
-          The goal is to generate large-scale environments dynamically,
-          without predefined maps or visible repetition.
-        </p>
-
-        <p class="muted">
-          The system will emphasize terrain realism, biome variation,
-          and performance-efficient generation suitable for real-time applications
-          such as games or simulations.
-        </p>
-
-        <p class="muted">
-          This project explores procedural algorithms, optimization techniques,
-          and modular plugin design within the Unity ecosystem.
-        </p>
-
-        <div class="metaRow">
-          <span class="pill neuInset">Unity</span>
-          <span class="pill neuInset">Procedural Generation</span>
-          <span class="pill neuInset">C#</span>
-          <span class="pill neuInset">Optimization</span>
-          <span class="pill neuInset">Game Systems</span>
-        </div>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-
-    <!-- SEMINARS -->
-    <section class="section" id="seminars">
-      <div class="container">
-        <div class="sectionHead">
-          <h2 class="h2">Seminars & Certificates</h2>
-          <p class="sub">Proof I finish quests.</p>
-        </div>
-
-        <div class="timeline neu reveal depth" data-depth="10">
-          <div class="tItem">
-            <div class="tDot" aria-hidden="true"></div>
-            <div>
-              <div class="tTop">
-                <strong>Vellum Certified Game Developer with Unity</strong>
-                <span class="tMeta">08/2022 – 10/2022</span>
-              </div>
-              <div class="muted">Unity fundamentals, systems thinking, and shipping a playable build.</div>
-            </div>
-          </div>
-
-          <div class="tItem">
-            <div class="tDot" aria-hidden="true"></div>
-            <div>
-              <div class="tTop">
-                <strong>Michigan Certificate of Proficiency</strong>
-                <span class="tMeta">05/2021</span>
-              </div>
-              <div class="muted">English proficiency certification.</div>
-            </div>
-          </div>
-
-          <div class="tItem">
-            <div class="tDot" aria-hidden="true"></div>
-            <div>
-              <div class="tTop">
-                <strong>Computer Science — Athens University of Economics and Business</strong>
-                <span class="tMeta">09/2017 – Present</span>
-              </div>
-              <div class="muted">CS foundations + real projects in parallel. Product-minded learning.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="langRow">
-          <div class="lang neuInset">Greek: 100%</div>
-          <div class="lang neuInset">English: ~80%</div>
-          <div class="lang neuInset">German: ~40%</div>
         </div>
       </div>
     </section>
 
-    <!-- FUTURE SEMINARS -->
-<section class="section" id="future-seminars">
-  <div class="container">
-    <div class="sectionHead">
-      <h2 class="h2">Planned Seminars & Learning</h2>
-      <p class="sub">Structured learning paths I plan to complete next.</p>
+    <div class="divider" aria-hidden="true">
+      <svg class="heart" viewBox="0 0 24 24" fill="none">
+        <path d="M12 21s-7-4.6-9.6-9C.5 8.3 2.4 5.5 5.6 5.2c1.7-.2 3.4.6 4.4 2 1-1.4 2.7-2.2 4.4-2 3.2.3 5.1 3.1 3.2 6.8C19 16.4 12 21 12 21Z"
+              fill="url(#g)"/>
+        <defs>
+          <linearGradient id="g" x1="4" y1="6" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#ff2b6a"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#a85bff"/>
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
 
-    <div class="timeline neu reveal depth" data-depth="9">
+    <!-- CHAPTER 2 -->
+    <section class="chapter">
+      <div class="card">
+        <div class="inner reveal">
+          <div class="kicker"><i></i> Κεφάλαιο 1 • Η αρχή</div>
+          <h2>Υπάρχει μια στιγμή που σε κάνει να χαμογελάς…</h2>
+          <p class="lead">
+            Κάπως έτσι ξεκίνησε: όχι με μεγάλα λόγια, αλλά με μια αίσθηση.
+            Ότι δίπλα σου ο κόσμος γίνεται πιο ήρεμος.
+          </p>
 
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Python Programming (Advanced)</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Advanced Python concepts, clean architecture, performance, and real-world problem solving.
-          </div>
-        </div>
-      </div>
-
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Databases & Data Modeling</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Relational and NoSQL databases, indexing strategies, query optimization, and schema design.
-          </div>
-        </div>
-      </div>
-
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Data Analysis & Visualization</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Data processing, analysis workflows, and clear visual communication of insights.
-          </div>
-        </div>
-      </div>
-
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>.NET Framework & C# Backend Development</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Backend development with .NET, API design, application structure, and performance considerations.
-          </div>
-        </div>
-      </div>
-
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>Cloud Computing Fundamentals</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Cloud infrastructure concepts, deployment models, scalability, and cost-aware architecture.
-          </div>
-        </div>
-      </div>
-
-      <div class="tItem">
-        <div class="tDot" aria-hidden="true"></div>
-        <div>
-          <div class="tTop">
-            <strong>DevOps & CI/CD Pipelines</strong>
-            <span class="tMeta">Planned</span>
-          </div>
-          <div class="muted">
-            Continuous integration, automated deployments, container workflows, and monitoring basics.
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="langRow">
-      <div class="lang neuInset">Platform: Coursera</div>
-      <div class="lang neuInset">Focus: Practical & Applied</div>
-      <div class="lang neuInset">Goal: Production-ready skills</div>
-    </div>
-  </div>
-</section>
-
-    <!-- ARCADE (one calm game) -->
-    <section class="section" id="arcade">
-      <div class="container">
-        <div class="sectionHead">
-          <h2 class="h2">Arcade</h2>
-          <p class="sub">One small toy. Optional. Quiet. (Because restraint is a superpower.)</p>
-        </div>
-
-        <div class="arcade neu reveal depth" data-depth="10">
-          <div class="arcadeHead">
-            <div>
-              <h3 class="h3">Orbit Dots</h3>
-              <p class="muted">Move your mouse (or finger). The dots orbit your pointer with gentle physics.</p>
+          <div class="grid">
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)">
+                Αν έπρεπε να περιγράψω την “πρώτη σπίθα” με τρεις εικόνες:
+              </p>
+              <ul class="list">
+                <li><span class="badge">✨</span><div><b>Ένα βλέμμα</b><div class="muted">που λέει “σε βλέπω” χωρίς λέξεις.</div></div></li>
+                <li><span class="badge">🌙</span><div><b>Μια νύχτα</b><div class="muted">που τελικά δεν ήθελα να τελειώσει.</div></div></li>
+                <li><span class="badge">🫶</span><div><b>Μια σιγουριά</b><div class="muted">ότι αυτό αξίζει να το κρατήσουμε.</div></div></li>
+              </ul>
             </div>
-            <button class="neuBtn" id="orbitReset">Reset</button>
-          </div>
-          <canvas class="canvas neuInset" id="orbit" width="900" height="320" aria-label="Orbit dots canvas"></canvas>
-        </div>
 
-        <div class="interests neuInset">
-          Interests: Fishing • Hiking • Gaming • Soccer • Painting • Scuba Diving • Photography • Videography
-        </div>
-      </div>
-    </section>
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Μικρή υπόσχεση:</b></p>
+              <p>
+                Όσο περνάει ο καιρός, θέλω να φτιάχνω μαζί σου
+                απλά πράγματα που μοιάζουν μεγάλα:
+                στιγμές, ασφάλεια, γέλια, “εδώ είμαι”.
+              </p>
 
-    <!-- CONTACT -->
-    <section class="section" id="contact">
-      <div class="container">
-        <div class="sectionHead">
-          <h2 class="h2">About & Contact</h2>
-          <p class="sub">If you want to collaborate or hire me, message me. Simple.</p>
-        </div>
-
-        <div class="grid2">
-          <article class="card neu reveal depth" data-depth="8">
-            <h3 class="h3">About</h3>
-            <p class="muted">
-              I’m Stratis — full-stack dev with a frontend eye and backend pragmatism.
-              I’ve built WordPress sites professionally and I enjoy custom builds where UX + performance matter.
-            </p>
-
-            <div class="contactList">
-              <a class="contactItem neuInset" href="mailto:stratosav1999@gmail.com">stratosav1999@gmail.com</a>
-              <a class="contactItem neuInset" href="tel:+306971951090">+30 697 195 1090</a>
-              <a class="contactItem neuInset" href="https://avagianos-dev.gr/" target="_blank" rel="noreferrer">https://avagianos-dev.gr/</a>
-              <a class="contactItem neuInset" href="https://github.com/ava1313" target="_blank" rel="noreferrer">github.com/ava1313</a>
-              <a class="contactItem neuInset" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
-            </div>
-          </article>
-
-          <article class="card neu reveal depth" data-depth="10">
-            <h3 class="h3">Message</h3>
-            <p class="muted">This opens your email client (no backend needed for GitHub Pages).</p>
-
-            <form class="form" id="contactForm">
-              <label>
-                <span>Name</span>
-                <input class="input neuInset" id="cName" autocomplete="name" required />
-              </label>
-              <label>
-                <span>Email</span>
-                <input class="input neuInset" id="cEmail" type="email" autocomplete="email" required />
-              </label>
-              <label>
-                <span>Message</span>
-                <textarea class="input neuInset" id="cMsg" rows="5" required></textarea>
-              </label>
-
-              <div class="formRow">
-                <button class="neuBtn neuBtn--accent" type="submit">Open Email</button>
-                <button class="neuBtn" type="button" id="copyEmail">Copy Email</button>
+              <div class="quote">
+                <p style="margin:0;color:rgba(255,247,255,.92)">
+                  “Αν η αγάπη είχε ήχο, θα ήταν ο τρόπος που γελάς.”
+                </p>
+                <p style="margin:6px 0 0;font-size:13px;color:rgba(255,247,255,.65)">
+                  — και κάπως έτσι σε ερωτεύομαι ξανά.
+                </p>
               </div>
+            </div>
+          </div>
 
-              <div class="formHint" id="formHint" aria-live="polite"></div>
-            </form>
-          </article>
         </div>
-
-        <footer class="footer">
-          <span>© <span id="year"></span> Efstratios (Stratis) Avagianos • GitHub Pages</span>
-          <a class="link" href="#top">Back to top</a>
-        </footer>
       </div>
     </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter">
+      <div class="card">
+        <div class="inner reveal">
+          <div class="kicker"><i></i> Κεφάλαιο 2 • Τα μικρά που μετράνε</div>
+          <h2>Αυτό που αγαπάω σε εμάς… είναι τα “καθημερινά”.</h2>
+          <p class="lead">
+            Δεν χρειάζεται να συμβεί κάτι θεαματικό.
+            Αρκεί να είσαι εσύ — και ξαφνικά όλα γίνονται πιο ωραία.
+          </p>
+
+          <div class="pillbox" style="margin-top:14px">
+            <ul class="list">
+              <li><span class="badge">☕</span><div><b>Μια απλή στιγμή</b><div class="muted">που γίνεται “τελετουργία” επειδή σε έχω.</div></div></li>
+              <li><span class="badge">🎶</span><div><b>Ένα τραγούδι</b><div class="muted">που από “τυχαίο” γίνεται “δικό μας”.</div></div></li>
+              <li><span class="badge">🧸</span><div><b>Μια αγκαλιά</b><div class="muted">που σε γυρίζει σπίτι.</div></div></li>
+            </ul>
+          </div>
+
+          <p style="margin-top:16px">
+            Κι αν κάποτε οι μέρες είναι δύσκολες, εγώ θέλω να είμαι το μέρος που
+            θα ξεκουράζεσαι — όχι άλλο βάρος.
+          </p>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter">
+      <div class="card">
+        <div class="inner reveal">
+          <div class="kicker"><i></i> Κεφάλαιο 3 • Το “μαζί”</div>
+          <h2>Το καλύτερο σχέδιο είναι αυτό που γράφεται μαζί σου.</h2>
+          <p class="lead">
+            Όχι τέλειο. Αληθινό. Με μικρές τρέλες, μεγάλα όνειρα,
+            και δύο ανθρώπους που διαλέγουν ο ένας τον άλλον.
+          </p>
+
+          <div class="grid">
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Θέλω να ζήσουμε:</b></p>
+              <ul class="list">
+                <li><span class="badge">🗺️</span><div><b>Μικρές αποδράσεις</b><div class="muted">χωρίς πρόγραμμα — μόνο αίσθηση.</div></div></li>
+                <li><span class="badge">🍝</span><div><b>Βραδιές στο σπίτι</b><div class="muted">όπου το “τίποτα” είναι το παν.</div></div></li>
+                <li><span class="badge">📸</span><div><b>Φωτογραφίες</b><div class="muted">που θυμίζουν πόσο ωραία τα καταφέρνουμε.</div></div></li>
+              </ul>
+            </div>
+
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Και να θυμάσαι:</b></p>
+              <p>
+                Εγώ δεν θέλω να σου αποδείξω κάτι για μια μέρα.
+                Θέλω να σε φροντίζω σε όλες τις μέρες.
+              </p>
+              <div class="quote">
+                <p style="margin:0;color:rgba(255,247,255,.92)">
+                  “Σε διαλέγω. Όχι επειδή πρέπει. Επειδή θέλω.”
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 / FINAL -->
+    <section class="chapter">
+      <div class="card">
+        <div class="inner reveal">
+          <div class="kicker"><i></i> Τελικό Κεφάλαιο • Μια ερώτηση</div>
+          <h2>Ντίνα, θα είσαι το Βαλεντίνο μου; 💌</h2>
+          <p class="lead">
+            Και όχι μόνο για σήμερα.
+            Για ό,τι έρχεται — με ηρεμία, τρυφερότητα, και ένα “μαζί” που μεγαλώνει.
+          </p>
+
+          <div class="final">
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Μικρό γράμμα:</b></p>
+              <p>
+                Σ’ ευχαριστώ που είσαι εσύ.
+                Που κάνεις τον χρόνο πιο γλυκό, και τις σκέψεις πιο φωτεινές.
+                Είμαι τυχερός που σε έχω.
+              </p>
+              <p style="margin-bottom:0;color:rgba(255,247,255,.92)">
+                Με αγάπη,<br><b>ο άνθρωπός σου</b> 💘
+              </p>
+            </div>
+
+            <div class="pillbox">
+              <p style="margin-top:0;color:rgba(255,247,255,.9)">
+                Πάτα για την απάντηση 👇
+              </p>
+              <div class="choiceRow">
+                <div class="btn primary" id="yesBtn">💖 ΝΑΙ</div>
+                <div class="btn ghost" id="noBtn">🙈 Ε… ΟΧΙ</div>
+                <div class="btn" id="confettiBtn">✨ Περισσότερη μαγεία</div>
+              </div>
+              <p class="tiny" style="margin:10px 0 0;color:rgba(255,247,255,.65)">
+                (Μην ανησυχείς. Το “ΟΧΙ” είναι ντροπαλό… 😄)
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <script src="script.js"></script>
+  <div class="toast" id="toast">💘</div>
+
+  <footer>
+    Φτιαγμένο με <b>αγάπη</b> για τη <b>Ντίνα</b>. • Καλή Ημέρα Αγίου Βαλεντίνου ✨
+  </footer>
+
+  <script>
+    // ---- Utilities
+    const $ = (q, el=document) => el.querySelector(q);
+    const $$ = (q, el=document) => [...el.querySelectorAll(q)];
+
+    // ---- Reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      for(const e of entries){
+        if(e.isIntersecting) e.target.classList.add('on');
+      }
+    }, { threshold: 0.18 });
+    $$('.reveal').forEach(el=> io.observe(el));
+
+    // ---- Scroll progress
+    const bar = $('#bar');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const p = (h.scrollTop) / (h.scrollHeight - h.clientHeight);
+      bar.style.width = `${Math.max(0, Math.min(1, p)) * 100}%`;
+    };
+    document.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+
+    // ---- Parallax-ish orbs
+    const orb1 = $('#orb1');
+    const orb2 = $('#orb2');
+    let mx = 0, my = 0;
+    window.addEventListener('pointermove', (e)=>{
+      mx = (e.clientX / window.innerWidth - .5);
+      my = (e.clientY / window.innerHeight - .5);
+      orb1.style.setProperty('--x', `${mx * 60}px`);
+      orb1.style.setProperty('--y', `${my * 40}px`);
+      orb2.style.setProperty('--x', `${mx * -70}px`);
+      orb2.style.setProperty('--y', `${my * 55}px`);
+    }, {passive:true});
+
+    // ---- Floating hearts generator
+    const hearts = $('#hearts');
+    const heartSvg = (fill) => `
+      <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21s-7-4.6-9.6-9C.5 8.3 2.4 5.5 5.6 5.2c1.7-.2 3.4.6 4.4 2 1-1.4 2.7-2.2 4.4-2 3.2.3 5.1 3.1 3.2 6.8C19 16.4 12 21 12 21Z"
+              fill="${fill}"/>
+      </svg>
+    `;
+    const palette = [
+      'rgba(255,43,106,.80)',
+      'rgba(255,79,163,.72)',
+      'rgba(168,91,255,.70)',
+      'rgba(255,214,165,.55)',
+      'rgba(255,247,255,.40)'
+    ];
+
+    function spawnHeart(){
+      const el = document.createElement('div');
+      el.className = 'h';
+      const s = 12 + Math.random()*26;       // size
+      const o = 0.22 + Math.random()*0.55;   // opacity
+      const d = 10 + Math.random()*18;       // duration
+      const lx = (Math.random()*100).toFixed(2) + 'vw';
+      const dx = ((Math.random()*2-1) * 12).toFixed(2) + 'vw';
+      const r = ((Math.random()*2-1) * 160).toFixed(0) + 'deg';
+      const fill = palette[(Math.random()*palette.length)|0];
+
+      el.style.setProperty('--s', s + 'px');
+      el.style.setProperty('--o', o);
+      el.style.setProperty('--d', d + 's');
+      el.style.setProperty('--lx', lx);
+      el.style.setProperty('--dx', dx);
+      el.style.setProperty('--r', r);
+      el.innerHTML = heartSvg(fill);
+
+      hearts.appendChild(el);
+      // Cleanup
+      setTimeout(()=> el.remove(), (d*1000)+200);
+    }
+
+    // Spawn gently over time
+    let heartTimer = setInterval(spawnHeart, 550);
+    // Start with a few
+    for(let i=0;i<10;i++) setTimeout(spawnHeart, i*120);
+
+    // ---- Toast helper
+    const toast = $('#toast');
+    let toastT;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('on');
+      clearTimeout(toastT);
+      toastT = setTimeout(()=> toast.classList.remove('on'), 2600);
+    }
+
+    // ---- Buttons
+    $('#topBtn').addEventListener('click', ()=> {
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    // Shy "NO" button that runs away a bit
+    const noBtn = $('#noBtn');
+    let noMoves = 0;
+    noBtn.addEventListener('pointerenter', ()=>{
+      noMoves++;
+      const x = (Math.random()*240 - 120);
+      const y = (Math.random()*120 - 60);
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+      if(noMoves === 2) showToast('🙈 Το “ΟΧΙ” ντρέπεται… δοκίμασε το “ΝΑΙ”');
+      if(noMoves === 4) showToast('😄 Εντάξει, νομίζω ξέρουμε την απάντηση…');
+    });
+    noBtn.addEventListener('click', ()=> {
+      showToast('🙈 Αυτό το κουμπί… δεν το εννοεί!');
+    });
+
+    // Confetti (simple DOM confetti)
+    function confettiBurst(){
+      const n = 120;
+      const layer = document.createElement('div');
+      layer.style.position='fixed';
+      layer.style.inset='0';
+      layer.style.pointerEvents='none';
+      layer.style.zIndex='60';
+      document.body.appendChild(layer);
+
+      const colors = ['rgba(255,43,106,.95)','rgba(255,79,163,.9)','rgba(168,91,255,.9)','rgba(255,214,165,.9)','rgba(255,247,255,.9)'];
+      for(let i=0;i<n;i++){
+        const p = document.createElement('i');
+        const size = 4 + Math.random()*7;
+        p.style.position='absolute';
+        p.style.left='50%';
+        p.style.top='68%';
+        p.style.width = size+'px';
+        p.style.height = (size*1.8)+'px';
+        p.style.borderRadius='2px';
+        p.style.background = colors[(Math.random()*colors.length)|0];
+        p.style.boxShadow='0 12px 30px rgba(0,0,0,.22)';
+        const ang = Math.random()*Math.PI*2;
+        const dist = 80 + Math.random()*260;
+        const tx = Math.cos(ang)*dist;
+        const ty = Math.sin(ang)*dist - 160;
+        const rot = (Math.random()*720 - 360);
+        const dur = 900 + Math.random()*900;
+
+        p.animate([
+          { transform:`translate(-50%,0) translate(0,0) rotate(0deg)`, opacity:1 },
+          { transform:`translate(-50%,0) translate(${tx}px, ${ty}px) rotate(${rot}deg)`, opacity: 0 }
+        ], { duration: dur, easing:'cubic-bezier(.15,.8,.15,1)', fill:'forwards' });
+
+        layer.appendChild(p);
+      }
+      setTimeout(()=> layer.remove(), 2200);
+    }
+
+    $('#confettiBtn').addEventListener('click', ()=>{
+      confettiBurst();
+      showToast('✨ Λίγη παραπάνω μαγεία, επειδή… Ντίνα!');
+    });
+
+    const yesBtn = $('#yesBtn');
+    yesBtn.addEventListener('click', ()=>{
+      confettiBurst();
+      showToast('💖 ΝΤΙΝΑ, ΕΙΣΑΙ ΤΟ “ΝΑΙ” ΜΟΥ.');
+      // make hearts momentarily faster
+      clearInterval(heartTimer);
+      heartTimer = setInterval(spawnHeart, 220);
+      setTimeout(()=>{
+        clearInterval(heartTimer);
+        heartTimer = setInterval(spawnHeart, 550);
+      }, 3500);
+    });
+
+    // ---- Tiny romantic sound (no copyrighted music)
+    // WebAudio: soft chime
+    let audioOn = false;
+    let audioCtx = null;
+
+    function chime(){
+      if(!audioOn) return;
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+
+      const o1 = audioCtx.createOscillator();
+      const o2 = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      o1.type = 'sine';
+      o2.type = 'triangle';
+      o1.frequency.setValueAtTime(659.25, now); // E5
+      o2.frequency.setValueAtTime(987.77, now); // B5
+
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+      o1.connect(g); o2.connect(g);
+      g.connect(audioCtx.destination);
+
+      o1.start(now);
+      o2.start(now + 0.02);
+      o1.stop(now + 0.95);
+      o2.stop(now + 0.95);
+    }
+
+    const musicBtn = $('#musicBtn');
+    const musicLabel = $('#musicLabel');
+
+    musicBtn.addEventListener('click', async ()=>{
+      audioOn = !audioOn;
+      musicLabel.textContent = audioOn ? 'Ήχος: ON' : 'Ήχος: OFF';
+      showToast(audioOn ? '🔊 Έτοιμο. Μικρή “καμπανούλα” σε κάθε μαγεία.' : '🔇 Ο ήχος απενεργοποιήθηκε.');
+      if(audioOn) {
+        // Resume context on gesture
+        try{
+          if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          await audioCtx.resume();
+          chime();
+        }catch(e){}
+      }
+    });
+
+    // Play chime on key moments
+    ['confettiBtn','yesBtn','topBtn'].forEach(id=>{
+      const el = $('#'+id);
+      if(el) el.addEventListener('click', chime);
+    });
+
+    // Chime when entering new chapters (subtle)
+    const chapterIO = new IntersectionObserver((entries)=>{
+      for(const e of entries){
+        if(e.isIntersecting) chime();
+      }
+    }, { threshold: 0.6 });
+    $$('.chapter').forEach(sec=> chapterIO.observe(sec));
+  </script>
 </body>
 </html>
