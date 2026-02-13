@@ -66,12 +66,13 @@
       opacity:.45;
     }
 
-    /* --- Header (logo only) --- */
+    /* --- Header --- */
     header{
       position:fixed; left:0; right:0; top:0;
       z-index:20;
       padding:14px 16px;
-      display:flex; align-items:center; justify-content:flex-start;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
       background: linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,0));
       backdrop-filter: blur(6px);
     }
@@ -90,6 +91,22 @@
     }
     .brand b{letter-spacing:.2px}
     .brand span{color:var(--muted); font-size:12.5px}
+
+    .btn{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      transition: transform .12s ease, background .2s ease, border .2s ease;
+      user-select:none;
+      white-space:nowrap;
+      font-size: 12.5px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
+    .btn:active{ transform: translateY(0px) scale(.99);}
 
     /* --- Main layout --- */
     main{ position:relative; z-index:2; }
@@ -287,20 +304,6 @@
       align-items:center;
       margin-top: 8px;
     }
-    .btn{
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.08);
-      color:var(--ink);
-      padding:10px 12px;
-      border-radius:999px;
-      display:inline-flex; align-items:center; gap:8px;
-      transition: transform .12s ease, background .2s ease, border .2s ease;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
-    .btn:active{ transform: translateY(0px) scale(.99);}
-    .tiny{ font-size:12px; opacity:.9; }
 
     .primary{
       background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
@@ -375,11 +378,18 @@
       .h{animation:none; display:none;}
       .glow-orb{transition:none}
     }
+
+    /* Mobile: keep navbar button readable */
+    @media (max-width: 420px){
+      header{ padding: 12px 10px; }
+      .btn{ padding: 9px 10px; font-size: 12px; }
+      .brand{ padding: 9px 10px; }
+    }
   </style>
 </head>
 
 <body>
-  <!-- Autoplay background song (song.mp3 in same folder). Loops forever. -->
+  <!-- Song in same folder as index.html -->
   <audio id="bgm" src="song.mp3" preload="auto" loop></audio>
 
   <div class="ambient" aria-hidden="true">
@@ -397,6 +407,10 @@
         <b>Για τη Ντίνα</b>
         <span>Η ιστορία μας ✨</span>
       </div>
+    </div>
+
+    <div class="btn" id="playSongBtn" title="Πάτα για να ξεκινήσει το τραγούδι">
+      🎶 Το τραγούδι μου για σένα
     </div>
   </header>
 
@@ -449,8 +463,8 @@
                 Αν έπρεπε να περιγράψω την πρώτη μας φορά με τρεις εικόνες:
               </p>
               <ul class="list">
-                <li><span class="badge">✨</span><div><b>Μια μεγάλη αγκαλιά</b><div class="muted">που σε κανει να νιώθεις οτι χωράει τα πάντα.</div></div></li>
-                <li><span class="badge">🌙</span><div><b>Μια νύχτα</b><div class="muted">που σιγουρα δεν ήθελα να τελειώσει(και ας είχα πιεί λιγο ουζακι παραπάνω).</div></div></li>
+                <li><span class="badge">✨</span><div><b>Μια μεγάλη αγκαλιά</b><div class="muted">που σε κάνει να νιώθεις ότι χωράει τα πάντα.</div></div></li>
+                <li><span class="badge">🌙</span><div><b>Μια νύχτα</b><div class="muted">που σίγουρα δεν ήθελα να τελειώσει (και ας είχα πιεί λίγο ουζάκι παραπάνω).</div></div></li>
                 <li><span class="badge">🫶</span><div><b>Μια σιγουριά</b><div class="muted">ότι αυτό αξίζει να το κρατήσουμε.</div></div></li>
               </ul>
             </div>
@@ -491,7 +505,7 @@
 
           <div class="pillbox" style="margin-top:14px">
             <ul class="list">
-              <li><span class="badge">☕</span><div><b>Μια απλή στιγμή</b><div class="muted">όπως εκείνη που γυρνάς από την δουλειά και σε περιμένω για να σου δώσω ένα φιλί.</div></div></li>
+              <li><span class="badge">☕</span><div><b>Μια απλή στιγμή</b><div class="muted">όπως εκείνη που γυρνάς από τη δουλειά και σε περιμένω για να σου δώσω ένα φιλί.</div></div></li>
               <li><span class="badge">🎶</span><div><b>Ένα τραγούδι</b><div class="muted">που από τυχαίο γίνεται “δικό μας”.</div></div></li>
               <li><span class="badge">🧸</span><div><b>Μια αγκαλιά</b><div class="muted">που με κάνει να νιώθω ο πιο τυχερός άνθρωπος στον πλανήτη.</div></div></li>
             </ul>
@@ -511,7 +525,7 @@
       <div class="card">
         <div class="inner reveal">
           <div class="kicker"><i></i> Κεφάλαιο 3 • Το “μαζί”</div>
-          <h2>η καλύτερη ιστορία είναι αυτό που γράφεται μαζί σου.</h2>
+          <h2>Η καλύτερη ιστορία είναι αυτό που γράφεται μαζί σου.</h2>
           <p class="lead">
             Όχι τέλειο. Αληθινό. Με μικρές τρέλες, μεγάλα όνειρα,
             και δύο ανθρώπους που διαλέγουν ο ένας τον άλλον.
@@ -521,9 +535,9 @@
             <div class="pillbox">
               <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Θέλω να ζήσουμε:</b></p>
               <ul class="list">
-                <li><span class="badge">🗺️</span><div><b>Μικρές αποδράσεις</b><div class="muted">χωρίς πρόγραμμα και όπου να ναι.</div></div></li>
-                <li><span class="badge">🍝</span><div><b>Βραδιές στο σπίτι</b><div class="muted">να βλέπουμε ταινίες (ή να με ανέχεσαι όταν παιζω με τους φιλους μου).</div></div></li>
-                <li><span class="badge">📸</span><div><b>Φωτογραφίες</b><div class="muted">που μας θυμίζουν πόσο όμορφα κυλάει ο χρόνος όταν είμαστε μαζι. Που μας θυμίζουν τις αναμνήσεις μας.</div></div></li>
+                <li><span class="badge">🗺️</span><div><b>Μικρές αποδράσεις</b><div class="muted">χωρίς πρόγραμμα και όπου να ’ναι.</div></div></li>
+                <li><span class="badge">🍝</span><div><b>Βραδιές στο σπίτι</b><div class="muted">να βλέπουμε ταινίες (ή να με ανέχεσαι όταν παίζω με τους φίλους μου).</div></div></li>
+                <li><span class="badge">📸</span><div><b>Φωτογραφίες</b><div class="muted">που μας θυμίζουν πόσο όμορφα κυλάει ο χρόνος όταν είμαστε μαζί. Που μας θυμίζουν τις αναμνήσεις μας.</div></div></li>
               </ul>
             </div>
 
@@ -535,7 +549,7 @@
               </p>
               <div class="quote">
                 <p style="margin:0;color:rgba(255,247,255,.92)">
-                  “Σε διαλέγω επειδή θέλω να είμαι μαζι σου.”
+                  “Σε διαλέγω επειδή θέλω να είμαι μαζί σου.”
                 </p>
               </div>
             </div>
@@ -571,12 +585,12 @@
 
             <div class="pillbox">
               <p style="margin-top:0;color:rgba(255,247,255,.9)">
-                Πεςςς μου🫠 (αν πατήσεις όχι θα το μάθω) 
+                Πεςςς μου🫠 (αν πατήσεις όχι θα το μάθω)
               </p>
               <div class="choiceRow">
                 <div class="btn primary" id="yesBtn">💖 ΝΑΙ</div>
                 <div class="btn ghost" id="noBtn">🙈 Ε… ΟΧΙ</div>
-                <div class="btn" id="confettiBtn">✨ Σαγαπωωωωωω 💞</div>
+                <div class="btn" id="confettiBtn">✨ Σ’ αγαπώωωωωω 💞</div>
               </div>
               <p class="tiny" style="margin:10px 0 0;color:rgba(255,247,255,.65)">
                 (Μην ανησυχείς. Το “ΟΧΙ” είναι ντροπαλό… 😄)
@@ -593,7 +607,7 @@
   <div class="toast" id="toast">💘</div>
 
   <footer>
-    Φτιαγμένο με <b>αγάπη</b> για την <b>ομορφιά</b>. • Καλή Ημέρα Αγίου Βαλεντίνου αγάπημ Αααααααααα και μη ξεχάσεις να πεις χρόνια πολλά στον Παππουδακο μας✨
+    Φτιαγμένο με <b>αγάπη</b> για την <b>ομορφιά</b>. • Καλή Ημέρα Αγίου Βαλεντίνου αγάπημ Αααααααααα και μη ξεχάσεις να πεις χρόνια πολλά στον Παππουδάκο μας✨
   </footer>
 
   <script>
@@ -641,9 +655,9 @@
     function spawnHeart(){
       const el = document.createElement('div');
       el.className = 'h';
-      const s = 12 + Math.random()*26;       // size
-      const o = 0.22 + Math.random()*0.55;   // opacity
-      const d = 10 + Math.random()*18;       // duration
+      const s = 12 + Math.random()*26;
+      const o = 0.22 + Math.random()*0.55;
+      const d = 10 + Math.random()*18;
       const lx = (Math.random()*100).toFixed(2) + 'vw';
       const dx = ((Math.random()*2-1) * 12).toFixed(2) + 'vw';
       const r = ((Math.random()*2-1) * 160).toFixed(0) + 'deg';
@@ -674,7 +688,7 @@
       toastT = setTimeout(()=> toast.classList.remove('on'), 2600);
     }
 
-    // Shy "NO" button that runs away a bit
+    // Shy "NO" button
     const noBtn = $('#noBtn');
     let noMoves = 0;
     noBtn.addEventListener('pointerenter', ()=>{
@@ -685,11 +699,9 @@
       if(noMoves === 2) showToast('🙈 Το “ΟΧΙ” ντρέπεται… δοκίμασε το “ΝΑΙ”');
       if(noMoves === 4) showToast('😄 Εντάξει, νομίζω ξέρουμε την απάντηση…');
     });
-    noBtn.addEventListener('click', ()=> {
-      showToast('🙈 Αυτό το κουμπί… δεν το εννοεί!');
-    });
+    noBtn.addEventListener('click', ()=> showToast('🙈 Αυτό το κουμπί… δεν το εννοεί!'));
 
-    // Confetti (simple DOM confetti)
+    // Confetti
     function confettiBurst(){
       const n = 120;
       const layer = document.createElement('div');
@@ -704,13 +716,14 @@
         const p = document.createElement('i');
         const size = 4 + Math.random()*7;
         p.style.position='absolute';
-        p.style.left='50%';
+        p.styleleft='50%';
         p.style.top='68%';
         p.style.width = size+'px';
         p.style.height = (size*1.8)+'px';
         p.style.borderRadius='2px';
         p.style.background = colors[(Math.random()*colors.length)|0];
         p.style.boxShadow='0 12px 30px rgba(0,0,0,.22)';
+
         const ang = Math.random()*Math.PI*2;
         const dist = 80 + Math.random()*260;
         const tx = Math.cos(ang)*dist;
@@ -744,30 +757,37 @@
       }, 3500);
     });
 
-    // ---- Background music: try autoplay on load, loop forever.
-    // Note: Some browsers block autoplay until a user gesture.
+    // ---- Song button (works on all mobiles because it's a user gesture)
     const bgm = document.getElementById('bgm');
+    const playSongBtn = document.getElementById('playSongBtn');
 
-    async function tryPlayBgm(){
+    let songStarted = false;
+
+    playSongBtn.addEventListener('click', async ()=>{
       try{
-        bgm.volume = 0.85;   // adjust if you want softer (0.4-0.7)
         bgm.loop = true;
-        await bgm.play();
-      }catch(err){
-        // Autoplay may be blocked. Start on first user interaction.
-        const resume = async () => {
-          try { await bgm.play(); } catch(e) {}
-          window.removeEventListener('pointerdown', resume);
-          window.removeEventListener('keydown', resume);
-          window.removeEventListener('touchstart', resume);
-        };
-        window.addEventListener('pointerdown', resume, { once:true });
-        window.addEventListener('keydown', resume, { once:true });
-        window.addEventListener('touchstart', resume, { once:true, passive:true });
-      }
-    }
+        bgm.volume = 0.85;
 
-    window.addEventListener('load', tryPlayBgm);
+        if(bgm.paused){
+          await bgm.play();
+          songStarted = true;
+          playSongBtn.textContent = '⏸️ Παίζει… (πάτα για παύση)';
+          showToast('🎶 Ξεκίνησε το τραγούδι σου 💘');
+        }else{
+          bgm.pause();
+          playSongBtn.textContent = '🎶 Το τραγούδι μου για σένα';
+          showToast('⏸️ Παύση');
+        }
+      }catch(e){
+        showToast('🔇 Δεν μπόρεσε να ξεκινήσει ο ήχος. Έλεγξε ότι υπάρχει το song.mp3 στο ίδιο folder.');
+      }
+    });
+
+    // Optional: if song ends for any reason, ensure it loops
+    bgm.addEventListener('ended', ()=>{
+      bgm.currentTime = 0;
+      bgm.play().catch(()=>{});
+    });
   </script>
 </body>
 </html>
