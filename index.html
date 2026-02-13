@@ -89,6 +89,67 @@
       --blur: blur(14px);
       --radius: 24px;
     }
+/* --- Secret PIN Section --- */
+.secretWrap{
+  display:grid;
+  gap:14px;
+  margin-top:18px;
+}
+
+.pinBox{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.18);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+}
+
+.pinInput{
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.pinInput input{
+  background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  padding:10px 12px;
+  color:white;
+  text-align:center;
+  font-size:18px;
+  width:120px;
+  letter-spacing:4px;
+}
+
+.pinBtn{
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,.18);
+  background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
+  color:white;
+  padding:10px 14px;
+  border-radius:999px;
+  user-select:none;
+}
+
+.secretMessage{
+  margin-top:18px;
+  padding:18px;
+  border-radius:16px;
+  background: rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  font-size:22px;
+  opacity:0;
+  transform: translateY(10px);
+  transition: all .5s ease;
+}
+
+.secretMessage.show{
+  opacity:1;
+  transform: translateY(0);
+}
 
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -513,7 +574,34 @@
         </defs>
       </svg>
     </div>
+<!-- SECRET MESSAGE WITH PIN -->
+<section class="chapter">
+  <div class="card">
+    <div class="inner reveal">
+      <div class="kicker"><i></i> Μυστικό μόνο για εσένα</div>
+      <h2>Ξέρεις τον κωδικό; 🔐</h2>
+      <p class="lead">
+        Υπάρχει ένα μήνυμα που μπορεί να το ξεκλειδώσεις μόνο εσυ...
+      </p>
 
+      <div class="secretWrap">
+        <div class="pinBox">
+          <div>Πληκτρολόγησε τον μυστικό αριθμό μας</div>
+
+          <div class="pinInput">
+            <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+            <div class="pinBtn" id="pinBtn">Ξεκλείδωσε 💌</div>
+          </div>
+
+          <div class="secretMessage" id="secretMessage">
+            Σ' αγαπώ πολύ ζωη μου ❤️
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
     <!-- CHAPTER 2 -->
     <section class="chapter">
       <div class="card">
@@ -1017,6 +1105,28 @@
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 })();
+
+
+// ---- Secret PIN logic
+const pinBtn = document.getElementById('pinBtn');
+const pinInput = document.getElementById('pinInput');
+const secretMessage = document.getElementById('secretMessage');
+
+pinBtn.addEventListener('click', checkPin);
+pinInput.addEventListener('keypress', function(e){
+  if(e.key === 'Enter') checkPin();
+});
+
+function checkPin(){
+  if(pinInput.value === "1399"){
+    secretMessage.classList.add('show');
+    confettiBurst(); // uses your existing confetti function
+    showToast("💖 Το ήξερες...");
+  } else {
+    showToast("🙈 Χμμμ... δοκίμασε ξανά");
+    pinInput.value = "";
+  }
+}
   </script>
 </body>
 </html>
