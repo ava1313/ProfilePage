@@ -5,6 +5,74 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Για την αγάπη μου 💘</title>
   <style>
+/* --- Scratch reveal section --- */
+.scratchWrap{
+  display:grid;
+  gap:14px;
+  margin-top: 18px;
+}
+
+.scratchCard{
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.18);
+  border-radius: 18px;
+  padding: 14px;
+  overflow:hidden;
+}
+
+.scratchStage{
+  position:relative;
+  width:100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow: 0 18px 60px rgba(0,0,0,.35);
+  background: rgba(255,255,255,.06);
+}
+
+.scratchStage img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+#scratchCanvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  touch-action: none; /* important for mobile scratching */
+}
+
+.scratchHint{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-top: 10px;
+  color: rgba(255,247,255,.78);
+  font-size: 13px;
+}
+
+.scratchMiniBtn{
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: rgba(255,247,255,.92);
+  padding: 9px 12px;
+  border-radius: 999px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  user-select:none;
+}
+.scratchMiniBtn:hover{ background: rgba(255,255,255,.12); }
+.scratchMiniBtn:active{ transform: scale(.99); }
     :root{
       --bg0:#07030f;
       --bg1:#120521;
@@ -601,7 +669,44 @@
         </div>
       </div>
     </section>
+<!-- SCRATCH REVEAL (ΤΕΛΟΣ) -->
+<section class="chapter">
+  <div class="card">
+    <div class="inner reveal">
+      <div class="kicker"><i></i> Τελευταίο δωράκι • μόνο για εμάς</div>
+      <h2>Ξύσε εδώ για να εμφανιστούμε… 🫶</h2>
+      <p class="lead">
+        Μια μικρή “κάρτα” που κρύβει την πιο αγαπημένη μου εικόνα: εμάς τους δύο.
+      </p>
 
+      <div class="scratchWrap">
+        <div class="scratchCard">
+          <div class="scratchStage" id="scratchStage">
+            <!-- Βάλε τη φωτογραφία σας στον ίδιο φάκελο με όνομα us.jpg -->
+            <img id="usPhoto" src="us.jpg" alt="Εμείς οι δύο" />
+            <canvas id="scratchCanvas"></canvas>
+          </div>
+
+          <div class="scratchHint">
+            <span>✨ Ξύσε με το δάχτυλο/ποντίκι για να αποκαλυφθεί.</span>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <div class="scratchMiniBtn" id="resetScratch">🔁 Ξανά</div>
+              <div class="scratchMiniBtn" id="revealAll">💖 Αποκάλυψε</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pillbox">
+          <p style="margin:0;color:rgba(255,247,255,.92)">
+            Αν υπάρχει κάτι που θέλω να “γράφει” αυτή η μέρα, είναι αυτό:
+            <b>Σε διαλέγω. Σε αγαπάω. Και είμαι σπίτι όταν είμαι μαζί σου.</b>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
   </main>
 
   <div class="toast" id="toast">💘</div>
@@ -788,6 +893,130 @@
       bgm.currentTime = 0;
       bgm.play().catch(()=>{});
     });
+// ---- Scratch card reveal (photo)
+(function initScratch(){
+  const stage = document.getElementById('scratchStage');
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+  const resetBtn = document.getElementById('resetScratch');
+  const revealBtn = document.getElementById('revealAll');
+
+  if(!stage || !canvas || !ctx) return;
+
+  function resizeCanvas(){
+    const r = stage.getBoundingClientRect();
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // cap for performance
+    canvas.width = Math.floor(r.width * dpr);
+    canvas.height = Math.floor(r.height * dpr);
+    canvas.style.width = r.width + 'px';
+    canvas.style.height = r.height + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    // paint scratch layer
+    paintCover();
+  }
+
+  function paintCover(){
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+
+    // Fill with a soft "silver" cover
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, 'rgba(255,255,255,.22)');
+    g.addColorStop(.5,'rgba(255,255,255,.12)');
+    g.addColorStop(1, 'rgba(255,255,255,.20)');
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+    // Add some subtle sparkles/dots
+    for(let i=0;i<140;i++){
+      const x = Math.random()*w;
+      const y = Math.random()*h;
+      const r = Math.random()*1.8;
+      ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.random()*0.18})`;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    // Text hint
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.font = '600 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Ξύσε εδώ 💖', w/2, h/2);
+
+    // Set mode for erasing by scratching
+    ctx.globalCompositeOperation = 'destination-out';
+  }
+
+  let isDown = false;
+  let last = null;
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+    return {
+      x: p.clientX - rect.left,
+      y: p.clientY - rect.top
+    };
+  }
+
+  function scratchLine(from, to){
+    const w = stage.clientWidth;
+    const brush = Math.max(22, Math.min(44, w * 0.05)); // adaptive brush size
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+    ctx.lineWidth = brush;
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+  }
+
+  function down(e){
+    isDown = true;
+    last = getPos(e);
+    // dot
+    scratchLine(last, {x:last.x+0.01, y:last.y+0.01});
+    e.preventDefault();
+  }
+  function move(e){
+    if(!isDown) return;
+    const pos = getPos(e);
+    scratchLine(last, pos);
+    last = pos;
+    e.preventDefault();
+  }
+  function up(){
+    isDown = false;
+    last = null;
+  }
+
+  // Mouse
+  canvas.addEventListener('mousedown', down);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', up);
+
+  // Touch
+  canvas.addEventListener('touchstart', down, {passive:false});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', up);
+
+  // Buttons
+  resetBtn?.addEventListener('click', paintCover);
+  revealBtn?.addEventListener('click', ()=>{
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillRect(0,0,stage.clientWidth,stage.clientHeight);
+  });
+
+  // Resize
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+})();
   </script>
 </body>
 </html>
