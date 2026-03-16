@@ -1,1136 +1,792 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Για την αγάπη μου 💘</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>Extreme Mobile Scroll Experience</title>
   <style>
-/* --- Scratch reveal section --- */
-.scratchWrap{
-  display:grid;
-  gap:14px;
-  margin-top: 18px;
-}
-
-.scratchCard{
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.18);
-  border-radius: 18px;
-  padding: 14px;
-  overflow:hidden;
-}
-
-.scratchStage{
-  position:relative;
-  width:100%;
-  aspect-ratio: 4/5;
-  border-radius: 16px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow: 0 18px 60px rgba(0,0,0,.35);
-  background: rgba(255,255,255,.06);
-}
-
-.scratchStage img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-object-position:center;
-  filter: saturate(1.05) contrast(1.02);
-}
-
-#scratchCanvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  touch-action: none; /* important for mobile scratching */
-}
-
-.scratchHint{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  margin-top: 10px;
-  color: rgba(255,247,255,.78);
-  font-size: 13px;
-}
-
-.scratchMiniBtn{
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.08);
-  color: rgba(255,247,255,.92);
-  padding: 9px 12px;
-  border-radius: 999px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  user-select:none;
-}
-.scratchMiniBtn:hover{ background: rgba(255,255,255,.12); }
-.scratchMiniBtn:active{ transform: scale(.99); }
-    :root{
-      --bg0:#07030f;
-      --bg1:#120521;
-      --bg2:#240a2f;
-      --ink:#fff7ff;
-      --muted:rgba(255,247,255,.78);
-      --glass:rgba(255,255,255,.08);
-      --stroke:rgba(255,255,255,.18);
-      --pink:#ff4fa3;
-      --rose:#ff2b6a;
-      --violet:#a85bff;
-      --gold:#ffd6a5;
-      --shadow: 0 18px 70px rgba(0,0,0,.55);
-      --blur: blur(14px);
+    :root {
+      --bg: #050816;
+      --bg-2: #0a1028;
+      --text: #f7f8ff;
+      --muted: rgba(247, 248, 255, 0.72);
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-strong: rgba(255, 255, 255, 0.14);
+      --border: rgba(255, 255, 255, 0.14);
+      --accent: #7c5cff;
+      --accent2: #00e5ff;
+      --accent3: #ff4ecd;
+      --green: #74ffb6;
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.4);
       --radius: 24px;
-    }
-/* --- Secret PIN Section --- */
-.secretWrap{
-  display:grid;
-  gap:14px;
-  margin-top:18px;
-}
-
-.pinBox{
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.18);
-  border-radius:18px;
-  padding:16px;
-  text-align:center;
-}
-
-.pinInput{
-  margin-top:12px;
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.pinInput input{
-  background: rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;
-  padding:10px 12px;
-  color:white;
-  text-align:center;
-  font-size:18px;
-  width:120px;
-  letter-spacing:4px;
-}
-
-.pinBtn{
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,.18);
-  background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
-  color:white;
-  padding:10px 14px;
-  border-radius:999px;
-  user-select:none;
-}
-
-.secretMessage{
-  margin-top:18px;
-  padding:18px;
-  border-radius:16px;
-  background: rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);
-  font-size:22px;
-  opacity:0;
-  transform: translateY(10px);
-  transition: all .5s ease;
-}
-
-.secretMessage.show{
-  opacity:1;
-  transform: translateY(0);
-}
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:
-        radial-gradient(1200px 800px at 20% 10%, rgba(255,79,163,.18), transparent 60%),
-        radial-gradient(1000px 700px at 80% 30%, rgba(168,91,255,.16), transparent 55%),
-        radial-gradient(800px 650px at 50% 90%, rgba(255,214,165,.10), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 45%, var(--bg2));
-      overflow-x:hidden;
+      --progress: 0;
     }
 
-    /* --- Ambient layers --- */
-    .ambient{
-      position:fixed; inset:0;
-      pointer-events:none;
-      z-index:0;
-      overflow:hidden;
-    }
-    .grain{
-      position:absolute; inset:-40%;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
-      transform:rotate(6deg);
-      mix-blend-mode:overlay;
-      opacity:.28;
-    }
-    .glow-orb{
-      position:absolute;
-      width:520px; height:520px;
-      border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,79,163,.40), rgba(168,91,255,.10) 55%, transparent 70%);
-      filter: blur(22px);
-      opacity:.55;
-      transform: translate3d(var(--x), var(--y), 0);
-      transition: transform .2s ease-out;
-    }
-    .glow-orb.two{
-      width:640px; height:640px;
-      background: radial-gradient(circle at 60% 40%, rgba(255,214,165,.24), rgba(255,43,106,.10) 52%, transparent 72%);
-      opacity:.45;
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* --- Header --- */
-    header{
-      position:fixed; left:0; right:0; top:0;
-      z-index:20;
-      padding:14px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
-      background: linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,0));
-      backdrop-filter: blur(6px);
+    html {
+      scroll-behavior: smooth;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      padding:10px 12px;
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      box-shadow: 0 10px 40px rgba(0,0,0,.22);
-    }
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, var(--gold), var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,163,.65);
-    }
-    .brand b{letter-spacing:.2px}
-    .brand span{color:var(--muted); font-size:12.5px}
 
-    .btn{
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.08);
-      color:var(--ink);
-      padding:10px 12px;
-      border-radius:999px;
-      display:inline-flex; align-items:center; gap:8px;
-      transition: transform .12s ease, background .2s ease, border .2s ease;
-      user-select:none;
-      white-space:nowrap;
-      font-size: 12.5px;
-    }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22);}
-    .btn:active{ transform: translateY(0px) scale(.99);}
-
-    /* --- Main layout --- */
-    main{ position:relative; z-index:2; }
-    .chapter{
+    body {
+      margin: 0;
       min-height: 100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 110px 16px 64px;
-    }
-    .card{
-      width:min(980px, 100%);
-      border-radius: var(--radius);
-      border:1px solid rgba(255,255,255,.14);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow: var(--shadow);
-      backdrop-filter: var(--blur);
-      overflow:hidden;
-      position:relative;
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-1px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(800px 240px at 20% 0%, rgba(255,79,163,.22), transparent 60%),
-        radial-gradient(700px 260px at 90% 10%, rgba(168,91,255,.18), transparent 55%),
-        radial-gradient(900px 500px at 30% 120%, rgba(255,214,165,.10), transparent 55%);
-      pointer-events:none;
-      opacity:.9;
-    }
-    .inner{
-      position:relative;
-      padding: 28px 22px;
-    }
-    @media(min-width: 860px){
-      .inner{ padding: 44px 46px; }
+        radial-gradient(circle at 20% 20%, rgba(124, 92, 255, 0.2), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(0, 229, 255, 0.18), transparent 25%),
+        radial-gradient(circle at 50% 80%, rgba(255, 78, 205, 0.16), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      overflow-x: hidden;
     }
 
-    .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding: 8px 12px;
-      border-radius:999px;
-      background: rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--muted);
-      font-size:13px;
-      letter-spacing:.2px;
-    }
-    .kicker i{
-      width:10px;height:10px;border-radius:50%;
-      background: linear-gradient(135deg, var(--rose), var(--violet));
-      box-shadow: 0 0 18px rgba(168,91,255,.55);
-      display:inline-block;
+    .progress-bar {
+      position: fixed;
+      inset: 0 auto auto 0;
+      height: 4px;
+      width: calc(var(--progress) * 100%);
+      z-index: 9999;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+      box-shadow: 0 0 18px rgba(124, 92, 255, 0.7);
     }
 
-    h1,h2{
+    .noise,
+    .grid,
+    .glow-layer,
+    .flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .noise {
+      opacity: 0.045;
+      background-image:
+        radial-gradient(circle at 25% 25%, #fff 0.7px, transparent 0.8px),
+        radial-gradient(circle at 75% 75%, #fff 0.7px, transparent 0.8px);
+      background-size: 14px 14px, 18px 18px;
+      mix-blend-mode: soft-light;
+    }
+
+    .grid {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, transparent, rgba(0,0,0,.7), transparent);
+      opacity: 0.3;
+      transform: translateY(calc(var(--scroll) * -0.08px));
+    }
+
+    .glow-layer::before,
+    .glow-layer::after {
+      content: "";
+      position: absolute;
+      width: 48vw;
+      height: 48vw;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.42;
+      transition: transform 0.15s linear;
+    }
+
+    .glow-layer::before {
+      left: -10vw;
+      top: 8vh;
+      background: radial-gradient(circle, rgba(124, 92, 255, 0.9), transparent 60%);
+      transform: translate3d(calc(var(--mx, 0) * 0.03px), calc(var(--my, 0) * 0.03px), 0);
+    }
+
+    .glow-layer::after {
+      right: -10vw;
+      top: 48vh;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.75), transparent 60%);
+      transform: translate3d(calc(var(--mx, 0) * -0.02px), calc(var(--my, 0) * -0.02px), 0);
+    }
+
+    .flash {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06), transparent 40%);
+      opacity: calc(max(0, (var(--velocity, 0) - 18) / 80));
+      mix-blend-mode: screen;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero,
+    .section {
+      position: relative;
+      padding: 22px 16px;
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: clip;
+    }
+
+    .hero-inner {
+      width: min(100%, 440px);
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow);
+      animation: floaty 4s ease-in-out infinite;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent2), var(--green));
+      box-shadow: 0 0 16px var(--accent2);
+    }
+
+    h1 {
       margin: 16px 0 10px;
-      line-height:1.06;
-      letter-spacing:-.6px;
-    }
-    h1{ font-size: clamp(34px, 4.6vw, 64px); }
-    h2{ font-size: clamp(26px, 3.3vw, 44px); }
-    p{
-      margin: 10px 0;
-      line-height:1.6;
-      color:var(--muted);
-      font-size: clamp(15.5px, 1.5vw, 18px);
-    }
-    .lead{
-      color: rgba(255,247,255,.92);
-      font-size: clamp(16.5px, 1.8vw, 20px);
-      line-height:1.65;
-      margin-top: 14px;
-      max-width: 62ch;
+      font-size: clamp(40px, 12vw, 76px);
+      line-height: 0.92;
+      letter-spacing: -0.05em;
+      font-weight: 900;
     }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 18px;
-    }
-    @media(min-width: 900px){
-      .grid{ grid-template-columns: 1.25fr .9fr; gap: 18px; }
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, #9db6ff 22%, #00e5ff 50%, #ff9de9 85%, #fff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      background-size: 220% 220%;
+      animation: hueShift 8s linear infinite;
     }
 
-    .pillbox{
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      border-radius: 18px;
-      padding: 14px 14px;
+    .subtitle {
+      margin: 0;
+      max-width: 36ch;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
     }
-    .list{
-      display:grid;
-      gap:10px;
-      margin: 10px 0 0;
-      padding:0;
-      list-style:none;
+
+    .hero-card {
+      margin-top: 22px;
+      position: relative;
+      min-height: 360px;
+      border-radius: 34px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      transform-style: preserve-3d;
     }
-    .list li{
-      display:flex; gap:10px;
-      align-items:flex-start;
-      padding: 10px 10px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
     }
-    .badge{
-      flex:0 0 auto;
-      width:30px;height:30px;
-      border-radius: 10px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, rgba(255,79,163,.35), rgba(168,91,255,.22));
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(10px);
+      opacity: 0.85;
+      animation: blobDrift linear infinite;
+      mix-blend-mode: screen;
+    }
+
+    .blob.b1 {
+      width: 160px;
+      height: 160px;
+      left: -30px;
+      top: 16px;
+      background: radial-gradient(circle, rgba(124,92,255,0.95), rgba(124,92,255,0.2) 60%, transparent 75%);
+      animation-duration: 12s;
+    }
+
+    .blob.b2 {
+      width: 140px;
+      height: 140px;
+      right: -30px;
+      top: 70px;
+      background: radial-gradient(circle, rgba(0,229,255,0.95), rgba(0,229,255,0.22) 60%, transparent 75%);
+      animation-duration: 16s;
+      animation-direction: reverse;
+    }
+
+    .blob.b3 {
+      width: 180px;
+      height: 180px;
+      left: 50%;
+      bottom: -60px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255,78,205,0.9), rgba(255,78,205,0.22) 55%, transparent 76%);
+      animation-duration: 14s;
+    }
+
+    .phone {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 220px;
+      height: 430px;
+      border-radius: 34px;
+      transform: translate(-50%, -50%) rotateX(calc(var(--heroTiltY) * 1deg)) rotateY(calc(var(--heroTiltX) * 1deg)) rotateZ(calc(var(--heroSpin) * 1deg));
+      transform-style: preserve-3d;
+      transition: transform 0.08s linear;
+      box-shadow:
+        0 40px 90px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255,255,255,0.12) inset,
+        0 0 60px rgba(124, 92, 255, 0.25);
+      background: linear-gradient(180deg, #10162f, #090d1d);
+      overflow: hidden;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,0.24), transparent 20%),
+        linear-gradient(160deg, rgba(255,255,255,0.07), transparent 30%);
+      pointer-events: none;
+    }
+
+    .notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 92px;
+      height: 24px;
+      transform: translateX(-50%);
+      border-radius: 0 0 16px 16px;
+      background: rgba(0,0,0,0.7);
+      z-index: 5;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 8px;
+      border-radius: 28px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(124,92,255,0.35), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(0,229,255,0.3), transparent 25%),
+        radial-gradient(circle at 50% 80%, rgba(255,78,205,0.25), transparent 28%),
+        linear-gradient(180deg, #0b1024, #060814);
+    }
+
+    .screen-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      transform: translateY(calc(var(--scroll) * -0.12px));
+    }
+
+    .ui-chip {
+      position: absolute;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+      animation: floaty 3.8s ease-in-out infinite;
+    }
+
+    .ui-chip.c1 { top: 62px; left: 16px; }
+    .ui-chip.c2 { top: 120px; right: 16px; animation-delay: -1s; }
+    .ui-chip.c3 { bottom: 82px; left: 18px; animation-delay: -2s; }
+
+    .orbital {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      animation: spin linear infinite;
+    }
+
+    .ring.r1 {
+      width: 110px;
+      height: 110px;
+      animation-duration: 9s;
+    }
+
+    .ring.r2 {
+      width: 170px;
+      height: 170px;
+      animation-duration: 14s;
+      animation-direction: reverse;
+    }
+
+    .ring.r3 {
+      width: 230px;
+      height: 230px;
+      animation-duration: 20s;
+    }
+
+    .core {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(124,92,255,.9), rgba(0,229,255,.85));
+      box-shadow:
+        0 0 35px rgba(124,92,255,.55),
+        0 0 70px rgba(0,229,255,.2);
+      animation: pulse 2.4s ease-in-out infinite;
+      transform: rotate(calc(var(--scroll) * 0.08deg));
+    }
+
+    .hero-copy {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(7, 10, 23, 0.46);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .hero-copy strong {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 6px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-copy span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .scroll-pill {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      animation: bounceY 1.8s infinite;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .section {
+      min-height: 92svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: clip;
+    }
+
+    .stack {
+      width: min(100%, 440px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #a9b6ff;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 8vw, 52px);
+      line-height: .98;
+      letter-spacing: -0.05em;
+    }
+
+    .section-text {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
       font-size: 15px;
     }
-    .muted{ color: var(--muted); }
 
-    .quote{
-      margin-top: 16px;
-      padding: 14px 14px;
-      border-left: 3px solid rgba(255,79,163,.6);
-      background: rgba(255,255,255,.05);
-      border-radius: 16px;
-    }
-
-    /* --- Scroll hint --- */
-    .scrollHint{
-      display:flex; align-items:center; gap:10px;
-      margin-top: 22px;
-      color: rgba(255,247,255,.8);
-      font-size: 13px;
-    }
-    .mouse{
-      width:22px; height:34px;
-      border-radius: 999px;
-      border:1.6px solid rgba(255,255,255,.45);
-      position:relative;
-      opacity:.9;
-    }
-    .mouse::after{
-      content:"";
-      position:absolute; left:50%; top:8px;
-      width:4px; height:4px; border-radius:50%;
-      background: rgba(255,255,255,.85);
-      transform: translateX(-50%);
-      animation: wheel 1.35s infinite ease-in-out;
-    }
-    @keyframes wheel{
-      0%{ transform: translate(-50%,0); opacity: .9;}
-      60%{ transform: translate(-50%,10px); opacity: .35;}
-      100%{ transform: translate(-50%,0); opacity: .9;}
+    .panel,
+    .card,
+    .stat,
+    .cta {
+      position: relative;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
     }
 
-    /* --- Reveal on scroll --- */
-    .reveal{
-      opacity:0;
-      transform: translateY(22px);
-      transition: opacity .9s ease, transform .9s ease;
+    .panel {
+      padding: 18px;
+    }
+
+    .panel::before,
+    .card::before,
+    .stat::before,
+    .cta::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.09), transparent 35%);
+      pointer-events: none;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px) scale(.96);
+      transition:
+        opacity .9s cubic-bezier(.2,.8,.2,1),
+        transform .9s cubic-bezier(.2,.8,.2,1);
       will-change: opacity, transform;
     }
-    .reveal.on{ opacity:1; transform: translateY(0); }
 
-    /* --- Big heart divider --- */
-    .divider{
-      height: 90px;
-      display:grid;
-      place-items:center;
-      opacity:.9;
-      margin: 10px 0 -10px;
-    }
-    .divider .heart{
-      width: 34px; height: 34px;
-      filter: drop-shadow(0 10px 18px rgba(255,79,163,.42));
-      animation: pulse 1.6s infinite ease-in-out;
-    }
-    @keyframes pulse{
-      0%,100%{ transform: scale(1); }
-      50%{ transform: scale(1.1); }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
-    /* --- Final interactive area --- */
-    .final{
-      display:grid;
-      gap:14px;
-      margin-top: 18px;
-    }
-    .choiceRow{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      margin-top: 8px;
+    .feature-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr 1fr;
     }
 
-    .primary{
-      background: linear-gradient(135deg, rgba(255,43,106,.35), rgba(255,79,163,.20));
-      border-color: rgba(255,79,163,.38);
+    .card {
+      min-height: 160px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform-style: preserve-3d;
     }
-    .primary:hover{ border-color: rgba(255,79,163,.55); }
-    .ghost{ background: rgba(255,255,255,.07); }
 
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%) translateY(20px);
-      opacity: 0;
-      z-index: 50;
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background:
+        linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,229,255,.25));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+      font-size: 20px;
+    }
+
+    .card h3 {
+      margin: 16px 0 6px;
+      font-size: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .parallax-block {
+      height: 360px;
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+    }
+
+    .layer {
+      position: absolute;
+      inset: 0;
+      transition: transform .08s linear;
+    }
+
+    .mountain {
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -6%;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      clip-path: polygon(0 100%, 18% 56%, 30% 70%, 45% 35%, 59% 63%, 75% 40%, 100% 100%);
+      filter: blur(.2px);
+    }
+
+    .mountain.m1 { opacity: 0.25; }
+    .mountain.m2 {
+      bottom: 4%;
+      opacity: 0.45;
+      clip-path: polygon(0 100%, 16% 60%, 36% 34%, 49% 58%, 67% 28%, 82% 48%, 100% 100%);
+    }
+    .mountain.m3 {
+      bottom: 12%;
+      opacity: 0.85;
+      clip-path: polygon(0 100%, 23% 66%, 38% 76%, 53% 36%, 66% 61%, 84% 31%, 100% 100%);
+    }
+
+    .sun {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      top: 26px;
+      right: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.9), rgba(0,229,255,.4) 30%, rgba(124,92,255,.2) 65%, transparent 75%);
+      filter: blur(1px);
+      box-shadow: 0 0 40px rgba(0,229,255,.28);
+    }
+
+    .floating-tag {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(7,10,23,.45);
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 12px;
+      color: #d9ddff;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .stats {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stat {
+      min-height: 120px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .stat .num {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .stat .lab {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+    }
+
+    .marquee-track {
+      display: inline-flex;
+      gap: 14px;
+      padding: 8px 0;
+      animation: marquee 18s linear infinite;
+    }
+
+    .chip {
       padding: 12px 14px;
       border-radius: 999px;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.42);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      transition: opacity .25s ease, transform .25s ease;
-      color: rgba(255,247,255,.92);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #dfe5ff;
       font-size: 13px;
-      max-width: min(92vw, 680px);
-      text-align:center;
-    }
-    .toast.on{
-      opacity:1;
-      transform: translateX(-50%) translateY(0px);
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
     }
 
-    /* --- Floating hearts --- */
-    .hearts{
-      position:fixed; inset:0;
-      pointer-events:none;
-      z-index:1;
-      overflow:hidden;
+    .cta {
+      padding: 18px;
     }
-    .h{
-      position:absolute;
-      left: var(--lx);
-      top: 110%;
-      width: var(--s);
-      height: var(--s);
-      opacity: var(--o);
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      flex: 1;
+      min-height: 50px;
+      border: none;
+      border-radius: 18px;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 18px 44px rgba(124, 92, 255, 0.28);
       transform: translateZ(0);
-      animation: floatUp var(--d) linear infinite;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,.25));
-    }
-    @keyframes floatUp{
-      0% { transform: translate3d(0,0,0) rotate(0deg); }
-      100% { transform: translate3d(var(--dx), -135vh, 0) rotate(var(--r)); }
+      transition: transform .2s ease, filter .2s ease;
     }
 
-    /* --- Footer --- */
-    footer{
-      padding: 30px 16px 46px;
-      text-align:center;
-      color: rgba(255,247,255,.7);
-      font-size: 12.5px;
-      z-index:2;
-      position:relative;
-    }
-    footer b{ color: rgba(255,247,255,.92); }
-
-    /* Reduce motion accessibility */
-    @media (prefers-reduced-motion: reduce){
-      .reveal{transition:none}
-      .mouse::after{animation:none}
-      .divider .heart{animation:none}
-      .h{animation:none; display:none;}
-      .glow-orb{transition:none}
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: none;
     }
 
-    /* Mobile: keep navbar button readable */
-    @media (max-width: 420px){
-      header{ padding: 12px 10px; }
-      .btn{ padding: 9px 10px; font-size: 12px; }
-      .brand{ padding: 9px 10px; }
+    .btn:active {
+      transform: scale(0.97);
+      filter: brightness(1.08);
+    }
+
+    .footer-space {
+      height: 24svh;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes hueShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    @keyframes blobDrift {
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
+      25%  { transform: translate3d(18px, -16px, 0) scale(1.06); }
+      50%  { transform: translate3d(-12px, 16px, 0) scale(0.96); }
+      75%  { transform: translate3d(12px, 8px, 0) scale(1.04); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.08) rotate(8deg); }
+    }
+
+    @keyframes bounceY {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-7px); }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @media (min-width: 700px) {
+      .hero-inner, .stack { width: min(100%, 560px); }
+      .hero-card { min-height: 460px; }
+      .phone {
+        width: 260px;
+        height: 500px;
+      }
     }
   </style>
 </head>
-
 <body>
-  <!-- Song in same folder as index.html -->
-  <audio id="bgm" src="song.mp3" preload="auto" loop></audio>
+  <div class="progress-bar"></div>
+  <div class="noise"></div>
+  <div class="grid"></div>
+  <div class="glow-layer"></div>
+  <div class="flash"></div>
 
-  <div class="ambient" aria-hidden="true">
-    <div class="grain"></div>
-    <div class="glow-orb" id="orb1" style="--x: -40px; --y: -20px;"></div>
-    <div class="glow-orb two" id="orb2" style="--x: 40px; --y: 140px;"></div>
-  </div>
-
-  <div class="hearts" id="hearts" aria-hidden="true"></div>
-
-  <header>
-    <div class="brand">
-      <span class="dot"></span>
-      <div style="display:flex;flex-direction:column;line-height:1.05">
-        <b>Για τη Ντίνα</b>
-        <span>Η ιστορία μας ✨</span>
-      </div>
-    </div>
-
-    <div class="btn" id="playSongBtn" title="Πάτα για να ξεκινήσει το τραγούδι">
-      🎶 Το τραγούδι μου για σένα
-    </div>
-  </header>
-
-  <main>
-    <!-- CHAPTER 1 -->
-    <section class="chapter">
-      <div class="card">
-        <div class="inner reveal">
-          <div class="kicker"><i></i> 14 Φεβρουαρίου • Για σένα</div>
-          <h1>Ντίνα…<br/>σου έφτιαξα κάτι μικρό, αλλά αληθινό 💘</h1>
-          <p class="lead">
-            Κάθε φορά που ξυπνάω δίπλα σου νιώθω κάθε μέρα κάτι διαφορετικό:
-            ζέστασια, αγάπη, σιγουριά και πολύ έρωτα.
-          </p>
-
-          <div class="scrollHint">
-            <span class="mouse" aria-hidden="true"></span>
-            <span>Κύλησε προς τα κάτω για να ξεκινήσει η ιστορία.</span>
-          </div>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Mobile First • Scroll Reactive • Experimental UI
         </div>
-      </div>
-    </section>
 
-    <div class="divider" aria-hidden="true">
-      <svg class="heart" viewBox="0 0 24 24" fill="none">
-        <path d="M12 21s-7-4.6-9.6-9C.5 8.3 2.4 5.5 5.6 5.2c1.7-.2 3.4.6 4.4 2 1-1.4 2.7-2.2 4.4-2 3.2.3 5.1 3.1 3.2 6.8C19 16.4 12 21 12 21Z"
-              fill="url(#g)"/>
-        <defs>
-          <linearGradient id="g" x1="4" y1="6" x2="20" y2="20" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#ff2b6a"/><stop offset=".55" stop-color="#ff4fa3"/><stop offset="1" stop-color="#a85bff"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-<!-- SECRET MESSAGE WITH PIN -->
-<section class="chapter">
-  <div class="card">
-    <div class="inner reveal">
-      <div class="kicker"><i></i> Μυστικό μόνο για εσένα</div>
-      <h2>Ξέρεις τον κωδικό; 🔐</h2>
-      <p class="lead">
-        Υπάρχει ένα μήνυμα που μπορεί να το ξεκλειδώσεις μόνο εσυ...
-      </p>
+        <h1 class="gradient-text">Ακραίο<br>Scroll UI</h1>
+        <p class="subtitle">
+          Ένα single-file mobile concept με kinetic motion, depth, glow, parallax και έντονη αισθητική όσο κάνεις scroll.
+        </p>
 
-      <div class="secretWrap">
-        <div class="pinBox">
-          <div>Πληκτρολόγησε τον μυστικό αριθμό μας</div>
-
-          <div class="pinInput">
-            <input type="password" id="pinInput" maxlength="4" placeholder="••••">
-            <div class="pinBtn" id="pinBtn">Ξεκλείδωσε 💌</div>
+        <div class="hero-card" id="heroCard">
+          <div class="hero-bg">
+            <div class="blob b1"></div>
+            <div class="blob b2"></div>
+            <div class="blob b3"></div>
           </div>
 
-          <div class="secretMessage" id="secretMessage">
-            Σ' αγαπώ πολύ ζωη μου ❤️
-          </div>
-        </div>
-      </div>
+          <div class="phone" id="phone">
+            <div class="notch"></div>
+            <div class="screen">
+              <div class="screen-grid"></div>
+              <div class="ui-chip c1">Velocity</div>
+              <div class="ui-chip c2">Parallax</div>
+              <div class="ui-chip c3">Morphing</div>
 
-    </div>
-  </div>
-</section>
-    <!-- CHAPTER 2 -->
-    <section class="chapter">
-      <div class="card">
-        <div class="inner reveal">
-          <div class="kicker"><i></i> Κεφάλαιο 1 • Η αρχή</div>
-          <h2>Υπάρχει μια στιγμή που σε κάνει να χαμογελάς…</h2>
-          <p class="lead">
-            Κάπως έτσι ξεκίνησε: όχι με μεγάλα λόγια, αλλά με μια αίσθηση.
-            Ότι δίπλα σου ο κόσμος γίνεται πιο ήρεμος.
-          </p>
-
-          <div class="grid">
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)">
-                Αν έπρεπε να περιγράψω την πρώτη μας φορά με τρεις εικόνες:
-              </p>
-              <ul class="list">
-                <li><span class="badge">✨</span><div><b>Μια μεγάλη αγκαλιά</b><div class="muted">που σε κάνει να νιώθεις ότι χωράει τα πάντα.</div></div></li>
-                <li><span class="badge">🌙</span><div><b>Μια νύχτα</b><div class="muted">που σίγουρα δεν ήθελα να τελειώσει (και ας είχα πιεί λίγο ουζάκι παραπάνω).</div></div></li>
-                <li><span class="badge">🫶</span><div><b>Μια σιγουριά</b><div class="muted">ότι αυτό αξίζει να το κρατήσουμε.</div></div></li>
-              </ul>
-            </div>
-
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Μικρή υπόσχεση:</b></p>
-              <p>
-                Όσο περνάει ο καιρός, θέλω να φτιάχνω μαζί σου
-                απλά πράγματα που μοιάζουν μεγάλα:
-                στιγμές, ασφάλεια, γέλια, εμπειρίες.
-              </p>
-
-              <div class="quote">
-                <p style="margin:0;color:rgba(255,247,255,.92)">
-                  “Αν η αγάπη είχε ήχο, θα ήταν ο τρόπος που γελάς.”
-                </p>
-                <p style="margin:6px 0 0;font-size:13px;color:rgba(255,247,255,.65)">
-                  — και κάπως έτσι σε ερωτεύομαι ξανά.
-                </p>
+              <div class="orbital">
+                <div class="ring r1"></div>
+                <div class="ring r2"></div>
+                <div class="ring r3"></div>
+                <div class="core"></div>
               </div>
             </div>
           </div>
 
-        </div>
-      </div>
-    </section>
-
-    <!-- CHAPTER 3 -->
-    <section class="chapter">
-      <div class="card">
-        <div class="inner reveal">
-          <div class="kicker"><i></i> Κεφάλαιο 2 • Τα μικρά που μετράνε</div>
-          <h2>Αυτό που αγαπάω σε εμάς… είναι η κάθε μέρα μαζί σου.</h2>
-          <p class="lead">
-            Δεν χρειάζεται να συμβεί κάτι θεαματικό.
-            Αρκεί να είσαι εσύ — και ξαφνικά όλα γίνονται πιο ωραία.
-          </p>
-
-          <div class="pillbox" style="margin-top:14px">
-            <ul class="list">
-              <li><span class="badge">☕</span><div><b>Μια απλή στιγμή</b><div class="muted">όπως εκείνη που γυρνάς από τη δουλειά και σε περιμένω για να σου δώσω ένα φιλί.</div></div></li>
-              <li><span class="badge">🎶</span><div><b>Ένα τραγούδι</b><div class="muted">που από τυχαίο γίνεται “δικό μας”.</div></div></li>
-              <li><span class="badge">🧸</span><div><b>Μια αγκαλιά</b><div class="muted">που με κάνει να νιώθω ο πιο τυχερός άνθρωπος στον πλανήτη.</div></div></li>
-            </ul>
-          </div>
-
-          <p style="margin-top:16px">
-            Κι αν κάποτε οι μέρες είναι δύσκολες, εγώ θέλω να είμαι το μέρος που
-            θα ξεκουράζεσαι — όχι άλλο βάρος.
-          </p>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- CHAPTER 4 -->
-    <section class="chapter">
-      <div class="card">
-        <div class="inner reveal">
-          <div class="kicker"><i></i> Κεφάλαιο 3 • Το “μαζί”</div>
-          <h2>Η καλύτερη ιστορία είναι αυτό που γράφεται μαζί σου.</h2>
-          <p class="lead">
-            Όχι τέλειο. Αληθινό. Με μικρές τρέλες, μεγάλα όνειρα,
-            και δύο ανθρώπους που διαλέγουν ο ένας τον άλλον.
-          </p>
-
-          <div class="grid">
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Θέλω να ζήσουμε:</b></p>
-              <ul class="list">
-                <li><span class="badge">🗺️</span><div><b>Μικρές αποδράσεις</b><div class="muted">χωρίς πρόγραμμα και όπου να ’ναι.</div></div></li>
-                <li><span class="badge">🍝</span><div><b>Βραδιές στο σπίτι</b><div class="muted">να βλέπουμε ταινίες (ή να με ανέχεσαι όταν παίζω με τους φίλους μου).</div></div></li>
-                <li><span class="badge">📸</span><div><b>Φωτογραφίες</b><div class="muted">που μας θυμίζουν πόσο όμορφα κυλάει ο χρόνος όταν είμαστε μαζί. Που μας θυμίζουν τις αναμνήσεις μας.</div></div></li>
-              </ul>
-            </div>
-
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Και να θυμάσαι:</b></p>
-              <p>
-                Εγώ δεν θέλω να σου αποδείξω κάτι για μια μέρα.
-                Θέλω να σε φροντίζω σε όλες τις μέρες.
-              </p>
-              <div class="quote">
-                <p style="margin:0;color:rgba(255,247,255,.92)">
-                  “Σε διαλέγω επειδή θέλω να είμαι μαζί σου.”
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- CHAPTER 5 / FINAL -->
-    <section class="chapter">
-      <div class="card">
-        <div class="inner reveal">
-          <div class="kicker"><i></i> Τελικό Κεφάλαιο • Μια ερώτηση</div>
-          <h2>Ντίνα, θα είσαι η ΒαλεΝτίνα μου; 💌</h2>
-          <p class="lead">
-            Και όχι μόνο για σήμερα.
-            Για ό,τι έρχεται....
-          </p>
-
-          <div class="final">
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)"><b>Μικρό γράμμα:</b></p>
-              <p>
-                Σ’ ευχαριστώ που είσαι εσύ.
-                Που κάνεις τον χρόνο πιο γλυκό, και τις σκέψεις πιο φωτεινές.
-                Είμαι τυχερός που σε έχω.
-              </p>
-              <p style="margin-bottom:0;color:rgba(255,247,255,.92)">
-                Με αγάπη,<br><b>ο φαντάρος σου</b> 💘
-              </p>
-            </div>
-
-            <div class="pillbox">
-              <p style="margin-top:0;color:rgba(255,247,255,.9)">
-                Πεςςς μου🫠 (αν πατήσεις όχι θα το μάθω)
-              </p>
-              <div class="choiceRow">
-                <div class="btn primary" id="yesBtn">💖 ΝΑΙ</div>
-                <div class="btn ghost" id="noBtn">🙈 Ε… ΟΧΙ</div>
-                <div class="btn" id="confettiBtn">✨ Σ’ αγαπώωωωωω 💞</div>
-              </div>
-              <p class="tiny" style="margin:10px 0 0;color:rgba(255,247,255,.65)">
-                (Μην ανησυχείς. Το “ΟΧΙ” είναι ντροπαλό… 😄)
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-<!-- SCRATCH REVEAL (ΤΕΛΟΣ) -->
-<section class="chapter">
-  <div class="card">
-    <div class="inner reveal">
-      <div class="kicker"><i></i> Τελευταίο δωράκι</div>
-      <h2>Ξύσε εδω 🫶</h2>
-      <p class="lead">
-        Μια μικρή κάρτα με εμάς.
-      </p>
-
-      <div class="scratchWrap">
-        <div class="scratchCard">
-          <div class="scratchStage" id="scratchStage">
-            <!-- Βάλε τη φωτογραφία σας στον ίδιο φάκελο με όνομα us.jpg -->
-            <img id="usPhoto" src="us.jpg" alt="Εμείς οι δύο" />
-            <canvas id="scratchCanvas"></canvas>
-          </div>
-
-          <div class="scratchHint">
-            <span>✨ Ξύσε με.</span>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <div class="scratchMiniBtn" id="resetScratch">🔁 Ξανά</div>
-              <div class="scratchMiniBtn" id="revealAll">💖 Αποκάλυψε</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pillbox">
-          <p style="margin:0;color:rgba(255,247,255,.92)">
-            Αν υπάρχει κάτι που θέλω να θυμάσαι για πάντα, είναι αυτό:
-            <b>Σε αγαπάω και είμαι σπίτι όταν είμαι μαζί σου.</b>
-          </p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-  </main>
-
-  <div class="toast" id="toast">💘</div>
-
-  <footer>
-    Φτιαγμένο με <b>αγάπη</b> για την <b>ομορφιά ΜΟΥ</b>. • Καλή Ημέρα Αγίου Βαλεντίνου αγάπημ....Αααααααααα και μη ξεχάσεις να πεις χρόνια πολλά στον Παππουδάκο μας✨
-  </footer>
-
-  <script>
-    // ---- Utilities
-    const $ = (q, el=document) => el.querySelector(q);
-    const $$ = (q, el=document) => [...el.querySelectorAll(q)];
-
-    // ---- Reveal on scroll
-    const io = new IntersectionObserver((entries)=>{
-      for(const e of entries){
-        if(e.isIntersecting) e.target.classList.add('on');
-      }
-    }, { threshold: 0.18 });
-    $$('.reveal').forEach(el=> io.observe(el));
-
-    // ---- Parallax-ish orbs
-    const orb1 = $('#orb1');
-    const orb2 = $('#orb2');
-    let mx = 0, my = 0;
-    window.addEventListener('pointermove', (e)=>{
-      mx = (e.clientX / window.innerWidth - .5);
-      my = (e.clientY / window.innerHeight - .5);
-      orb1.style.setProperty('--x', `${mx * 60}px`);
-      orb1.style.setProperty('--y', `${my * 40}px`);
-      orb2.style.setProperty('--x', `${mx * -70}px`);
-      orb2.style.setProperty('--y', `${my * 55}px`);
-    }, {passive:true});
-
-    // ---- Floating hearts generator
-    const hearts = $('#hearts');
-    const heartSvg = (fill) => `
-      <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 21s-7-4.6-9.6-9C.5 8.3 2.4 5.5 5.6 5.2c1.7-.2 3.4.6 4.4 2 1-1.4 2.7-2.2 4.4-2 3.2.3 5.1 3.1 3.2 6.8C19 16.4 12 21 12 21Z"
-              fill="${fill}"/>
-      </svg>
-    `;
-    const palette = [
-      'rgba(255,43,106,.80)',
-      'rgba(255,79,163,.72)',
-      'rgba(168,91,255,.70)',
-      'rgba(255,214,165,.55)',
-      'rgba(255,247,255,.40)'
-    ];
-
-    function spawnHeart(){
-      const el = document.createElement('div');
-      el.className = 'h';
-      const s = 12 + Math.random()*26;
-      const o = 0.22 + Math.random()*0.55;
-      const d = 10 + Math.random()*18;
-      const lx = (Math.random()*100).toFixed(2) + 'vw';
-      const dx = ((Math.random()*2-1) * 12).toFixed(2) + 'vw';
-      const r = ((Math.random()*2-1) * 160).toFixed(0) + 'deg';
-      const fill = palette[(Math.random()*palette.length)|0];
-
-      el.style.setProperty('--s', s + 'px');
-      el.style.setProperty('--o', o);
-      el.style.setProperty('--d', d + 's');
-      el.style.setProperty('--lx', lx);
-      el.style.setProperty('--dx', dx);
-      el.style.setProperty('--r', r);
-      el.innerHTML = heartSvg(fill);
-
-      hearts.appendChild(el);
-      setTimeout(()=> el.remove(), (d*1000)+200);
-    }
-
-    let heartTimer = setInterval(spawnHeart, 550);
-    for(let i=0;i<10;i++) setTimeout(spawnHeart, i*120);
-
-    // ---- Toast helper
-    const toast = $('#toast');
-    let toastT;
-    function showToast(msg){
-      toast.textContent = msg;
-      toast.classList.add('on');
-      clearTimeout(toastT);
-      toastT = setTimeout(()=> toast.classList.remove('on'), 2600);
-    }
-
-    // Shy "NO" button
-    const noBtn = $('#noBtn');
-    let noMoves = 0;
-    noBtn.addEventListener('pointerenter', ()=>{
-      noMoves++;
-      const x = (Math.random()*240 - 120);
-      const y = (Math.random()*120 - 60);
-      noBtn.style.transform = `translate(${x}px, ${y}px)`;
-      if(noMoves === 2) showToast('🙈 Το “ΟΧΙ” ντρέπεται… δοκίμασε το “ΝΑΙ”');
-      if(noMoves === 4) showToast('😄 Εντάξει, νομίζω ξέρουμε την απάντηση…');
-    });
-    noBtn.addEventListener('click', ()=> showToast('🙈 Αυτό το κουμπί… δεν το εννοεί!'));
-
-    // Confetti
-    function confettiBurst(){
-      const n = 120;
-      const layer = document.createElement('div');
-      layer.style.position='fixed';
-      layer.style.inset='0';
-      layer.style.pointerEvents='none';
-      layer.style.zIndex='60';
-      document.body.appendChild(layer);
-
-      const colors = ['rgba(255,43,106,.95)','rgba(255,79,163,.9)','rgba(168,91,255,.9)','rgba(255,214,165,.9)','rgba(255,247,255,.9)'];
-      for(let i=0;i<n;i++){
-        const p = document.createElement('i');
-        const size = 4 + Math.random()*7;
-        p.style.position='absolute';
-        p.style.left='50%';
-        p.style.top='68%';
-        p.style.width = size+'px';
-        p.style.height = (size*1.8)+'px';
-        p.style.borderRadius='2px';
-        p.style.background = colors[(Math.random()*colors.length)|0];
-        p.style.boxShadow='0 12px 30px rgba(0,0,0,.22)';
-
-        const ang = Math.random()*Math.PI*2;
-        const dist = 80 + Math.random()*260;
-        const tx = Math.cos(ang)*dist;
-        const ty = Math.sin(ang)*dist - 160;
-        const rot = (Math.random()*720 - 360);
-        const dur = 900 + Math.random()*900;
-
-        p.animate([
-          { transform:`translate(-50%,0) translate(0,0) rotate(0deg)`, opacity:1 },
-          { transform:`translate(-50%,0) translate(${tx}px, ${ty}px) rotate(${rot}deg)`, opacity: 0 }
-        ], { duration: dur, easing:'cubic-bezier(.15,.8,.15,1)', fill:'forwards' });
-
-        layer.appendChild(p);
-      }
-      setTimeout(()=> layer.remove(), 2200);
-    }
-
-    $('#confettiBtn').addEventListener('click', ()=>{
-      confettiBurst();
-      showToast('Είσαι η ζωή μου');
-    });
-
-    $('#yesBtn').addEventListener('click', ()=>{
-      confettiBurst();
-      showToast('💖 ΝΤΙΝΑ, ΕΙΣΑΙ ΤΟ “ΝΑΙ” ΜΟΥ.');
-      clearInterval(heartTimer);
-      heartTimer = setInterval(spawnHeart, 220);
-      setTimeout(()=>{
-        clearInterval(heartTimer);
-        heartTimer = setInterval(spawnHeart, 550);
-      }, 3500);
-    });
-
-    // ---- Song button (works on all mobiles because it's a user gesture)
-    const bgm = document.getElementById('bgm');
-    const playSongBtn = document.getElementById('playSongBtn');
-
-    let songStarted = false;
-
-    playSongBtn.addEventListener('click', async ()=>{
-      try{
-        bgm.loop = true;
-        bgm.volume = 0.85;
-
-        if(bgm.paused){
-          await bgm.play();
-          songStarted = true;
-          playSongBtn.textContent = '⏸️ Παίζει… (πάτα για παύση)';
-          showToast('🎶 Ξεκίνησε το τραγούδι σου 💘');
-        }else{
-          bgm.pause();
-          playSongBtn.textContent = '🎶 Το τραγούδι μου για σένα';
-          showToast('⏸️ Παύση');
-        }
-      }catch(e){
-        showToast('🔇 Δεν μπόρεσε να ξεκινήσει ο ήχος. Έλεγξε ότι υπάρχει το song.mp3 στο ίδιο folder.');
-      }
-    });
-
-    // Optional: if song ends for any reason, ensure it loops
-    bgm.addEventListener('ended', ()=>{
-      bgm.currentTime = 0;
-      bgm.play().catch(()=>{});
-    });
-// ---- Scratch card reveal (photo)
-(function initScratch(){
-  const stage = document.getElementById('scratchStage');
-  const canvas = document.getElementById('scratchCanvas');
-  const ctx = canvas.getContext('2d');
-  const resetBtn = document.getElementById('resetScratch');
-  const revealBtn = document.getElementById('revealAll');
-
-  if(!stage || !canvas || !ctx) return;
-
-  function resizeCanvas(){
-    const r = stage.getBoundingClientRect();
-    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // cap for performance
-    canvas.width = Math.floor(r.width * dpr);
-    canvas.height = Math.floor(r.height * dpr);
-    canvas.style.width = r.width + 'px';
-    canvas.style.height = r.height + 'px';
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-
-    // paint scratch layer
-    paintCover();
-  }
-
-  function paintCover(){
-    const w = stage.clientWidth;
-    const h = stage.clientHeight;
-
-    // Fill with a soft "silver" cover
-    const g = ctx.createLinearGradient(0,0,w,h);
-    g.addColorStop(0, 'rgba(15, 8, 25, .95)');
-g.addColorStop(.5,'rgba(25, 12, 40, .92)');
-g.addColorStop(1, 'rgba(10, 6, 18, .95)');
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
-
-    // Add some subtle sparkles/dots
-    for(let i=0;i<140;i++){
-      const x = Math.random()*w;
-      const y = Math.random()*h;
-      const r = Math.random()*1.8;
-      ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.random()*0.18})`;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fill();
-    }
-
-    // Text hint
-    ctx.fillStyle = 'rgba(255,255,255,.92)';
-ctx.font = '700 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-ctx.textAlign = 'center';
-ctx.shadowColor = 'rgba(0,0,0,.35)';
-ctx.shadowBlur = 10;
-ctx.fillText('Ξύσε εδώ 💖', w/2, h/2);
-ctx.shadowBlur = 0;
-
-    // Set mode for erasing by scratching
-    ctx.globalCompositeOperation = 'destination-out';
-  }
-
-  let isDown = false;
-  let last = null;
-
-  function getPos(e){
-    const rect = canvas.getBoundingClientRect();
-    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-    return {
-      x: p.clientX - rect.left,
-      y: p.clientY - rect.top
-    };
-  }
-
-  function scratchLine(from, to){
-    const w = stage.clientWidth;
-    const brush = Math.max(22, Math.min(44, w * 0.05)); // adaptive brush size
-
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = 'rgba(0,0,0,1)';
-    ctx.lineWidth = brush;
-
-    ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.lineTo(to.x, to.y);
-    ctx.stroke();
-  }
-
-  function down(e){
-    isDown = true;
-    last = getPos(e);
-    // dot
-    scratchLine(last, {x:last.x+0.01, y:last.y+0.01});
-    e.preventDefault();
-  }
-  function move(e){
-    if(!isDown) return;
-    const pos = getPos(e);
-    scratchLine(last, pos);
-    last = pos;
-    e.preventDefault();
-  }
-  function up(){
-    isDown = false;
-    last = null;
-  }
-
-  // Mouse
-  canvas.addEventListener('mousedown', down);
-  window.addEventListener('mousemove', move);
-  window.addEventListener('mouseup', up);
-
-  // Touch
-  canvas.addEventListener('touchstart', down, {passive:false});
-  canvas.addEventListener('touchmove', move, {passive:false});
-  canvas.addEventListener('touchend', up);
-
-  // Buttons
-  resetBtn?.addEventListener('click', paintCover);
-  revealBtn?.addEventListener('click', ()=>{
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillRect(0,0,stage.clientWidth,stage.clientHeight);
-  });
-
-  // Resize
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-})();
-
-
-// ---- Secret PIN logic
-const pinBtn = document.getElementById('pinBtn');
-const pinInput = document.getElementById('pinInput');
-const secretMessage = document.getElementById('secretMessage');
-
-pinBtn.addEventListener('click', checkPin);
-pinInput.addEventListener('keypress', function(e){
-  if(e.key === 'Enter') checkPin();
-});
-
-function checkPin(){
-  if(pinInput.value === "1399"){
-    secretMessage.classList.add('show');
-    confettiBurst(); // uses your existing confetti function
-    showToast("💖 Το ήξερες...");
-  } else {
-    showToast("🙈 Χμμμ... δοκίμασε ξανά");
-    pinInput.value = "";
-  }
-}
-  </script>
-</body>
-</html>
+ 
