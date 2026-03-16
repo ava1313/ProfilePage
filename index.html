@@ -789,4 +789,336 @@
             </div>
           </div>
 
- 
+          <div class="hero-copy">
+            <strong>Scroll για να σπάσει το layout</strong>
+            <span>
+              Το background, τα layers, η κάρτα και τα στοιχεία κινούνται με διαφορετικές ταχύτητες ώστε να δημιουργείται έντονο βάθος.
+            </span>
+          </div>
+        </div>
+
+        <div class="scroll-pill">Swipe / Scroll</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="stack">
+        <div class="panel reveal">
+          <div class="eyebrow">01 — Animated Cards</div>
+          <h2 class="section-title">Glassmorphism με movement</h2>
+          <p class="section-text">
+            Οι κάρτες εμφανίζονται με reveal motion, ελαφρύ 3D tilt και responsive μετακίνηση βάσει της θέσης τους στο viewport.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="card reveal tilt-card">
+            <div class="card-icon">✦</div>
+            <div>
+              <h3>Depth Layers</h3>
+              <p>Πολλαπλά layers κινούνται με διαφορετικό ρυθμό για cinematic αίσθηση.</p>
+            </div>
+          </article>
+
+          <article class="card reveal tilt-card">
+            <div class="card-icon">◌</div>
+            <div>
+              <h3>Glow Motion</h3>
+              <p>Δυναμικά glow στοιχεία ακολουθούν την κίνηση και ενισχύουν το contrast.</p>
+            </div>
+          </article>
+
+          <article class="card reveal tilt-card">
+            <div class="card-icon">↯</div>
+            <div>
+              <h3>Velocity FX</h3>
+              <p>Όσο πιο γρήγορα σκρολάρεις, τόσο πιο έντονο γίνεται το screen flash.</p>
+            </div>
+          </article>
+
+          <article class="card reveal tilt-card">
+            <div class="card-icon">∞</div>
+            <div>
+              <h3>Modern Aesthetic</h3>
+              <p>Rounded panels, blur, gradients, cinematic shadows, high-density mobile layout.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="stack">
+        <div class="parallax-block reveal" id="parallaxScene">
+          <div class="floating-tag">Extreme Parallax Scene</div>
+          <div class="layer" data-depth="0.12">
+            <div class="sun"></div>
+          </div>
+          <div class="layer" data-depth="0.2">
+            <div class="mountain m1"></div>
+          </div>
+          <div class="layer" data-depth="0.38">
+            <div class="mountain m2"></div>
+          </div>
+          <div class="layer" data-depth="0.62">
+            <div class="mountain m3"></div>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="eyebrow">02 — Parallax</div>
+          <h2 class="section-title">Το scroll γίνεται σκηνή</h2>
+          <p class="section-text">
+            Η συγκεκριμένη ενότητα δείχνει layered parallax με mobile performance-friendly transforms. Δεν βασίζεται σε βαριά libraries.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="stack">
+        <div class="stats">
+          <div class="stat reveal">
+            <div class="num" data-target="120">0</div>
+            <div class="lab">fps-inspired feel</div>
+          </div>
+          <div class="stat reveal">
+            <div class="num" data-target="300">0</div>
+            <div class="lab">layers moving</div>
+          </div>
+          <div class="stat reveal">
+            <div class="num" data-target="999">0</div>
+            <div class="lab">visual intensity</div>
+          </div>
+        </div>
+
+        <div class="panel reveal">
+          <div class="eyebrow">03 — Live Count</div>
+          <h2 class="section-title">Animated micro-interactions</h2>
+          <p class="section-text">
+            Οι counters τρέχουν μόλις μπουν στο viewport. Το reveal παραμένει διακριτικό αλλά κοφτερό, χωρίς να βαραίνει το UI.
+          </p>
+        </div>
+
+        <div class="marquee reveal">
+          <div class="marquee-track">
+            <span class="chip">Scroll Progress</span>
+            <span class="chip">3D Tilt</span>
+            <span class="chip">Parallax Scene</span>
+            <span class="chip">Glass Panels</span>
+            <span class="chip">Blur + Glow</span>
+            <span class="chip">Velocity Flash</span>
+            <span class="chip">Modern Mobile UI</span>
+            <span class="chip">Scroll Progress</span>
+            <span class="chip">3D Tilt</span>
+            <span class="chip">Parallax Scene</span>
+            <span class="chip">Glass Panels</span>
+            <span class="chip">Blur + Glow</span>
+            <span class="chip">Velocity Flash</span>
+            <span class="chip">Modern Mobile UI</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="stack">
+        <div class="cta reveal tilt-card">
+          <div class="eyebrow">04 — CTA</div>
+          <h2 class="section-title">Έτοιμο για πείραγμα</h2>
+          <p class="section-text">
+            Μπορείς να το επεκτείνεις σε landing page, app intro, product teaser ή portfolio hero για κινητό.
+          </p>
+
+          <div class="cta-row">
+            <button class="btn" id="shakeBtn">Trigger Chaos</button>
+            <button class="btn secondary" id="topBtn">Back Top</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-space"></div>
+  </main>
+
+  <script>
+    const root = document.documentElement;
+    const revealEls = document.querySelectorAll('.reveal');
+    const tiltCards = document.querySelectorAll('.tilt-card');
+    const stats = document.querySelectorAll('.num');
+    const parallaxScene = document.getElementById('parallaxScene');
+    const phone = document.getElementById('phone');
+    const shakeBtn = document.getElementById('shakeBtn');
+    const topBtn = document.getElementById('topBtn');
+
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let velocity = 0;
+
+    function clamp(v, min, max) {
+      return Math.min(max, Math.max(min, v));
+    }
+
+    function map(value, inMin, inMax, outMin, outMax) {
+      const p = (value - inMin) / (inMax - inMin);
+      return outMin + (outMax - outMin) * p;
+    }
+
+    function updateScrollVars() {
+      const y = window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = h > 0 ? y / h : 0;
+      root.style.setProperty('--progress', progress.toFixed(4));
+      root.style.setProperty('--scroll', y.toFixed(2));
+
+      const now = performance.now();
+      const dy = Math.abs(y - lastY);
+      const dt = Math.max(16, now - lastT);
+      velocity = dy / dt * 24;
+      root.style.setProperty('--velocity', velocity.toFixed(2));
+
+      const heroFactor = clamp(1 - y / window.innerHeight, 0, 1);
+      root.style.setProperty('--heroTiltX', map(Math.sin(y * 0.01), -1, 1, -8 * heroFactor, 8 * heroFactor));
+      root.style.setProperty('--heroTiltY', map(Math.cos(y * 0.008), -1, 1, -8 * heroFactor, 8 * heroFactor));
+      root.style.setProperty('--heroSpin', (progress * 16).toFixed(2));
+
+      lastY = y;
+      lastT = now;
+
+      applyParallax();
+      applyViewportTilt();
+    }
+
+    function applyParallax() {
+      if (!parallaxScene) return;
+      const rect = parallaxScene.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const centerOffset = rect.top + rect.height / 2 - vh / 2;
+      const normalized = clamp(centerOffset / vh, -1.4, 1.4);
+
+      parallaxScene.querySelectorAll('.layer').forEach(layer => {
+        const depth = parseFloat(layer.dataset.depth || '0.2');
+        const moveY = normalized * depth * -70;
+        const scale = 1 + depth * 0.08;
+        layer.style.transform = `translate3d(0, ${moveY}px, 0) scale(${scale})`;
+      });
+    }
+
+    function applyViewportTilt() {
+      tiltCards.forEach((card, i) => {
+        const rect = card.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
+        const cx = rect.left + rect.width / 2 - vw / 2;
+        const cy = rect.top + rect.height / 2 - vh / 2;
+
+        const rx = clamp((-cy / vh) * 10, -10, 10);
+        const ry = clamp((cx / vw) * 12, -12, 12);
+        const z = clamp(1 - Math.abs(cy) / vh, 0, 1);
+        const translateY = (1 - z) * 20;
+
+        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(${translateY}px)`;
+      });
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('in');
+      });
+    }, { threshold: 0.16 });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        if (el.dataset.done) return;
+        el.dataset.done = '1';
+        animateCounter(el, parseInt(el.dataset.target, 10) || 0, 1100);
+      });
+    }, { threshold: 0.55 });
+
+    stats.forEach(el => statsObserver.observe(el));
+
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      function tick(now) {
+        const p = clamp((now - start) / duration, 0, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.floor(target * eased);
+        if (p < 1) requestAnimationFrame(tick);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    let pointerX = 0;
+    let pointerY = 0;
+
+    function updatePointer(x, y) {
+      pointerX = x;
+      pointerY = y;
+      root.style.setProperty('--mx', x.toFixed(1));
+      root.style.setProperty('--my', y.toFixed(1));
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const offsetX = (x - vw / 2) / vw;
+      const offsetY = (y - vh / 2) / vh;
+
+      if (phone) {
+        const rx = clamp(-offsetY * 18, -12, 12);
+        const ry = clamp(offsetX * 18, -12, 12);
+        root.style.setProperty('--heroTiltY', rx.toFixed(2));
+        root.style.setProperty('--heroTiltX', ry.toFixed(2));
+      }
+    }
+
+    window.addEventListener('mousemove', (e) => updatePointer(e.clientX, e.clientY), { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (!t) return;
+      updatePointer(t.clientX, t.clientY);
+    }, { passive: true });
+
+    shakeBtn?.addEventListener('click', () => {
+      document.body.animate(
+        [
+          { transform: 'translate3d(0,0,0)' },
+          { transform: 'translate3d(-6px, 3px, 0)' },
+          { transform: 'translate3d(6px, -4px, 0)' },
+          { transform: 'translate3d(-5px, 2px, 0)' },
+          { transform: 'translate3d(4px, -2px, 0)' },
+          { transform: 'translate3d(0,0,0)' }
+        ],
+        {
+          duration: 420,
+          iterations: 1,
+          easing: 'cubic-bezier(.2,.8,.2,1)'
+        }
+      );
+
+      document.querySelectorAll('.blob').forEach((blob, idx) => {
+        blob.animate(
+          [
+            { transform: 'scale(1) translate3d(0,0,0)' },
+            { transform: `scale(${1.15 + idx * 0.05}) translate3d(${8 - idx * 4}px, ${-10 + idx * 8}px, 0)` },
+            { transform: 'scale(1) translate3d(0,0,0)' }
+          ],
+          { duration: 600, easing: 'ease-out' }
+        );
+      });
+    });
+
+    topBtn?.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', updateScrollVars, { passive: true });
+    window.addEventListener('resize', updateScrollVars);
+    updatePointer(window.innerWidth / 2, window.innerHeight / 2);
+    updateScrollVars();
+  </script>
+</body>
+</html>
