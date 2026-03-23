@@ -2,1123 +2,1126 @@
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stanfood | Χονδρική Επεξεργασία & Συσκευασία Τροφίμων</title>
   <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    name="description"
+    content="Η Stanfood είναι ελληνική εταιρεία επεξεργασίας, τυποποίησης και συσκευασίας τροφίμων για HoReCa, βιομηχανίες και δημόσιο τομέα."
   />
-  <title>Extreme Mobile Scroll Experience</title>
   <style>
-    :root {
-      --bg: #050816;
-      --bg-2: #0a1028;
-      --text: #f7f8ff;
-      --muted: rgba(247, 248, 255, 0.72);
-      --panel: rgba(255, 255, 255, 0.08);
-      --panel-strong: rgba(255, 255, 255, 0.14);
-      --border: rgba(255, 255, 255, 0.14);
-      --accent: #7c5cff;
-      --accent2: #00e5ff;
-      --accent3: #ff4ecd;
-      --green: #74ffb6;
-      --shadow: 0 20px 70px rgba(0, 0, 0, 0.4);
-      --radius: 24px;
-      --progress: 0;
+    :root{
+      --bg:#f7f3eb;
+      --bg-2:#fffaf3;
+      --card:rgba(255,255,255,.78);
+      --card-strong:rgba(255,255,255,.92);
+      --text:#2c231d;
+      --muted:#6f6258;
+      --line:rgba(90,65,40,.12);
+      --primary:#a4551d;
+      --primary-2:#d57a21;
+      --accent:#e7c282;
+      --green:#688c55;
+      --shadow:0 18px 45px rgba(87,55,27,.12);
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+      --container:1180px;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at 20% 20%, rgba(124, 92, 255, 0.2), transparent 30%),
-        radial-gradient(circle at 80% 15%, rgba(0, 229, 255, 0.18), transparent 25%),
-        radial-gradient(circle at 50% 80%, rgba(255, 78, 205, 0.16), transparent 28%),
-        linear-gradient(180deg, var(--bg), var(--bg-2));
-      overflow-x: hidden;
+        radial-gradient(circle at 0% 0%, rgba(213,122,33,.10), transparent 26%),
+        radial-gradient(circle at 100% 0%, rgba(104,140,85,.10), transparent 24%),
+        linear-gradient(180deg, #faf6f0 0%, #f6efe4 100%);
+      overflow-x:hidden;
     }
 
-    .progress-bar {
-      position: fixed;
-      inset: 0 auto auto 0;
-      height: 4px;
-      width: calc(var(--progress) * 100%);
-      z-index: 9999;
-      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-      box-shadow: 0 0 18px rgba(124, 92, 255, 0.7);
-    }
-
-    .noise,
-    .grid,
-    .glow-layer,
-    .flash {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .noise {
-      opacity: 0.045;
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
       background-image:
-        radial-gradient(circle at 25% 25%, #fff 0.7px, transparent 0.8px),
-        radial-gradient(circle at 75% 75%, #fff 0.7px, transparent 0.8px);
-      background-size: 14px 14px, 18px 18px;
-      mix-blend-mode: soft-light;
+        linear-gradient(rgba(80,55,35,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80,55,35,.03) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(circle at center, black 60%, transparent 100%);
     }
 
-    .grid {
+    img{display:block;max-width:100%}
+    a{text-decoration:none;color:inherit}
+    .container{width:min(calc(100% - 32px), var(--container));margin:0 auto}
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:100;
+      backdrop-filter:blur(18px);
+      background:rgba(250,246,240,.78);
+      border-bottom:1px solid rgba(100,70,45,.08);
+    }
+
+    .nav{
+      min-height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:22px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width:58px;
+      height:58px;
+      border-radius:18px;
+      overflow:hidden;
+      flex:0 0 auto;
+      box-shadow:0 10px 26px rgba(164,85,29,.22);
+      background:#fff;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .brand-text strong{
+      display:block;
+      font-size:1.06rem;
+      line-height:1.1;
+      letter-spacing:.01em;
+    }
+
+    .brand-text span{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .nav-links a{
+      color:var(--muted);
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.25s ease;
+      font-size:.96rem;
+    }
+
+    .nav-links a:hover{
+      color:var(--text);
+      background:rgba(164,85,29,.08);
+    }
+
+    .nav-links .cta{
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      box-shadow:0 12px 28px rgba(164,85,29,.20);
+    }
+
+    .hero{
+      padding:54px 0 30px;
+      position:relative;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    .hero-copy,.hero-visual{
+      position:relative;
+      overflow:hidden;
+      border-radius:34px;
+      border:1px solid rgba(92,63,39,.08);
+      box-shadow:var(--shadow);
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.76));
+    }
+
+    .hero-copy{
+      padding:42px;
+      min-height:640px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      isolation:isolate;
+    }
+
+    .hero-copy::before{
+      content:"";
+      position:absolute;
+      inset:auto -90px -120px auto;
+      width:240px;
+      height:240px;
+      background:radial-gradient(circle, rgba(213,122,33,.18), transparent 70%);
+      z-index:-1;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      width:max-content;
+      max-width:100%;
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.74);
+      border:1px solid rgba(102,74,48,.10);
+      color:var(--green);
+      font-weight:700;
+      font-size:.92rem;
+      margin-bottom:18px;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 0 8px rgba(104,140,85,.12);
+    }
+
+    h1,h2,h3{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      letter-spacing:-.02em;
+    }
+
+    .hero h1{
+      font-size:clamp(2.8rem, 6vw, 5.2rem);
+      line-height:.95;
+      max-width:650px;
+      margin-bottom:14px;
+    }
+
+    .hero-subtitle{
+      font-size:clamp(1.22rem,2vw,1.7rem);
+      line-height:1.25;
+      color:#45362c;
+      max-width:640px;
+      margin-bottom:18px;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+
+    .hero-desc{
+      font-size:1.05rem;
+      line-height:1.8;
+      color:var(--muted);
+      max-width:620px;
+      margin-bottom:28px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:28px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-height:54px;
+      padding:0 22px;
+      border-radius:16px;
+      font-weight:700;
+      transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+      border:1px solid transparent;
+      cursor:pointer;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;
+      box-shadow:0 14px 28px rgba(164,85,29,.22);
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.7);
+      border-color:rgba(110,80,54,.12);
+      color:var(--text);
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:6px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(110,80,54,.10);
+      border-radius:18px;
+      padding:18px 16px;
+      min-height:110px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.65rem;
+      font-family:Georgia,"Times New Roman",serif;
+      margin-bottom:6px;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.45;
+    }
+
+    .hero-visual{
+      min-height:640px;
+      padding:18px;
+      display:grid;
+      grid-template-rows:1.35fr .95fr;
+      gap:16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.55)),
+        linear-gradient(135deg, rgba(231,194,130,.18), rgba(104,140,85,.12));
+    }
+
+    .visual-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:26px;
+      background:#e8dfd2;
+      border:1px solid rgba(90,62,35,.08);
+      min-height:0;
+    }
+
+    .visual-card img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transform:scale(1.02);
+    }
+
+    .visual-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, transparent 45%, rgba(35,25,18,.28) 100%);
+    }
+
+    .floating-badge{
+      position:absolute;
+      left:20px;
+      bottom:20px;
+      z-index:2;
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(95,65,40,.08);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 10px 26px rgba(45,30,18,.12);
+      max-width:72%;
+    }
+
+    .floating-badge strong{
+      display:block;
+      font-size:1rem;
+      margin-bottom:4px;
+    }
+
+    .floating-badge span{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.45;
+    }
+
+    .visual-bottom{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      min-height:0;
+    }
+
+    .section{
+      padding:34px 0;
+    }
+
+    .section-heading{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:20px;
+      margin-bottom:22px;
+    }
+
+    .section-heading h2{
+      font-size:clamp(2rem,4vw,3rem);
+      line-height:1;
+      margin-bottom:8px;
+    }
+
+    .section-heading p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:700px;
+    }
+
+    .overview-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+
+    .overview-card,
+    .why-card,
+    .client-box,
+    .contact-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .overview-card{
+      padding:22px 20px;
+      min-height:190px;
+      position:relative;
+      overflow:hidden;
+      transition:transform .25s ease, box-shadow .25s ease;
+    }
+
+    .overview-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 22px 50px rgba(87,55,27,.16);
+    }
+
+    .overview-icon{
+      width:56px;
+      height:56px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg, rgba(164,85,29,.12), rgba(213,122,33,.18));
+      font-size:1.4rem;
+      margin-bottom:16px;
+    }
+
+    .overview-card h3{
+      font-size:1.35rem;
+      margin-bottom:10px;
+    }
+
+    .overview-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.98rem;
+    }
+
+    .about-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      align-items:stretch;
+    }
+
+    .about-text,
+    .image-panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .about-text{
+      padding:30px;
+    }
+
+    .about-text h2{
+      font-size:clamp(2rem,4vw,3rem);
+      margin-bottom:18px;
+    }
+
+    .about-text p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.85;
+      font-size:1rem;
+    }
+
+    .about-text p:last-child{margin-bottom:0}
+
+    .image-panel{
+      position:relative;
+      min-height:420px;
+    }
+
+    .image-panel img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .image-panel::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(32,22,15,.18));
+    }
+
+    .split-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+    }
+
+    .client-box,
+    .why-card{
+      padding:28px;
+    }
+
+    .client-box h2,
+    .why-card h2{
+      font-size:clamp(1.9rem,3vw,2.6rem);
+      margin-bottom:18px;
+    }
+
+    .list{
+      display:grid;
+      gap:12px;
+      margin:0;
+      padding:0;
+      list-style:none;
+    }
+
+    .list li{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:1rem;
+    }
+
+    .list .check{
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      flex:0 0 26px;
+      display:grid;
+      place-items:center;
+      font-size:.9rem;
+      color:#fff;
+      background:linear-gradient(135deg,var(--green),#88a96f);
+      box-shadow:0 8px 16px rgba(104,140,85,.18);
+      margin-top:2px;
+    }
+
+    .private-label{
+      position:relative;
+      overflow:hidden;
+      border-radius:28px;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      padding:34px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.88), rgba(255,255,255,.70)),
+        radial-gradient(circle at top right, rgba(213,122,33,.14), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(104,140,85,.10), transparent 30%);
+    }
+
+    .private-label-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:24px;
+      align-items:center;
+    }
+
+    .private-label h2{
+      font-size:clamp(2rem,4vw,3rem);
+      margin-bottom:16px;
+    }
+
+    .private-label p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:1rem;
+      max-width:700px;
+    }
+
+    .private-points{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .point{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(100,70,45,.10);
+      color:var(--text);
+      font-weight:600;
+      line-height:1.45;
+    }
+
+    .mini-gallery{
+      display:grid;
+      gap:14px;
+    }
+
+    .mini-gallery .image-panel{
+      min-height:230px;
+      border-radius:22px;
+      box-shadow:none;
+      background:#eadfce;
+    }
+
+    .contact-card{
+      padding:30px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .contact-card::before{
+      content:"";
+      position:absolute;
+      right:-80px;
+      top:-80px;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(213,122,33,.18), transparent 70%);
+    }
+
+    .contact-top{
+      display:grid;
+      grid-template-columns:1fr .9fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .contact-card h2{
+      font-size:clamp(2rem,4vw,3rem);
+      margin-bottom:16px;
+    }
+
+    .contact-card p{
+      color:var(--muted);
+      line-height:1.8;
+      margin:0 0 10px;
+    }
+
+    .contact-lines{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .contact-item{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:16px 18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.68);
+      border:1px solid rgba(100,70,45,.10);
+    }
+
+    .contact-item strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:1rem;
+    }
+
+    .contact-item span,
+    .contact-item a{
+      color:var(--muted);
+      line-height:1.55;
+      word-break:break-word;
+    }
+
+    .contact-badge{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      flex:0 0 40px;
+      background:linear-gradient(135deg, rgba(164,85,29,.12), rgba(213,122,33,.18));
+    }
+
+    .map-card{
+      height:100%;
+      min-height:320px;
+      border-radius:24px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(100,70,45,.10);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.64), rgba(255,255,255,.46)),
+        radial-gradient(circle at 20% 20%, rgba(213,122,33,.16), transparent 26%),
+        radial-gradient(circle at 80% 70%, rgba(104,140,85,.14), transparent 28%),
+        #efe5d7;
+    }
+
+    .map-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: linear-gradient(180deg, transparent, rgba(0,0,0,.7), transparent);
-      opacity: 0.3;
-      transform: translateY(calc(var(--scroll) * -0.08px));
-    }
-
-    .glow-layer::before,
-    .glow-layer::after {
-      content: "";
-      position: absolute;
-      width: 48vw;
-      height: 48vw;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.42;
-      transition: transform 0.15s linear;
-    }
-
-    .glow-layer::before {
-      left: -10vw;
-      top: 8vh;
-      background: radial-gradient(circle, rgba(124, 92, 255, 0.9), transparent 60%);
-      transform: translate3d(calc(var(--mx, 0) * 0.03px), calc(var(--my, 0) * 0.03px), 0);
-    }
-
-    .glow-layer::after {
-      right: -10vw;
-      top: 48vh;
-      background: radial-gradient(circle, rgba(0, 229, 255, 0.75), transparent 60%);
-      transform: translate3d(calc(var(--mx, 0) * -0.02px), calc(var(--my, 0) * -0.02px), 0);
-    }
-
-    .flash {
-      background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06), transparent 40%);
-      opacity: calc(max(0, (var(--velocity, 0) - 18) / 80));
-      mix-blend-mode: screen;
-    }
-
-    .app {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero,
-    .section {
-      position: relative;
-      padding: 22px 16px;
-    }
-
-    .hero {
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: clip;
-    }
-
-    .hero-inner {
-      width: min(100%, 440px);
-      position: relative;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      box-shadow: var(--shadow);
-      animation: floaty 4s ease-in-out infinite;
-    }
-
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent2), var(--green));
-      box-shadow: 0 0 16px var(--accent2);
-    }
-
-    h1 {
-      margin: 16px 0 10px;
-      font-size: clamp(40px, 12vw, 76px);
-      line-height: 0.92;
-      letter-spacing: -0.05em;
-      font-weight: 900;
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #fff 0%, #9db6ff 22%, #00e5ff 50%, #ff9de9 85%, #fff 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      background-size: 220% 220%;
-      animation: hueShift 8s linear infinite;
-    }
-
-    .subtitle {
-      margin: 0;
-      max-width: 36ch;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .hero-card {
-      margin-top: 22px;
-      position: relative;
-      min-height: 360px;
-      border-radius: 34px;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      transform-style: preserve-3d;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-    }
-
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(10px);
-      opacity: 0.85;
-      animation: blobDrift linear infinite;
-      mix-blend-mode: screen;
-    }
-
-    .blob.b1 {
-      width: 160px;
-      height: 160px;
-      left: -30px;
-      top: 16px;
-      background: radial-gradient(circle, rgba(124,92,255,0.95), rgba(124,92,255,0.2) 60%, transparent 75%);
-      animation-duration: 12s;
-    }
-
-    .blob.b2 {
-      width: 140px;
-      height: 140px;
-      right: -30px;
-      top: 70px;
-      background: radial-gradient(circle, rgba(0,229,255,0.95), rgba(0,229,255,0.22) 60%, transparent 75%);
-      animation-duration: 16s;
-      animation-direction: reverse;
-    }
-
-    .blob.b3 {
-      width: 180px;
-      height: 180px;
-      left: 50%;
-      bottom: -60px;
-      transform: translateX(-50%);
-      background: radial-gradient(circle, rgba(255,78,205,0.9), rgba(255,78,205,0.22) 55%, transparent 76%);
-      animation-duration: 14s;
-    }
-
-    .phone {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 220px;
-      height: 430px;
-      border-radius: 34px;
-      transform: translate(-50%, -50%) rotateX(calc(var(--heroTiltY) * 1deg)) rotateY(calc(var(--heroTiltX) * 1deg)) rotateZ(calc(var(--heroSpin) * 1deg));
-      transform-style: preserve-3d;
-      transition: transform 0.08s linear;
-      box-shadow:
-        0 40px 90px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255,255,255,0.12) inset,
-        0 0 60px rgba(124, 92, 255, 0.25);
-      background: linear-gradient(180deg, #10162f, #090d1d);
-      overflow: hidden;
-    }
-
-    .phone::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 20% 15%, rgba(255,255,255,0.24), transparent 20%),
-        linear-gradient(160deg, rgba(255,255,255,0.07), transparent 30%);
-      pointer-events: none;
-    }
-
-    .notch {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      width: 92px;
-      height: 24px;
-      transform: translateX(-50%);
-      border-radius: 0 0 16px 16px;
-      background: rgba(0,0,0,0.7);
-      z-index: 5;
-    }
-
-    .screen {
-      position: absolute;
-      inset: 8px;
-      border-radius: 28px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(124,92,255,0.35), transparent 30%),
-        radial-gradient(circle at 80% 20%, rgba(0,229,255,0.3), transparent 25%),
-        radial-gradient(circle at 50% 80%, rgba(255,78,205,0.25), transparent 28%),
-        linear-gradient(180deg, #0b1024, #060814);
-    }
-
-    .screen-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size: 24px 24px;
-      transform: translateY(calc(var(--scroll) * -0.12px));
-    }
-
-    .ui-chip {
-      position: absolute;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #fff;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
-      animation: floaty 3.8s ease-in-out infinite;
-    }
-
-    .ui-chip.c1 { top: 62px; left: 16px; }
-    .ui-chip.c2 { top: 120px; right: 16px; animation-delay: -1s; }
-    .ui-chip.c3 { bottom: 82px; left: 18px; animation-delay: -2s; }
-
-    .orbital {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-    }
-
-    .ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.12);
-      animation: spin linear infinite;
-    }
-
-    .ring.r1 {
-      width: 110px;
-      height: 110px;
-      animation-duration: 9s;
-    }
-
-    .ring.r2 {
-      width: 170px;
-      height: 170px;
-      animation-duration: 14s;
-      animation-direction: reverse;
-    }
-
-    .ring.r3 {
-      width: 230px;
-      height: 230px;
-      animation-duration: 20s;
-    }
-
-    .core {
-      width: 72px;
-      height: 72px;
-      border-radius: 24px;
-      background:
-        linear-gradient(135deg, rgba(124,92,255,.9), rgba(0,229,255,.85));
-      box-shadow:
-        0 0 35px rgba(124,92,255,.55),
-        0 0 70px rgba(0,229,255,.2);
-      animation: pulse 2.4s ease-in-out infinite;
-      transform: rotate(calc(var(--scroll) * 0.08deg));
-    }
-
-    .hero-copy {
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 18px;
-      padding: 16px;
-      border-radius: 22px;
-      background: rgba(7, 10, 23, 0.46);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-
-    .hero-copy strong {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 6px;
-      letter-spacing: -0.03em;
-    }
-
-    .hero-copy span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .scroll-pill {
-      position: absolute;
-      left: 50%;
-      bottom: 14px;
-      transform: translateX(-50%);
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      animation: bounceY 1.8s infinite;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .section {
-      min-height: 92svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: clip;
-    }
-
-    .stack {
-      width: min(100%, 440px);
-      display: grid;
-      gap: 18px;
-    }
-
-    .eyebrow {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: #a9b6ff;
-      margin-bottom: 8px;
-    }
-
-    .section-title {
-      margin: 0 0 8px;
-      font-size: clamp(30px, 8vw, 52px);
-      line-height: .98;
-      letter-spacing: -0.05em;
-    }
-
-    .section-text {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 15px;
-    }
-
-    .panel,
-    .card,
-    .stat,
-    .cta {
-      position: relative;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: var(--shadow);
-    }
-
-    .panel {
-      padding: 18px;
-    }
-
-    .panel::before,
-    .card::before,
-    .stat::before,
-    .cta::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.09), transparent 35%);
-      pointer-events: none;
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(36px) scale(.96);
-      transition:
-        opacity .9s cubic-bezier(.2,.8,.2,1),
-        transform .9s cubic-bezier(.2,.8,.2,1);
-      will-change: opacity, transform;
-    }
-
-    .reveal.in {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-
-    .feature-grid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .card {
-      min-height: 160px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transform-style: preserve-3d;
-    }
-
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background:
-        linear-gradient(135deg, rgba(124,92,255,.35), rgba(0,229,255,.25));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
-      font-size: 20px;
-    }
-
-    .card h3 {
-      margin: 16px 0 6px;
-      font-size: 16px;
-      letter-spacing: -0.03em;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .parallax-block {
-      height: 360px;
-      border-radius: 30px;
-      position: relative;
-      overflow: hidden;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-    }
-
-    .layer {
-      position: absolute;
-      inset: 0;
-      transition: transform .08s linear;
-    }
-
-    .mountain {
-      position: absolute;
-      left: -10%;
-      right: -10%;
-      bottom: -6%;
-      height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
-      clip-path: polygon(0 100%, 18% 56%, 30% 70%, 45% 35%, 59% 63%, 75% 40%, 100% 100%);
-      filter: blur(.2px);
-    }
-
-    .mountain.m1 { opacity: 0.25; }
-    .mountain.m2 {
-      bottom: 4%;
-      opacity: 0.45;
-      clip-path: polygon(0 100%, 16% 60%, 36% 34%, 49% 58%, 67% 28%, 82% 48%, 100% 100%);
-    }
-    .mountain.m3 {
-      bottom: 12%;
-      opacity: 0.85;
-      clip-path: polygon(0 100%, 23% 66%, 38% 76%, 53% 36%, 66% 61%, 84% 31%, 100% 100%);
-    }
-
-    .sun {
-      position: absolute;
-      width: 110px;
-      height: 110px;
-      top: 26px;
-      right: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,.9), rgba(0,229,255,.4) 30%, rgba(124,92,255,.2) 65%, transparent 75%);
-      filter: blur(1px);
-      box-shadow: 0 0 40px rgba(0,229,255,.28);
-    }
-
-    .floating-tag {
-      position: absolute;
-      left: 16px;
-      top: 16px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(7,10,23,.45);
-      border: 1px solid rgba(255,255,255,.12);
-      font-size: 12px;
-      color: #d9ddff;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .stats {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .stat {
-      min-height: 120px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-
-    .stat .num {
-      font-size: clamp(22px, 6vw, 32px);
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    .stat .lab {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .marquee {
-      overflow: hidden;
-      white-space: nowrap;
-      mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
-    }
-
-    .marquee-track {
-      display: inline-flex;
-      gap: 14px;
-      padding: 8px 0;
-      animation: marquee 18s linear infinite;
-    }
-
-    .chip {
-      padding: 12px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,.12);
-      color: #dfe5ff;
-      font-size: 13px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
-    }
-
-    .cta {
-      padding: 18px;
-    }
-
-    .cta-row {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .btn {
-      flex: 1;
-      min-height: 50px;
-      border: none;
-      border-radius: 18px;
-      color: #fff;
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 18px 44px rgba(124, 92, 255, 0.28);
-      transform: translateZ(0);
-      transition: transform .2s ease, filter .2s ease;
-    }
-
-    .btn.secondary {
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: none;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-      filter: brightness(1.08);
-    }
-
-    .footer-space {
-      height: 24svh;
-    }
-
-    @keyframes floaty {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    @keyframes hueShift {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
-
-    @keyframes blobDrift {
-      0%   { transform: translate3d(0, 0, 0) scale(1); }
-      25%  { transform: translate3d(18px, -16px, 0) scale(1.06); }
-      50%  { transform: translate3d(-12px, 16px, 0) scale(0.96); }
-      75%  { transform: translate3d(12px, 8px, 0) scale(1.04); }
-      100% { transform: translate3d(0, 0, 0) scale(1); }
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.08) rotate(8deg); }
-    }
-
-    @keyframes bounceY {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-7px); }
-    }
-
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-
-    @media (min-width: 700px) {
-      .hero-inner, .stack { width: min(100%, 560px); }
-      .hero-card { min-height: 460px; }
-      .phone {
-        width: 260px;
-        height: 500px;
+        linear-gradient(rgba(120,85,55,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120,85,55,.08) 1px, transparent 1px);
+      background-size:36px 36px;
+      opacity:.45;
+    }
+
+    .map-pin{
+      position:absolute;
+      top:50%;
+      left:54%;
+      transform:translate(-50%,-50%);
+      width:92px;
+      height:92px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.9);
+      box-shadow:0 18px 40px rgba(50,30,16,.18);
+      border:1px solid rgba(100,70,45,.10);
+      z-index:2;
+      text-align:center;
+      padding:14px;
+      font-weight:800;
+      color:var(--primary);
+    }
+
+    .site-footer{
+      padding:22px 0 36px;
+      color:var(--muted);
+    }
+
+    .footer-inner{
+      border-top:1px solid rgba(100,70,45,.10);
+      padding-top:22px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      font-size:.95rem;
+    }
+
+    [data-reveal]{
+      opacity:0;
+      transform:translateY(26px);
+      transition:opacity .8s ease, transform .8s ease;
+      will-change:transform, opacity;
+    }
+
+    [data-reveal].visible{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .hero-float{
+      animation:float 6s ease-in-out infinite;
+    }
+
+    .delay-1{transition-delay:.08s}
+    .delay-2{transition-delay:.16s}
+    .delay-3{transition-delay:.24s}
+    .delay-4{transition-delay:.32s}
+
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
+    }
+
+    @media (max-width: 1080px){
+      .hero-grid,
+      .about-grid,
+      .split-grid,
+      .private-label-grid,
+      .contact-top{
+        grid-template-columns:1fr;
+      }
+
+      .overview-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .hero-copy,.hero-visual{
+        min-height:auto;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 720px){
+      .nav{
+        min-height:74px;
+      }
+
+      .nav-links{
+        display:none;
+      }
+
+      .hero{
+        padding:28px 0 24px;
+      }
+
+      .hero-copy{
+        padding:24px;
+        border-radius:24px;
+      }
+
+      .hero-visual{
+        padding:12px;
+        border-radius:24px;
+      }
+
+      .visual-bottom{
+        grid-template-columns:1fr;
+      }
+
+      .overview-grid,
+      .private-points{
+        grid-template-columns:1fr;
+      }
+
+      .section{
+        padding:24px 0;
+      }
+
+      .about-text,
+      .client-box,
+      .why-card,
+      .private-label,
+      .contact-card{
+        padding:22px;
+      }
+
+      .floating-badge{
+        max-width:82%;
+        left:14px;
+        bottom:14px;
+      }
+
+      .brand-text span{
+        display:none;
       }
     }
   </style>
 </head>
 <body>
-  <div class="progress-bar"></div>
-  <div class="noise"></div>
-  <div class="grid"></div>
-  <div class="glow-layer"></div>
-  <div class="flash"></div>
-
-  <main class="app">
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="badge">
-          <span class="badge-dot"></span>
-          Mobile First • Scroll Reactive • Experimental UI
+  <header class="site-header">
+    <div class="container nav">
+      <a href="#hero" class="brand" aria-label="Stanfood αρχική">
+        <div class="brand-logo">
+          <img src="logo.jpg" alt="Stanfood logo" />
         </div>
+        <div class="brand-text">
+          <strong>Stanfood</strong>
+          <span>Χονδρική επεξεργασία & συσκευασία τροφίμων</span>
+        </div>
+      </a>
 
-        <h1 class="gradient-text">Ακραίο<br>Scroll UI</h1>
-        <p class="subtitle">
-          Ένα single-file mobile concept με kinetic motion, depth, glow, parallax και έντονη αισθητική όσο κάνεις scroll.
-        </p>
+      <nav class="nav-links">
+        <a href="#overview">Εταιρεία</a>
+        <a href="#about">Σχετικά</a>
+        <a href="#markets">Αγορές</a>
+        <a href="#private-label">Private Label</a>
+        <a href="#contact" class="cta">Επικοινωνία</a>
+      </nav>
+    </div>
+  </header>
 
-        <div class="hero-card" id="heroCard">
-          <div class="hero-bg">
-            <div class="blob b1"></div>
-            <div class="blob b2"></div>
-            <div class="blob b3"></div>
+  <main>
+    <section class="hero" id="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy" data-reveal>
+          <div class="eyebrow hero-float">
+            <span class="dot"></span>
+            Αξιόπιστος συνεργάτης χονδρικής
           </div>
 
-          <div class="phone" id="phone">
-            <div class="notch"></div>
-            <div class="screen">
-              <div class="screen-grid"></div>
-              <div class="ui-chip c1">Velocity</div>
-              <div class="ui-chip c2">Parallax</div>
-              <div class="ui-chip c3">Morphing</div>
+          <h1>Stanfood</h1>
+          <div class="hero-subtitle">
+            Επεξεργασία, τυποποίηση και συσκευασία τροφίμων για επαγγελματική χρήση
+          </div>
+          <p class="hero-desc">
+            Η Stanfood δραστηριοποιείται στον χώρο των εισαγωγών μπαχαρικών, των πρώτων
+            υλών τροφίμων, της επεξεργασίας και της τυποποίησης, εξυπηρετώντας
+            χονδρεμπόρους, HoReCa, βιομηχανίες και δημόσιο τομέα.
+          </p>
 
-              <div class="orbital">
-                <div class="ring r1"></div>
-                <div class="ring r2"></div>
-                <div class="ring r3"></div>
-                <div class="core"></div>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary">Επικοινωνία</a>
+            <a href="#private-label" class="btn btn-secondary">Private Label</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat" data-reveal class="delay-1">
+              <strong>B2B</strong>
+              <span>Συνεργασίες αποκλειστικά για χονδρική και επαγγελματική διάθεση.</span>
+            </div>
+            <div class="stat" data-reveal>
+              <strong>Food</strong>
+              <span>Πρώτες ύλες, μπαχαρικά και υπηρεσίες συσκευασίας για οργανωμένη τροφοδοσία.</span>
+            </div>
+            <div class="stat" data-reveal>
+              <strong>Supply</strong>
+              <span>Σταθερή και συνεπής τροφοδοσία με επαγγελματικό προσανατολισμό.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual" data-reveal>
+          <div class="visual-card">
+            <img src="img1.png" alt="Μεταφορά και φόρτωση εμπορευμάτων Stanfood" />
+            <div class="floating-badge">
+              <strong>Διαχείριση φορτίων & προμήθειας</strong>
+              <span>Οργανωμένη εφοδιαστική αλυσίδα για επαγγελματικούς συνεργάτες.</span>
+            </div>
+          </div>
+
+          <div class="visual-bottom">
+            <div class="visual-card">
+              <img src="img2.png" alt="Μηχάνημα επεξεργασίας και συσκευασίας τροφίμων" />
+            </div>
+            <div class="visual-card">
+              <img src="img3.png" alt="Εγκαταστάσεις και αποθήκευση προϊόντων Stanfood" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div>
+            <h2>Company Overview</h2>
+            <p>
+              Η δραστηριότητα της Stanfood καλύπτει κρίσιμα στάδια της αλυσίδας τροφίμων,
+              από την προμήθεια πρώτων υλών έως την επεξεργασία, την τυποποίηση και την τελική συσκευασία.
+            </p>
+          </div>
+        </div>
+
+        <div class="overview-grid">
+          <article class="overview-card" data-reveal>
+            <div class="overview-icon">🌿</div>
+            <h3>Εισαγωγές μπαχαρικών</h3>
+            <p>Προμήθεια και διάθεση μπαχαρικών με επαγγελματική στόχευση για χονδρική αγορά.</p>
+          </article>
+
+          <article class="overview-card" data-reveal>
+            <div class="overview-icon">📦</div>
+            <h3>Πρώτες ύλες τροφίμων</h3>
+            <p>Υποστήριξη επιχειρήσεων με βασικές πρώτες ύλες για σταθερή παραγωγική και εμπορική ροή.</p>
+          </article>
+
+          <article class="overview-card" data-reveal>
+            <div class="overview-icon">⚙️</div>
+            <h3>Επεξεργασία</h3>
+            <p>Οργανωμένες διαδικασίες επεξεργασίας με έμφαση στη συνέπεια και στην επαγγελματική εξυπηρέτηση.</p>
+          </article>
+
+          <article class="overview-card" data-reveal>
+            <div class="overview-icon">🏷️</div>
+            <h3>Τυποποίηση & συσκευασία</h3>
+            <p>Ευέλικτες λύσεις συσκευασίας για συνεργάτες που χρειάζονται έτοιμο προϊόν για διάθεση ή επαναπώληση.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container about-grid">
+        <div class="about-text" data-reveal>
+          <h2>About Us</h2>
+          <p>
+            Η Stanfood είναι μια ελληνική εταιρεία που εξειδικεύεται στην επεξεργασία,
+            την τυποποίηση και τη συσκευασία τροφίμων.
+          </p>
+          <p>
+            Συνεργαζόμαστε με χονδρέμπορους που δραστηριοποιούνται στον χώρο του HoReCa,
+            τις βιομηχανίες και την τροφοδοσία του δημόσιου τομέα.
+          </p>
+          <p>
+            Η προσέγγισή μας βασίζεται στη συνέπεια, στην επαγγελματική συνεργασία και
+            στη δυνατότητα προσαρμογής στις πραγματικές ανάγκες κάθε πελάτη.
+          </p>
+        </div>
+
+        <div class="image-panel" data-reveal>
+          <img src="img2.png" alt="Συστήματα επεξεργασίας και συσκευασίας Stanfood" />
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="markets">
+      <div class="container split-grid">
+        <div class="client-box" data-reveal>
+          <h2>Markets & Clients</h2>
+          <ul class="list">
+            <li><span class="check">✓</span><span>Χονδρέμπορους HoReCa</span></li>
+            <li><span class="check">✓</span><span>Τροφοδότες δημόσιου τομέα</span></li>
+            <li><span class="check">✓</span><span>Βιομηχανίες</span></li>
+          </ul>
+        </div>
+
+        <div class="why-card" data-reveal>
+          <h2>Why Stanfood</h2>
+          <ul class="list">
+            <li><span class="check">✓</span><span>Αξιόπιστη προμήθεια προϊόντων</span></li>
+            <li><span class="check">✓</span><span>Σταθερή και συνεπής τροφοδοσία</span></li>
+            <li><span class="check">✓</span><span>Ευρεία γκάμα προϊόντων</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="private-label">
+      <div class="container">
+        <div class="private-label" data-reveal>
+          <div class="private-label-grid">
+            <div>
+              <h2>Packaging & Private Label</h2>
+              <p>
+                Παρέχουμε υπηρεσίες συσκευασίας και ανάπτυξης ιδιωτικής ετικέτας
+                (private label), προσφέροντας στους συνεργάτες μας τη δυνατότητα να
+                δημιουργήσουν και να διαθέσουν τα προϊόντα με το δικό τους brand.
+              </p>
+              <p>
+                Η υπηρεσία απευθύνεται σε επαγγελματίες που χρειάζονται αξιόπιστο
+                συνεργάτη για εμπορική αξιοποίηση προϊόντων με σταθερότητα και σωστή παρουσίαση.
+              </p>
+
+              <div class="private-points">
+                <div class="point">Συσκευασία για επαγγελματική αγορά</div>
+                <div class="point">Ανάπτυξη προϊόντων με ιδιωτική ετικέτα</div>
+                <div class="point">Υποστήριξη εμπορικής διάθεσης</div>
+                <div class="point">Προσαρμογή στις ανάγκες του συνεργάτη</div>
+              </div>
+            </div>
+
+            <div class="mini-gallery">
+              <div class="image-panel">
+                <img src="img3.png" alt="Private label και επαγγελματική αποθήκευση προϊόντων" />
               </div>
             </div>
           </div>
-
-          <div class="hero-copy">
-            <strong>Scroll για να σπάσει το layout</strong>
-            <span>
-              Το background, τα layers, η κάρτα και τα στοιχεία κινούνται με διαφορετικές ταχύτητες ώστε να δημιουργείται έντονο βάθος.
-            </span>
-          </div>
         </div>
-
-        <div class="scroll-pill">Swipe / Scroll</div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="stack">
-        <div class="panel reveal">
-          <div class="eyebrow">01 — Animated Cards</div>
-          <h2 class="section-title">Glassmorphism με movement</h2>
-          <p class="section-text">
-            Οι κάρτες εμφανίζονται με reveal motion, ελαφρύ 3D tilt και responsive μετακίνηση βάσει της θέσης τους στο viewport.
-          </p>
-        </div>
-
-        <div class="feature-grid">
-          <article class="card reveal tilt-card">
-            <div class="card-icon">✦</div>
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="contact-card" data-reveal>
+          <div class="contact-top">
             <div>
-              <h3>Depth Layers</h3>
-              <p>Πολλαπλά layers κινούνται με διαφορετικό ρυθμό για cinematic αίσθηση.</p>
+              <h2>Contact</h2>
+              <p>
+                Για συνεργασίες χονδρικής, επαγγελματική τροφοδοσία, συσκευασία ή private label,
+                επικοινωνήστε μαζί μας.
+              </p>
+
+              <div class="contact-lines">
+                <div class="contact-item">
+                  <div class="contact-badge">🏢</div>
+                  <div>
+                    <strong>Stanfood – Ελλάδα</strong>
+                    <span>Σφακτηρίας 86, Πειραιάς, Τ.Κ. 18546</span>
+                  </div>
+                </div>
+
+                <div class="contact-item">
+                  <div class="contact-badge">✉️</div>
+                  <div>
+                    <strong>Email</strong>
+                    <a href="mailto:stfpaschalis@gmail.com">stfpaschalis@gmail.com</a>
+                  </div>
+                </div>
+
+                <div class="contact-item">
+                  <div class="contact-badge">📞</div>
+                  <div>
+                    <strong>Τηλέφωνο</strong>
+                    <a href="tel:+302104623760">2104623760</a>
+                  </div>
+                </div>
+              </div>
             </div>
-          </article>
 
-          <article class="card reveal tilt-card">
-            <div class="card-icon">◌</div>
-            <div>
-              <h3>Glow Motion</h3>
-              <p>Δυναμικά glow στοιχεία ακολουθούν την κίνηση και ενισχύουν το contrast.</p>
+            <div class="map-card" aria-hidden="true">
+              <div class="map-pin">Stanfood<br />Πειραιάς</div>
             </div>
-          </article>
-
-          <article class="card reveal tilt-card">
-            <div class="card-icon">↯</div>
-            <div>
-              <h3>Velocity FX</h3>
-              <p>Όσο πιο γρήγορα σκρολάρεις, τόσο πιο έντονο γίνεται το screen flash.</p>
-            </div>
-          </article>
-
-          <article class="card reveal tilt-card">
-            <div class="card-icon">∞</div>
-            <div>
-              <h3>Modern Aesthetic</h3>
-              <p>Rounded panels, blur, gradients, cinematic shadows, high-density mobile layout.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="stack">
-        <div class="parallax-block reveal" id="parallaxScene">
-          <div class="floating-tag">Extreme Parallax Scene</div>
-          <div class="layer" data-depth="0.12">
-            <div class="sun"></div>
-          </div>
-          <div class="layer" data-depth="0.2">
-            <div class="mountain m1"></div>
-          </div>
-          <div class="layer" data-depth="0.38">
-            <div class="mountain m2"></div>
-          </div>
-          <div class="layer" data-depth="0.62">
-            <div class="mountain m3"></div>
-          </div>
-        </div>
-
-        <div class="panel reveal">
-          <div class="eyebrow">02 — Parallax</div>
-          <h2 class="section-title">Το scroll γίνεται σκηνή</h2>
-          <p class="section-text">
-            Η συγκεκριμένη ενότητα δείχνει layered parallax με mobile performance-friendly transforms. Δεν βασίζεται σε βαριά libraries.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="stack">
-        <div class="stats">
-          <div class="stat reveal">
-            <div class="num" data-target="120">0</div>
-            <div class="lab">fps-inspired feel</div>
-          </div>
-          <div class="stat reveal">
-            <div class="num" data-target="300">0</div>
-            <div class="lab">layers moving</div>
-          </div>
-          <div class="stat reveal">
-            <div class="num" data-target="999">0</div>
-            <div class="lab">visual intensity</div>
-          </div>
-        </div>
-
-        <div class="panel reveal">
-          <div class="eyebrow">03 — Live Count</div>
-          <h2 class="section-title">Animated micro-interactions</h2>
-          <p class="section-text">
-            Οι counters τρέχουν μόλις μπουν στο viewport. Το reveal παραμένει διακριτικό αλλά κοφτερό, χωρίς να βαραίνει το UI.
-          </p>
-        </div>
-
-        <div class="marquee reveal">
-          <div class="marquee-track">
-            <span class="chip">Scroll Progress</span>
-            <span class="chip">3D Tilt</span>
-            <span class="chip">Parallax Scene</span>
-            <span class="chip">Glass Panels</span>
-            <span class="chip">Blur + Glow</span>
-            <span class="chip">Velocity Flash</span>
-            <span class="chip">Modern Mobile UI</span>
-            <span class="chip">Scroll Progress</span>
-            <span class="chip">3D Tilt</span>
-            <span class="chip">Parallax Scene</span>
-            <span class="chip">Glass Panels</span>
-            <span class="chip">Blur + Glow</span>
-            <span class="chip">Velocity Flash</span>
-            <span class="chip">Modern Mobile UI</span>
           </div>
         </div>
       </div>
     </section>
-
-    <section class="section">
-      <div class="stack">
-        <div class="cta reveal tilt-card">
-          <div class="eyebrow">04 — CTA</div>
-          <h2 class="section-title">Έτοιμο για πείραγμα</h2>
-          <p class="section-text">
-            Μπορείς να το επεκτείνεις σε landing page, app intro, product teaser ή portfolio hero για κινητό.
-          </p>
-
-          <div class="cta-row">
-            <button class="btn" id="shakeBtn">Trigger Chaos</button>
-            <button class="btn secondary" id="topBtn">Back Top</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="footer-space"></div>
   </main>
 
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>© <span id="year"></span> Stanfood. All rights reserved.</div>
+      <div>Χονδρική επεξεργασία, τυποποίηση & συσκευασία τροφίμων</div>
+    </div>
+  </footer>
+
   <script>
-    const root = document.documentElement;
-    const revealEls = document.querySelectorAll('.reveal');
-    const tiltCards = document.querySelectorAll('.tilt-card');
-    const stats = document.querySelectorAll('.num');
-    const parallaxScene = document.getElementById('parallaxScene');
-    const phone = document.getElementById('phone');
-    const shakeBtn = document.getElementById('shakeBtn');
-    const topBtn = document.getElementById('topBtn');
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-    let lastY = window.scrollY;
-    let lastT = performance.now();
-    let velocity = 0;
-
-    function clamp(v, min, max) {
-      return Math.min(max, Math.max(min, v));
-    }
-
-    function map(value, inMin, inMax, outMin, outMax) {
-      const p = (value - inMin) / (inMax - inMin);
-      return outMin + (outMax - outMin) * p;
-    }
-
-    function updateScrollVars() {
-      const y = window.scrollY;
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = h > 0 ? y / h : 0;
-      root.style.setProperty('--progress', progress.toFixed(4));
-      root.style.setProperty('--scroll', y.toFixed(2));
-
-      const now = performance.now();
-      const dy = Math.abs(y - lastY);
-      const dt = Math.max(16, now - lastT);
-      velocity = dy / dt * 24;
-      root.style.setProperty('--velocity', velocity.toFixed(2));
-
-      const heroFactor = clamp(1 - y / window.innerHeight, 0, 1);
-      root.style.setProperty('--heroTiltX', map(Math.sin(y * 0.01), -1, 1, -8 * heroFactor, 8 * heroFactor));
-      root.style.setProperty('--heroTiltY', map(Math.cos(y * 0.008), -1, 1, -8 * heroFactor, 8 * heroFactor));
-      root.style.setProperty('--heroSpin', (progress * 16).toFixed(2));
-
-      lastY = y;
-      lastT = now;
-
-      applyParallax();
-      applyViewportTilt();
-    }
-
-    function applyParallax() {
-      if (!parallaxScene) return;
-      const rect = parallaxScene.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const centerOffset = rect.top + rect.height / 2 - vh / 2;
-      const normalized = clamp(centerOffset / vh, -1.4, 1.4);
-
-      parallaxScene.querySelectorAll('.layer').forEach(layer => {
-        const depth = parseFloat(layer.dataset.depth || '0.2');
-        const moveY = normalized * depth * -70;
-        const scale = 1 + depth * 0.08;
-        layer.style.transform = `translate3d(0, ${moveY}px, 0) scale(${scale})`;
-      });
-    }
-
-    function applyViewportTilt() {
-      tiltCards.forEach((card, i) => {
-        const rect = card.getBoundingClientRect();
-        const vh = window.innerHeight;
-        const vw = window.innerWidth;
-        const cx = rect.left + rect.width / 2 - vw / 2;
-        const cy = rect.top + rect.height / 2 - vh / 2;
-
-        const rx = clamp((-cy / vh) * 10, -10, 10);
-        const ry = clamp((cx / vw) * 12, -12, 12);
-        const z = clamp(1 - Math.abs(cy) / vh, 0, 1);
-        const translateY = (1 - z) * 20;
-
-        card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(${translateY}px)`;
-      });
-    }
-
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('in');
-      });
-    }, { threshold: 0.16 });
-
-    revealEls.forEach(el => revealObserver.observe(el));
-
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        if (el.dataset.done) return;
-        el.dataset.done = '1';
-        animateCounter(el, parseInt(el.dataset.target, 10) || 0, 1100);
-      });
-    }, { threshold: 0.55 });
-
-    stats.forEach(el => statsObserver.observe(el));
-
-    function animateCounter(el, target, duration) {
-      const start = performance.now();
-      function tick(now) {
-        const p = clamp((now - start) / duration, 0, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.floor(target * eased);
-        if (p < 1) requestAnimationFrame(tick);
-        else el.textContent = target;
-      }
-      requestAnimationFrame(tick);
-    }
-
-    let pointerX = 0;
-    let pointerY = 0;
-
-    function updatePointer(x, y) {
-      pointerX = x;
-      pointerY = y;
-      root.style.setProperty('--mx', x.toFixed(1));
-      root.style.setProperty('--my', y.toFixed(1));
-
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const offsetX = (x - vw / 2) / vw;
-      const offsetY = (y - vh / 2) / vh;
-
-      if (phone) {
-        const rx = clamp(-offsetY * 18, -12, 12);
-        const ry = clamp(offsetX * 18, -12, 12);
-        root.style.setProperty('--heroTiltY', rx.toFixed(2));
-        root.style.setProperty('--heroTiltX', ry.toFixed(2));
-      }
-    }
-
-    window.addEventListener('mousemove', (e) => updatePointer(e.clientX, e.clientY), { passive: true });
-    window.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      if (!t) return;
-      updatePointer(t.clientX, t.clientY);
-    }, { passive: true });
-
-    shakeBtn?.addEventListener('click', () => {
-      document.body.animate(
-        [
-          { transform: 'translate3d(0,0,0)' },
-          { transform: 'translate3d(-6px, 3px, 0)' },
-          { transform: 'translate3d(6px, -4px, 0)' },
-          { transform: 'translate3d(-5px, 2px, 0)' },
-          { transform: 'translate3d(4px, -2px, 0)' },
-          { transform: 'translate3d(0,0,0)' }
-        ],
-        {
-          duration: 420,
-          iterations: 1,
-          easing: 'cubic-bezier(.2,.8,.2,1)'
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
         }
-      );
+      });
+    }, { threshold: 0.14 });
 
-      document.querySelectorAll('.blob').forEach((blob, idx) => {
-        blob.animate(
-          [
-            { transform: 'scale(1) translate3d(0,0,0)' },
-            { transform: `scale(${1.15 + idx * 0.05}) translate3d(${8 - idx * 4}px, ${-10 + idx * 8}px, 0)` },
-            { transform: 'scale(1) translate3d(0,0,0)' }
-          ],
-          { duration: 600, easing: 'ease-out' }
-        );
+    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener("click", function(e){
+        const id = this.getAttribute("href");
+        const target = document.querySelector(id);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     });
-
-    topBtn?.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    window.addEventListener('scroll', updateScrollVars, { passive: true });
-    window.addEventListener('resize', updateScrollVars);
-    updatePointer(window.innerWidth / 2, window.innerHeight / 2);
-    updateScrollVars();
   </script>
 </body>
 </html>
