@@ -1,11 +1,10 @@
 (() => {
-  const $ = (s, p=document) => p.querySelector(s);
-  const $$ = (s, p=document) => [...p.querySelectorAll(s)];
+  const $ = (selector, parent = document) => parent.querySelector(selector);
+  const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
 
-  // year
-  $("#year").textContent = new Date().getFullYear();
+  const year = $("#year");
+  if (year) year.textContent = new Date().getFullYear();
 
-  // mobile nav
   const navToggle = $("#navToggle");
   const navLinks = $("#navLinks");
   if (navToggle && navLinks) {
@@ -13,253 +12,225 @@
       const open = navLinks.classList.toggle("open");
       navToggle.setAttribute("aria-expanded", String(open));
     });
-    $$(".navLink", navLinks).forEach(a => a.addEventListener("click", () => {
-      navLinks.classList.remove("open");
-      navToggle.setAttribute("aria-expanded", "false");
-    }));
+
+    $$(".navLink", navLinks).forEach((link) => {
+      link.addEventListener("click", () => {
+        navLinks.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
   }
 
-  // reveal
-  const revealObs = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (e.isIntersecting) e.target.classList.add("in");
-    }
+  const revealItems = $$(".reveal");
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.classList.add("in");
+    });
   }, { threshold: 0.12 });
-  $$(".reveal").forEach(el => revealObs.observe(el));
+  revealItems.forEach((item) => revealObserver.observe(item));
 
-  // scrollspy
-  const ids = ["skills","projects","future","seminars","arcade","contact"];
-  const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
-  const links = $$(".navLink").filter(a => a.getAttribute("href")?.startsWith("#"));
+  const navSectionIds = ["projects", "systems", "experience", "skills", "learning", "contact"];
+  const sections = navSectionIds.map((id) => document.getElementById(id)).filter(Boolean);
+  const navAnchors = $$(".navLink");
 
-  const setActive = (id) => {
-    links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${id}`));
+  const setActiveLink = (id) => {
+    navAnchors.forEach((anchor) => {
+      anchor.classList.toggle("active", anchor.getAttribute("href") === `#${id}`);
+    });
   };
 
-  const spy = new IntersectionObserver((entries) => {
-    const v = entries
-      .filter(e => e.isIntersecting)
-      .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (v?.target?.id) setActive(v.target.id);
-  }, { threshold: [0.2, 0.35, 0.55] });
+  const navObserver = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-  sections.forEach(s => spy.observe(s));
+    if (visible?.target?.id) setActiveLink(visible.target.id);
+  }, { threshold: [0.24, 0.45, 0.7] });
 
-  // skill dots (5 max)
-  $$(".dots").forEach(d => {
-    const level = Math.max(0, Math.min(5, Number(d.dataset.level || 0)));
-    d.innerHTML = "";
-    for (let i=1;i<=5;i++){
+  sections.forEach((section) => navObserver.observe(section));
+
+  $$(".dots").forEach((dots, groupIndex) => {
+    const level = Math.max(0, Math.min(5, Number(dots.dataset.level || 0)));
+    dots.innerHTML = "";
+
+    for (let i = 1; i <= 5; i += 1) {
       const dot = document.createElement("i");
-      if (i <= level) dot.classList.add("on");
-      d.appendChild(dot);
+      dots.appendChild(dot);
+
+      if (i <= level) {
+        const delay = (groupIndex * 50) + (i * 110);
+        setTimeout(() => dot.classList.add("on"), delay);
+      }
     }
   });
 
-  // gentle pseudo-3D depth on scroll (VERY subtle)
-  const depthEls = $$(".depth");
-  const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
+  const depthElements = $$(".depth");
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  let px = 0;
+  let py = 0;
 
-  let px = 0, py = 0;
-  window.addEventListener("pointermove", (e) => {
-    const w = window.innerWidth || 1;
-    const h = window.innerHeight || 1;
-    px = (e.clientX / w) * 2 - 1;
-    py = (e.clientY / h) * 2 - 1;
-  }, { passive:true });
+  window.addEventListener("pointermove", (event) => {
+    const width = window.innerWidth || 1;
+    const height = window.innerHeight || 1;
+    px = (event.clientX / width) * 2 - 1;
+    py = (event.clientY / height) * 2 - 1;
+  }, { passive: true });
 
   const animateDepth = () => {
-    const vh = window.innerHeight || 1;
-    for (const el of depthEls) {
-      const d = Number(el.dataset.depth || 8);
-      const r = el.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > vh) continue;
+    const viewportHeight = window.innerHeight || 1;
 
-      // local scroll position (-1..1)
-      const local = ((r.top + r.height/2) / vh) * 2 - 1;
+    depthElements.forEach((element) => {
+      const rect = element.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > viewportHeight) return;
 
-      // tiny transform
-      const tx = clamp(px * d * 0.35, -8, 8);
-      const ty = clamp(py * d * 0.25, -6, 6);
-      const rz = clamp(local * -0.4, -0.6, 0.6);
+      const strength = Number(element.dataset.depth || 8);
+      const localOffset = ((rect.top + (rect.height / 2)) / viewportHeight) * 2 - 1;
+      const translateX = clamp(px * strength * 0.2, -7, 7);
+      const translateY = clamp(py * strength * 0.16, -5, 5);
+      const rotate = clamp(localOffset * -0.8, -0.8, 0.8);
 
-      el.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotateZ(${rz.toFixed(2)}deg)`;
-    }
+      element.style.transform =
+        `translate3d(${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px, 0) rotate(${rotate.toFixed(2)}deg)`;
+    });
+
     requestAnimationFrame(animateDepth);
   };
   requestAnimationFrame(animateDepth);
 
-  // contact form -> mailto
   const form = $("#contactForm");
-  const hint = $("#formHint");
-  const copyBtn = $("#copyEmail");
-  const emailTo = "stratosav1999@gmail.com";
+  const formHint = $("#formHint");
+  const copyButton = $("#copyEmail");
+  const emailAddress = "stratosav1999@gmail.com";
 
-  if (copyBtn) {
-    copyBtn.addEventListener("click", async () => {
+  if (copyButton) {
+    copyButton.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(emailTo);
-        hint.textContent = "Email copied.";
+        await navigator.clipboard.writeText(emailAddress);
+        if (formHint) formHint.textContent = "Email copied to clipboard.";
       } catch {
-        hint.textContent = `Could not copy. Email: ${emailTo}`;
+        if (formHint) formHint.textContent = `Could not copy automatically. Email: ${emailAddress}`;
       }
     });
   }
 
   if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = $("#cName").value.trim();
-      const email = $("#cEmail").value.trim();
-      const msg = $("#cMsg").value.trim();
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
 
-      if (!name || !email || !msg) {
-        hint.textContent = "Please fill in all fields.";
+      const name = $("#cName")?.value.trim() || "";
+      const email = $("#cEmail")?.value.trim() || "";
+      const message = $("#cMsg")?.value.trim() || "";
+
+      if (!name || !email || !message) {
+        if (formHint) formHint.textContent = "Please fill in all fields first.";
         return;
       }
 
-      const subject = encodeURIComponent(`Portfolio contact — ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${msg}\n\n— Sent from GitHub Pages`);
-      window.location.href = `mailto:${emailTo}?subject=${subject}&body=${body}`;
-      hint.textContent = "Opening your email client…";
+      const subject = encodeURIComponent(`Portfolio contact - ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}\n\n- Sent from portfolio site`);
+      window.location.href = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
+
+      if (formHint) formHint.textContent = "Opening your email client.";
     });
   }
 
-  // Arcade: Orbit Dots (quiet, tactile)
-  const canvas = $("#orbit");
-  const reset = $("#orbitReset");
+  const boardStatus = $("#boardStatus");
+  const tempValue = $("#tempValue");
+  const humidityValue = $("#humidityValue");
+  const soilValue = $("#soilValue");
+  const latencyValue = $("#latencyValue");
+  const eventLog = $("#eventLog");
+  const boardActions = $$(".boardAction");
 
-  if (canvas) {
-    const ctx = canvas.getContext("2d", { alpha: true });
-    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  if (boardStatus && tempValue && humidityValue && soilValue && latencyValue && eventLog && boardActions.length) {
+    let mode = "normal";
 
-    const fit = () => {
-      const cssW = canvas.clientWidth || 900;
-      const cssH = canvas.clientHeight || 320;
-      canvas.width = Math.floor(cssW * DPR);
-      canvas.height = Math.floor(cssH * DPR);
-    };
-    fit();
-    window.addEventListener("resize", fit, { passive:true });
+    const setMode = (nextMode) => {
+      mode = nextMode;
+      boardStatus.className = "boardState";
 
-    const rand = (a,b) => a + Math.random()*(b-a);
-
-    let dots = [];
-    const makeDots = (n=60) => {
-      dots = Array.from({length:n}, () => ({
-        a: rand(0, Math.PI*2),
-        r: rand(20, 140) * DPR,
-        s: rand(0.006, 0.02),
-        x: rand(0, canvas.width),
-        y: rand(0, canvas.height),
-        vx: 0, vy: 0
-      }));
-    };
-    makeDots();
-
-    let mx = canvas.width/2, my = canvas.height/2;
-    const setPointer = (ev) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = (ev.clientX - rect.left) / (rect.width || 1);
-      const y = (ev.clientY - rect.top) / (rect.height || 1);
-      mx = x * canvas.width;
-      my = y * canvas.height;
-    };
-    canvas.addEventListener("pointermove", setPointer, { passive:true });
-    canvas.addEventListener("pointerdown", setPointer, { passive:true });
-
-    const draw = () => {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      // background haze (very subtle)
-      ctx.globalAlpha = 0.08;
-      ctx.beginPath();
-      ctx.arc(mx, my, 180*DPR, 0, Math.PI*2);
-      ctx.fillStyle = "#7cc7ff";
-      ctx.fill();
-
-      ctx.globalAlpha = 1;
-
-      for (const d of dots) {
-        d.a += d.s;
-
-        const tx = mx + Math.cos(d.a) * d.r;
-        const ty = my + Math.sin(d.a) * d.r;
-
-        // soft spring
-        const dx = tx - d.x;
-        const dy = ty - d.y;
-        d.vx = (d.vx + dx * 0.002) * 0.92;
-        d.vy = (d.vy + dy * 0.002) * 0.92;
-        d.x += d.vx;
-        d.y += d.vy;
-
-        // dot
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, 2.2*DPR, 0, Math.PI*2);
-        ctx.fillStyle = "rgba(231,237,247,0.85)";
-        ctx.fill();
-
-        // tiny line (close)
-        const lx = mx - d.x;
-        const ly = my - d.y;
-        const dist = Math.hypot(lx,ly);
-        if (dist < 160*DPR) {
-          const a = (1 - dist/(160*DPR)) * 0.22;
-          ctx.globalAlpha = a;
-          ctx.beginPath();
-          ctx.moveTo(d.x, d.y);
-          ctx.lineTo(mx, my);
-          ctx.strokeStyle = "rgba(124,199,255,0.9)";
-          ctx.lineWidth = 1*DPR;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
+      if (mode === "alert") {
+        boardStatus.classList.add("is-alert");
+        boardStatus.textContent = "Alert";
+      } else if (mode === "sleep") {
+        boardStatus.classList.add("is-sleep");
+        boardStatus.textContent = "Sleep";
+      } else {
+        boardStatus.classList.add("is-online");
+        boardStatus.textContent = "Online";
       }
 
-      requestAnimationFrame(draw);
+      boardActions.forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === mode);
+      });
     };
-    requestAnimationFrame(draw);
 
-    if (reset) reset.addEventListener("click", () => makeDots());
+    const pushLog = (message) => {
+      const now = new Date();
+      const stamp = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const row = document.createElement("div");
+      row.innerHTML = `<span>${stamp}</span><p>${message}</p>`;
+      eventLog.prepend(row);
+
+      while (eventLog.children.length > 4) {
+        eventLog.removeChild(eventLog.lastElementChild);
+      }
+    };
+
+    const renderTelemetry = () => {
+      const temp = mode === "alert" ? 31 + Math.random() * 4 : mode === "sleep" ? 18 + Math.random() * 2 : 23 + Math.random() * 3;
+      const humidity = mode === "alert" ? 34 + Math.random() * 8 : mode === "sleep" ? 49 + Math.random() * 4 : 55 + Math.random() * 7;
+      const soil = mode === "alert" ? 29 + Math.random() * 10 : mode === "sleep" ? 63 + Math.random() * 5 : 68 + Math.random() * 8;
+      const latency = mode === "alert" ? 80 + Math.random() * 35 : mode === "sleep" ? 26 + Math.random() * 12 : 38 + Math.random() * 18;
+
+      tempValue.textContent = `${temp.toFixed(1)}\u00B0C`;
+      humidityValue.textContent = `${Math.round(humidity)}%`;
+      soilValue.textContent = `${Math.round(soil)}%`;
+      latencyValue.textContent = `${Math.round(latency)} ms`;
+    };
+
+    boardActions.forEach((button) => {
+      button.addEventListener("click", () => {
+        setMode(button.dataset.mode || "normal");
+
+        if (mode === "alert") {
+          pushLog("Moisture dropped below target. Alert state broadcast over MQTT.");
+        } else if (mode === "sleep") {
+          pushLog("Board switched to low-power mode. Telemetry cadence reduced.");
+        } else {
+          pushLog("System back to normal mode. Sync cadence restored.");
+        }
+
+        renderTelemetry();
+      });
+    });
+
+    setMode("normal");
+    renderTelemetry();
+
+    window.setInterval(() => {
+      renderTelemetry();
+
+      const messages = {
+        normal: [
+          "Sensor packet received and written to dashboard state.",
+          "MQTT broker heartbeat OK. No retries needed.",
+          "Telemetry values remain inside expected range."
+        ],
+        alert: [
+          "Alert payload forwarded to UI and notification service.",
+          "Threshold breach detected. Waiting for acknowledgement.",
+          "High temperature trend persists. Monitoring continues."
+        ],
+        sleep: [
+          "Low-power mode active. Next sensor wake cycle scheduled.",
+          "Telemetry snapshot stored before standby interval.",
+          "Board is sleeping to preserve battery."
+        ]
+      };
+
+      const pool = messages[mode];
+      pushLog(pool[Math.floor(Math.random() * pool.length)]);
+    }, 3200);
   }
 })();
-// =========================
-// SKILLS: DOTS LOAD ON SCROLL
-// =========================
-
-const skillSections = document.querySelectorAll("#skills .card");
-
-const skillObserver = new IntersectionObserver((entries, observer) => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-
-    const dotsContainers = entry.target.querySelectorAll(".dots");
-
-dotsContainers.forEach((dots, index) => {
-      const level = Math.max(0, Math.min(5, Number(dots.dataset.level || 0)));
-      dots.innerHTML = "";
-
-      for (let i = 1; i <= 5; i++) {
-        const dot = document.createElement("i");
-
-        if (i <= level) {
-          // staggered "loading" effect
-          dot.style.transitionDelay = `${(i + index) * 120}ms`;
-
-          setTimeout(() => dot.classList.add("on"), i * 160);
-        }
-
-        dots.appendChild(dot);
-      }
-    });
-
-    // Run only once per card
-    observer.unobserve(entry.target);
-  });
-}, {
-  threshold: 0.35   // activates when ~35% visible (feels natural)
-});
-
-// observe each skill card
-skillSections.forEach(card => skillObserver.observe(card));

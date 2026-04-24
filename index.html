@@ -1,1147 +1,530 @@
- <!DOCTYPE html>
-<html lang="el">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stanfood | Χονδρική Επεξεργασία & Συσκευασία Τροφίμων</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10141d" />
+  <title>Stratis Avagianos — Full-Stack Developer</title>
   <meta
     name="description"
-    content="Η Stanfood είναι ελληνική εταιρεία επεξεργασίας, τυποποίησης και συσκευασίας τροφίμων για HoReCa, βιομηχανίες και δημόσιο τομέα."
+    content="Portfolio of Stratis Avagianos, a full-stack developer building practical products across frontend, backend, mobile, databases, and connected devices."
   />
-  <style>
-    :root{
-      --bg:#f7f3eb;
-      --bg-2:#fffaf3;
-      --card:rgba(255,255,255,.78);
-      --card-strong:rgba(255,255,255,.92);
-      --text:#2c231d;
-      --muted:#6f6258;
-      --line:rgba(90,65,40,.12);
-      --primary:#a4551d;
-      --primary-2:#d57a21;
-      --accent:#e7c282;
-      --green:#688c55;
-      --shadow:0 18px 45px rgba(87,55,27,.12);
-      --radius-xl:30px;
-      --radius-lg:22px;
-      --radius-md:16px;
-      --container:1180px;
-    }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at 0% 0%, rgba(213,122,33,.10), transparent 26%),
-        radial-gradient(circle at 100% 0%, rgba(104,140,85,.10), transparent 24%),
-        linear-gradient(180deg, #faf6f0 0%, #f6efe4 100%);
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.18;
-      background-image:
-        linear-gradient(rgba(80,55,35,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(80,55,35,.03) 1px, transparent 1px);
-      background-size:42px 42px;
-      mask-image:radial-gradient(circle at center, black 60%, transparent 100%);
-    }
-
-    img{display:block;max-width:100%}
-    a{text-decoration:none;color:inherit}
-    .container{width:min(calc(100% - 32px), var(--container));margin:0 auto}
-
-    .site-header{
-      position:sticky;
-      top:0;
-      z-index:100;
-      backdrop-filter:blur(18px);
-      background:rgba(250,246,240,.78);
-      border-bottom:1px solid rgba(100,70,45,.08);
-    }
-
-    .nav{
-      min-height:82px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:22px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
-
-    .brand-logo{
-      width:58px;
-      height:58px;
-      border-radius:18px;
-      overflow:hidden;
-      flex:0 0 auto;
-      box-shadow:0 10px 26px rgba(164,85,29,.22);
-     
-    }
-
-    .brand-logo img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .brand-text strong{
-      display:block;
-      font-size:1.06rem;
-      line-height:1.1;
-      letter-spacing:.01em;
-    }
-
-    .brand-text span{
-      color:var(--muted);
-      font-size:.9rem;
-    }
-
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .nav-links a{
-      color:var(--muted);
-      padding:10px 14px;
-      border-radius:999px;
-      transition:.25s ease;
-      font-size:.96rem;
-    }
-
-    .nav-links a:hover{
-      color:var(--text);
-      background:rgba(164,85,29,.08);
-    }
-
-    .nav-links .cta{
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      box-shadow:0 12px 28px rgba(164,85,29,.20);
-    }
-
-    .hero{
-      padding:54px 0 30px;
-      position:relative;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:28px;
-      align-items:stretch;
-    }
-
-    .hero-copy,.hero-visual{
-      position:relative;
-      overflow:hidden;
-      border-radius:34px;
-      border:1px solid rgba(92,63,39,.08);
-      box-shadow:var(--shadow);
-      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.76));
-    }
-
-    .hero-copy{
-      padding:42px;
-      min-height:640px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      isolation:isolate;
-    }
-
-    .hero-copy::before{
-      content:"";
-      position:absolute;
-      inset:auto -90px -120px auto;
-      width:240px;
-      height:240px;
-      background:radial-gradient(circle, rgba(213,122,33,.18), transparent 70%);
-      z-index:-1;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      width:max-content;
-      max-width:100%;
-      padding:10px 16px;
-      border-radius:999px;
-      background:rgba(255,255,255,.74);
-      border:1px solid rgba(102,74,48,.10);
-      color:var(--green);
-      font-weight:700;
-      font-size:.92rem;
-      margin-bottom:18px;
-    }
-
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--green);
-      box-shadow:0 0 0 8px rgba(104,140,85,.12);
-    }
-
-    h1,h2,h3{
-      margin:0;
-      font-family:Georgia,"Times New Roman",serif;
-      letter-spacing:-.02em;
-    }
-
-    .hero h1{
-      font-size:clamp(2.8rem, 6vw, 5.2rem);
-      line-height:.95;
-      max-width:650px;
-      margin-bottom:14px;
-    }
-
-    .hero-subtitle{
-      font-size:clamp(1.22rem,2vw,1.7rem);
-      line-height:1.25;
-      color:#45362c;
-      max-width:640px;
-      margin-bottom:18px;
-      font-family:Georgia,"Times New Roman",serif;
-    }
-
-    .hero-desc{
-      font-size:1.05rem;
-      line-height:1.8;
-      color:var(--muted);
-      max-width:620px;
-      margin-bottom:28px;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:28px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      min-height:54px;
-      padding:0 22px;
-      border-radius:16px;
-      font-weight:700;
-      transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
-      border:1px solid transparent;
-      cursor:pointer;
-    }
-
-    .btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      box-shadow:0 14px 28px rgba(164,85,29,.22);
-    }
-
-    .btn-secondary{
-      background:rgba(255,255,255,.7);
-      border-color:rgba(110,80,54,.12);
-      color:var(--text);
-    }
-
-    .hero-stats{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-      margin-top:6px;
-    }
-
-    .stat{
-      background:rgba(255,255,255,.65);
-      border:1px solid rgba(110,80,54,.10);
-      border-radius:18px;
-      padding:18px 16px;
-      min-height:110px;
-    }
-
-    .stat strong{
-      display:block;
-      font-size:1.65rem;
-      font-family:Georgia,"Times New Roman",serif;
-      margin-bottom:6px;
-    }
-
-    .stat span{
-      color:var(--muted);
-      font-size:.95rem;
-      line-height:1.45;
-    }
-
-    .hero-visual{
-      min-height:640px;
-      padding:18px;
-      display:grid;
-      grid-template-rows:1.35fr .95fr;
-      gap:16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.55)),
-        linear-gradient(135deg, rgba(231,194,130,.18), rgba(104,140,85,.12));
-    }
-
-    .visual-card{
-      position:relative;
-      overflow:hidden;
-      border-radius:26px;
-      background:#e8dfd2;
-      border:1px solid rgba(90,62,35,.08);
-      min-height:0;
-    }
-
-    .visual-card img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      transform:scale(1.02);
-    }
-
-    .visual-card::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg, transparent 45%, rgba(35,25,18,.28) 100%);
-    }
-
-    .floating-badge{
-      position:absolute;
-      left:20px;
-      bottom:20px;
-      z-index:2;
-      background:rgba(255,255,255,.88);
-      backdrop-filter:blur(12px);
-      border:1px solid rgba(95,65,40,.08);
-      border-radius:18px;
-      padding:14px 16px;
-      box-shadow:0 10px 26px rgba(45,30,18,.12);
-      max-width:72%;
-    }
-
-    .floating-badge strong{
-      display:block;
-      font-size:1rem;
-      margin-bottom:4px;
-    }
-
-    .floating-badge span{
-      color:var(--muted);
-      font-size:.92rem;
-      line-height:1.45;
-    }
-
-    .visual-bottom{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-      min-height:0;
-    }
-
-    .section{
-      padding:34px 0;
-    }
-
-    .section-heading{
-      display:flex;
-      align-items:end;
-      justify-content:space-between;
-      gap:20px;
-      margin-bottom:22px;
-    }
-
-    .section-heading h2{
-      font-size:clamp(2rem,4vw,3rem);
-      line-height:1;
-      margin-bottom:8px;
-    }
-
-    .section-heading p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.7;
-      max-width:700px;
-    }
-
-    .overview-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
-    }
-
-    .overview-card,
-    .why-card,
-    .client-box,
-    .contact-card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-    }
-
-    .overview-card{
-      padding:22px 20px;
-      min-height:190px;
-      position:relative;
-      overflow:hidden;
-      transition:transform .25s ease, box-shadow .25s ease;
-    }
-
-    .overview-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 22px 50px rgba(87,55,27,.16);
-    }
-
-    .overview-icon{
-      width:56px;
-      height:56px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg, rgba(164,85,29,.12), rgba(213,122,33,.18));
-      font-size:1.4rem;
-      margin-bottom:16px;
-    }
-
-    .overview-card h3{
-      font-size:1.35rem;
-      margin-bottom:10px;
-    }
-
-    .overview-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.65;
-      font-size:.98rem;
-    }
-
-    .about-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:24px;
-      align-items:stretch;
-    }
-
-    .about-text,
-    .image-panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:26px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-
-    .about-text{
-      padding:30px;
-    }
-
-    .about-text h2{
-      font-size:clamp(2rem,4vw,3rem);
-      margin-bottom:18px;
-    }
-
-    .about-text p{
-      margin:0 0 16px;
-      color:var(--muted);
-      line-height:1.85;
-      font-size:1rem;
-    }
-
-    .about-text p:last-child{margin-bottom:0}
-
-    .image-panel{
-      position:relative;
-      min-height:420px;
-    }
-
-    .image-panel img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .image-panel::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(32,22,15,.18));
-    }
-
-    .split-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:24px;
-    }
-
-    .client-box,
-    .why-card{
-      padding:28px;
-    }
-
-    .client-box h2,
-    .why-card h2{
-      font-size:clamp(1.9rem,3vw,2.6rem);
-      margin-bottom:18px;
-    }
-
-    .list{
-      display:grid;
-      gap:12px;
-      margin:0;
-      padding:0;
-      list-style:none;
-    }
-
-    .list li{
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      color:var(--muted);
-      line-height:1.65;
-      font-size:1rem;
-    }
-
-    .list .check{
-      width:26px;
-      height:26px;
-      border-radius:50%;
-      flex:0 0 26px;
-      display:grid;
-      place-items:center;
-      font-size:.9rem;
-      color:#fff;
-      background:linear-gradient(135deg,var(--green),#88a96f);
-      box-shadow:0 8px 16px rgba(104,140,85,.18);
-      margin-top:2px;
-    }
-
-    .private-label{
-      position:relative;
-      overflow:hidden;
-      border-radius:28px;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-      padding:34px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.88), rgba(255,255,255,.70)),
-        radial-gradient(circle at top right, rgba(213,122,33,.14), transparent 28%),
-        radial-gradient(circle at bottom left, rgba(104,140,85,.10), transparent 30%);
-    }
-
-    .private-label-grid{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:24px;
-      align-items:center;
-    }
-
-    .private-label h2{
-      font-size:clamp(2rem,4vw,3rem);
-      margin-bottom:16px;
-    }
-
-    .private-label p{
-      margin:0 0 16px;
-      color:var(--muted);
-      line-height:1.8;
-      font-size:1rem;
-      max-width:700px;
-    }
-
-    .private-points{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:12px;
-      margin-top:18px;
-    }
-
-    .point{
-      padding:16px;
-      border-radius:18px;
-      background:rgba(255,255,255,.72);
-      border:1px solid rgba(100,70,45,.10);
-      color:var(--text);
-      font-weight:600;
-      line-height:1.45;
-    }
-
-    .mini-gallery{
-      display:grid;
-      gap:14px;
-    }
-
-    .mini-gallery .image-panel{
-      min-height:230px;
-      border-radius:22px;
-      box-shadow:none;
-      background:#eadfce;
-    }
-
-    .contact-card{
-      padding:30px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .contact-card::before{
-      content:"";
-      position:absolute;
-      right:-80px;
-      top:-80px;
-      width:220px;
-      height:220px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(213,122,33,.18), transparent 70%);
-    }
-
-    .contact-top{
-      display:grid;
-      grid-template-columns:1fr .9fr;
-      gap:24px;
-      align-items:start;
-    }
-
-    .contact-card h2{
-      font-size:clamp(2rem,4vw,3rem);
-      margin-bottom:16px;
-    }
-
-    .contact-card p{
-      color:var(--muted);
-      line-height:1.8;
-      margin:0 0 10px;
-    }
-
-    .contact-lines{
-      display:grid;
-      gap:14px;
-      margin-top:18px;
-    }
-
-    .contact-item{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-      padding:16px 18px;
-      border-radius:18px;
-      background:rgba(255,255,255,.68);
-      border:1px solid rgba(100,70,45,.10);
-    }
-
-    .contact-item strong{
-      display:block;
-      margin-bottom:4px;
-      font-size:1rem;
-    }
-
-    .contact-item span,
-    .contact-item a{
-      color:var(--muted);
-      line-height:1.55;
-      word-break:break-word;
-    }
-
-    .contact-badge{
-      width:40px;
-      height:40px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      flex:0 0 40px;
-      background:linear-gradient(135deg, rgba(164,85,29,.12), rgba(213,122,33,.18));
-    }
-
-    .map-card{
-  height:100%;
-  min-height:320px;
-  border-radius:24px;
-  overflow:hidden;
-  position:relative;
-  border:1px solid rgba(100,70,45,.10);
-  background:#efe5d7;
-}
-
-.map-card iframe{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-    .map-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(120,85,55,.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(120,85,55,.08) 1px, transparent 1px);
-      background-size:36px 36px;
-      opacity:.45;
-    }
-
-    .map-pin{
-      position:absolute;
-      top:50%;
-      left:54%;
-      transform:translate(-50%,-50%);
-      width:92px;
-      height:92px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:rgba(255,255,255,.9);
-      box-shadow:0 18px 40px rgba(50,30,16,.18);
-      border:1px solid rgba(100,70,45,.10);
-      z-index:2;
-      text-align:center;
-      padding:14px;
-      font-weight:800;
-      color:var(--primary);
-    }
-
-    .site-footer{
-      padding:22px 0 36px;
-      color:var(--muted);
-    }
-
-    .footer-inner{
-      border-top:1px solid rgba(100,70,45,.10);
-      padding-top:22px;
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-      font-size:.95rem;
-    }
-
-    [data-reveal]{
-      opacity:0;
-      transform:translateY(26px);
-      transition:opacity .8s ease, transform .8s ease;
-      will-change:transform, opacity;
-    }
-
-    [data-reveal].visible{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-    .hero-float{
-      animation:float 6s ease-in-out infinite;
-    }
-
-    @keyframes float{
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-10px)}
-    }
-
-    @media (max-width: 1080px){
-      .hero-grid,
-      .about-grid,
-      .split-grid,
-      .private-label-grid,
-      .contact-top{
-        grid-template-columns:1fr;
-      }
-
-      .overview-grid{
-        grid-template-columns:repeat(2,1fr);
-      }
-
-      .hero-copy,.hero-visual{
-        min-height:auto;
-      }
-
-      .hero-stats{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 720px){
-      .nav{
-        min-height:74px;
-      }
-
-      .nav-links{
-        display:none;
-      }
-
-      .hero{
-        padding:28px 0 24px;
-      }
-
-      .hero-copy{
-        padding:24px;
-        border-radius:24px;
-      }
-
-      .hero-visual{
-        padding:12px;
-        border-radius:24px;
-      }
-
-      .visual-bottom{
-        grid-template-columns:1fr;
-      }
-
-      .overview-grid,
-      .private-points{
-        grid-template-columns:1fr;
-      }
-
-      .section{
-        padding:24px 0;
-      }
-
-      .about-text,
-      .client-box,
-      .why-card,
-      .private-label,
-      .contact-card{
-        padding:22px;
-      }
-
-      .floating-badge{
-        max-width:82%;
-        left:14px;
-        bottom:14px;
-      }
-
-      .brand-text span{
-        display:none;
-      }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a href="#hero" class="brand" aria-label="Stanfood αρχική">
-        <div class="brand-logo">
-          <img src="logo.png" alt="Stanfood logo" />
-        </div>
-        <div class="brand-text">
-          <strong>Stanfood</strong>
-          <span>Χονδρική επεξεργασία & συσκευασία τροφίμων</span>
-        </div>
+  <div class="pageGlow pageGlow--left" aria-hidden="true"></div>
+  <div class="pageGlow pageGlow--right" aria-hidden="true"></div>
+  <div class="gridOverlay" aria-hidden="true"></div>
+
+  <header class="siteHeader">
+    <nav class="nav shell" id="nav">
+      <a class="brand" href="#top" aria-label="Go to top">
+        <span class="brandMark">SA</span>
+        <span class="brandText">
+          <strong>Stratis Avagianos</strong>
+          <span>Full-Stack Developer</span>
+        </span>
       </a>
 
-      <nav class="nav-links">
-        <a href="#overview">Εταιρεία</a>
-        <a href="#about">Σχετικά</a>
-        <a href="#markets">Αγορές</a>
-        <a href="#private-label">Private Label</a>
-        <a href="#contact" class="cta">Επικοινωνία</a>
-      </nav>
-    </div>
+      <button class="navToggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="navLinks" id="navLinks">
+        <a class="navLink" href="#projects">Projects</a>
+        <a class="navLink" href="#systems">Systems UI</a>
+        <a class="navLink" href="#experience">Experience</a>
+        <a class="navLink" href="#skills">Skills</a>
+        <a class="navLink" href="#learning">Now</a>
+        <a class="navLink" href="#contact">Contact</a>
+        <a class="button button--ghost" href="assets/resume.pdf" download>Resume</a>
+      </div>
+    </nav>
   </header>
 
-  <main>
-    <section class="hero" id="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy" data-reveal>
-          <div class="eyebrow hero-float">
-            <span class="dot"></span>
-            Αξιόπιστος συνεργάτης χονδρικής
-          </div>
+  <main id="top">
+    <section class="hero shell">
+      <div class="heroCopy reveal">
+        <div class="eyebrowRow">
+          <span class="eyebrow">Available for junior and freelance roles</span>
+          <span class="eyebrow eyebrow--soft">Piraeus, Greece</span>
+        </div>
 
-          <h1>Stanfood</h1>
-          <div class="hero-subtitle">
-            Επεξεργασία, τυποποίηση και συσκευασία τροφίμων για επαγγελματική χρήση
-          </div>
-          <p class="hero-desc">
-            Η Stanfood δραστηριοποιείται στον χώρο των εισαγωγών μπαχαρικών, των πρώτων
-            υλών τροφίμων, της επεξεργασίας και της τυποποίησης, εξυπηρετώντας
-            χονδρεμπόρους, HoReCa, βιομηχανίες και δημόσιο τομέα.
-          </p>
+        <h1 class="heroTitle">
+          Full-stack products,
+          <span>from interface to backend</span>
+          to connected devices.
+        </h1>
 
-          <div class="hero-actions">
-            <a href="#contact" class="btn btn-primary">Επικοινωνία</a>
-            <a href="#private-label" class="btn btn-secondary">Private Label</a>
-          </div>
+        <p class="heroLead">
+          I am Stratis, a full-stack developer who enjoys building complete systems: frontend experiences, backend
+          logic, databases, mobile apps, APIs, and hardware-connected flows. I care about polished UI, but I do not
+          stop there. I like making the whole thing work. I have also recently finished my Army service and I am fully
+          focused on building what comes next.
+        </p>
 
-          <div class="hero-stats">
-            <div class="stat">
-              <strong>B2B</strong>
-              <span>Συνεργασίες αποκλειστικά για χονδρική και επαγγελματική διάθεση.</span>
-            </div>
-            <div class="stat">
-              <strong>Food</strong>
-              <span>Πρώτες ύλες, μπαχαρικά και υπηρεσίες συσκευασίας για οργανωμένη τροφοδοσία.</span>
-            </div>
-            <div class="stat">
-              <strong>Supply</strong>
-              <span>Σταθερή και συνεπής τροφοδοσία με επαγγελματικό προσανατολισμό.</span>
-            </div>
+        <div class="heroActions">
+          <a class="button button--primary" href="#projects">See selected work</a>
+          <a class="button button--ghost" href="mailto:stratosav1999@gmail.com">Email me</a>
+          <a class="button button--ghost" href="https://github.com/ava1313" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="button button--ghost" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
+
+        <div class="heroMeta">
+          <div class="metric">
+            <span class="metricLabel">What I build</span>
+            <strong>Web apps, mobile apps, APIs, dashboards, and connected-device flows</strong>
+          </div>
+          <div class="metric">
+            <span class="metricLabel">Comfort zone</span>
+            <strong>React, Vite, TypeScript, Python, Firebase, databases, MQTT, Docker</strong>
+          </div>
+          <div class="metric">
+            <span class="metricLabel">Dream</span>
+            <strong>Create or join a team that publishes a successful game</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="heroPanel reveal depth" data-depth="10">
+        <div class="portraitCard">
+          <div class="portraitFrame">
+            <img src="assets/profile.png" alt="Portrait of Stratis Avagianos" />
+          </div>
+          <div class="portraitCaption">
+            <p>UI sense, backend curiosity, mobile energy, and a real interest in systems that connect software with hardware.</p>
           </div>
         </div>
 
-        <div class="hero-visual" data-reveal>
-          <div class="visual-card">
-            <img
-              src="https://mecaluxuk.cdnwm.com/case-studies/pallet-racks-warehouse-food-drinks-jot-l.1.1.jpg?imdensity=1&imwidth=1280"
-              alt="Αποθήκη τροφίμων και χονδρική διανομή"
-            />
-            <div class="floating-badge">
-              <strong>Οργανωμένη τροφοδοσία & αποθήκευση</strong>
-              <span>Αξιόπιστη εφοδιαστική αλυσίδα για επαγγελματικούς συνεργάτες.</span>
-            </div>
+        <div class="signalCard">
+          <div class="signalRow">
+            <span>Frontend</span>
+            <strong>React, Vite, TypeScript, modern UI</strong>
           </div>
-
-          <div class="visual-bottom">
-            <div class="visual-card">
-              <img
-                src="https://images.squarespace-cdn.com/content/5282e5f8e4b05ddf097866b8/a002b83f-8036-4ed0-91be-887d9bc4f661/import%2Bcopy.png?content-type=image%2Fpng"
-                alt="Εισαγωγές και μεταφορά προϊόντων"
-              />
-            </div>
-            <div class="visual-card">
-              <img
-                src="https://images.squarespace-cdn.com/content/5282e5f8e4b05ddf097866b8/db6d307d-9247-4bd1-b965-195dd7b6bbb4/Tech%2Bcopy%2B2.png?content-type=image%2Fpng"
-                alt="Ποιοτικός έλεγχος και διασφάλιση ποιότητας"
-              />
-            </div>
+          <div class="signalRow">
+            <span>Backend</span>
+            <strong>Python, Node.js, Firebase, APIs, databases</strong>
+          </div>
+          <div class="signalRow">
+            <span>Connected systems</span>
+            <strong>ESP32, MQTT, Raspberry Pi, self-hosting</strong>
+          </div>
+          <div class="signalRow">
+            <span>Creative ambition</span>
+            <strong>Games, Unity, interactive systems, mobile ideas</strong>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="overview">
-      <div class="container">
-        <div class="section-heading" data-reveal>
+    <section class="section shell" id="projects">
+      <div class="sectionIntro reveal">
+        <span class="sectionTag">Selected work</span>
+        <h2>Projects that show both product thinking and technical range.</h2>
+        <p>
+          I want the portfolio to show more than visual design. These projects reflect embedded systems, mobile apps,
+          backend communication, real-time interaction, and practical infrastructure work.
+        </p>
+      </div>
+
+      <div class="projectGrid">
+        <article class="projectCard projectCard--featured reveal depth" data-depth="12">
+          <div class="projectHeader">
+            <span class="projectType">Current mobile project</span>
+            <h3>TinyWins — a 7-day challenge app</h3>
+          </div>
+          <p>
+            My current programming hobby is building mobile apps with Flutter in Android Studio using Firebase. Right
+            now I am building <strong>TinyWins</strong>, a 7-day challenge app that encourages people to do small things
+            that improve their life, like drinking water, walking, or doing something kind.
+          </p>
+          <p>
+            The app is around 70% done and my goal is to publish it soon on both Android and iPhone. It is a project I
+            care about because it combines product thinking, mobile UX, backend services, and the motivation to ship.
+          </p>
+          <div class="tagRow">
+            <span>Flutter</span>
+            <span>Android Studio</span>
+            <span>Firebase</span>
+            <span>Mobile UX</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="10">
+          <div class="projectHeader">
+            <span class="projectType">Embedded + mobile</span>
+            <h3>Emergency Button for elderly users</h3>
+          </div>
+          <p>
+            Designed an ESP32-based emergency button with a companion Android app and Firebase communication. The goal
+            was simple and human: one physical press should trigger immediate help without relying on smartphone fluency.
+          </p>
+          <div class="tagRow">
+            <span>ESP32</span>
+            <span>Firebase</span>
+            <span>Android Studio</span>
+            <span>3D Printing</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="9">
+          <div class="projectHeader">
+            <span class="projectType">Infrastructure</span>
+            <h3>Self-hosted Raspberry Pi environment</h3>
+          </div>
+          <p>
+            Built and maintained a self-hosted setup using Docker and NGINX to run multiple services. It taught me a
+            lot about networking, reverse proxies, deployment constraints, and keeping things reliable over time.
+          </p>
+          <div class="tagRow">
+            <span>Raspberry Pi</span>
+            <span>NGINX</span>
+            <span>Docker</span>
+            <span>Reverse Proxy</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="8">
+          <div class="projectHeader">
+            <span class="projectType">Real-time interaction</span>
+            <h3>Gamification layer in Unity</h3>
+          </div>
+          <p>
+            Created an interactive Unity experience that reacts to live JSON data streams. It explored how motion,
+            feedback, and real-time behavior can make information feel more alive than a static dashboard.
+          </p>
+          <div class="tagRow">
+            <span>Unity</span>
+            <span>C#</span>
+            <span>JSON</span>
+            <span>Real-time Data</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="7">
+          <div class="projectHeader">
+            <span class="projectType">Automation</span>
+            <h3>Wake My PC from anywhere</h3>
+          </div>
+          <p>
+            Built a Raspberry Pi service triggered by a Telegram bot command to power on my PC remotely. It was a small
+            but very practical system that combined automation, networking, and remote-control logic.
+          </p>
+          <div class="tagRow">
+            <span>Telegram Bot</span>
+            <span>Automation</span>
+            <span>Networking</span>
+            <span>Raspberry Pi</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="systems">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Interactive systems UI</span>
+          <h2>A fake control surface for the kind of ESP32 and sensor systems I like building.</h2>
+        </div>
+        <p>
+          This is not a live deployment. It is an interactive UI concept that simulates how I would present board
+          status, telemetry, and sensor updates in a product dashboard.
+        </p>
+      </div>
+
+      <div class="systemsGrid">
+        <article class="boardCard reveal depth" data-depth="8">
+          <div class="boardHeader">
+            <div>
+              <span class="projectType">Board A</span>
+              <h3>Greenhouse Node</h3>
+            </div>
+            <span class="boardState is-online" id="boardStatus">Online</span>
+          </div>
+
+          <div class="telemetryGrid">
+            <div class="telemetryTile">
+              <span>Temperature</span>
+              <strong id="tempValue">24.6&#176;C</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>Humidity</span>
+              <strong id="humidityValue">58%</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>Soil Moisture</span>
+              <strong id="soilValue">71%</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>MQTT Latency</span>
+              <strong id="latencyValue">42 ms</strong>
+            </div>
+          </div>
+
+          <div class="boardControls">
+            <button class="button button--ghost boardAction" type="button" data-mode="normal">Normal mode</button>
+            <button class="button button--ghost boardAction" type="button" data-mode="alert">Alert mode</button>
+            <button class="button button--ghost boardAction" type="button" data-mode="sleep">Sleep mode</button>
+          </div>
+
+          <div class="eventLog" id="eventLog">
+            <div><span>09:42</span><p>MQTT connection healthy. Sensor sync running.</p></div>
+            <div><span>09:45</span><p>Moisture threshold stable. No action required.</p></div>
+            <div><span>09:47</span><p>Dashboard waiting for next packet.</p></div>
+          </div>
+        </article>
+
+        <article class="protocolCard reveal">
+          <span class="sectionTag">How I think about it</span>
+          <h3>Full-stack means the pipeline, not just the screen.</h3>
+          <p>
+            For connected products I like thinking across the whole chain: device state, transport, backend, storage,
+            and finally the UI that makes the data useful.
+          </p>
+          <div class="protocolList">
+            <div>
+              <strong>Device layer</strong>
+              <p>ESP32, sensors, GPIO logic, battery-aware behavior.</p>
+            </div>
+            <div>
+              <strong>Transport</strong>
+              <p>MQTT or HTTP for communication, depending on the system need.</p>
+            </div>
+            <div>
+              <strong>Backend</strong>
+              <p>Python, Node.js, Firebase, auth, rules, and data handling.</p>
+            </div>
+            <div>
+              <strong>Frontend</strong>
+              <p>Dashboards and mobile UIs that turn raw values into useful decisions.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="experience">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Experience</span>
+          <h2>Work that shaped how I communicate, prioritize, and ship.</h2>
+        </div>
+        <p>
+          My path includes client work and non-dev roles too, and that has helped me become more practical, more
+          reliable, and easier to work with under real constraints.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
           <div>
-            <h2>Company Overview</h2>
+            <div class="timelineTop">
+              <h3>Front-End Developer at Darc</h3>
+              <span>Apr 2023 – Feb 2025</span>
+            </div>
             <p>
-              Η δραστηριότητα της Stanfood καλύπτει κρίσιμα στάδια της αλυσίδας τροφίμων,
-              από την προμήθεια πρώτων υλών έως την επεξεργασία, την τυποποίηση και την τελική συσκευασία.
+              Built and maintained client websites in WordPress with a strong focus on responsive UI, performance, and
+              production-ready delivery while working with designers and stakeholders.
             </p>
           </div>
-        </div>
+        </article>
 
-        <div class="overview-grid">
-          <article class="overview-card" data-reveal>
-            <div class="overview-icon">🌿</div>
-            <h3>Εισαγωγές μπαχαρικών</h3>
-            <p>Προμήθεια και διάθεση μπαχαρικών με επαγγελματική στόχευση για χονδρική αγορά.</p>
-          </article>
-
-          <article class="overview-card" data-reveal>
-            <div class="overview-icon">📦</div>
-            <h3>Πρώτες ύλες τροφίμων</h3>
-            <p>Υποστήριξη επιχειρήσεων με βασικές πρώτες ύλες για σταθερή παραγωγική και εμπορική ροή.</p>
-          </article>
-
-          <article class="overview-card" data-reveal>
-            <div class="overview-icon">⚙️</div>
-            <h3>Επεξεργασία</h3>
-            <p>Οργανωμένες διαδικασίες επεξεργασίας με έμφαση στη συνέπεια και στην επαγγελματική εξυπηρέτηση.</p>
-          </article>
-
-          <article class="overview-card" data-reveal>
-            <div class="overview-icon">🏷️</div>
-            <h3>Τυποποίηση & συσκευασία</h3>
-            <p>Ευέλικτες λύσεις συσκευασίας για συνεργάτες που χρειάζονται έτοιμο προϊόν για διάθεση ή επαναπώληση.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="about">
-      <div class="container about-grid">
-        <div class="about-text" data-reveal>
-          <h2>About Us</h2>
-          <p>
-            Η Stanfood είναι μια ελληνική εταιρεία που εξειδικεύεται στην επεξεργασία,
-            την τυποποίηση και τη συσκευασία τροφίμων.
-          </p>
-          <p>
-            Συνεργαζόμαστε με χονδρέμπορους που δραστηριοποιούνται στον χώρο του HoReCa,
-            τις βιομηχανίες και την τροφοδοσία του δημόσιου τομέα.
-          </p>
-          <p>
-            Η προσέγγισή μας βασίζεται στη συνέπεια, στην επαγγελματική συνεργασία και
-            στη δυνατότητα προσαρμογής στις πραγματικές ανάγκες κάθε πελάτη.
-          </p>
-        </div>
-
-        <div class="image-panel" data-reveal>
-          <img
-            src="https://images.squarespace-cdn.com/content/5282e5f8e4b05ddf097866b8/db6d307d-9247-4bd1-b965-195dd7b6bbb4/Tech%2Bcopy%2B2.png?content-type=image%2Fpng"
-            alt="Έλεγχος ποιότητας τροφίμων και επαγγελματική επεξεργασία"
-          />
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="markets">
-      <div class="container split-grid">
-        <div class="client-box" data-reveal>
-          <h2>Markets & Clients</h2>
-          <ul class="list">
-            <li><span class="check">✓</span><span>Χονδρέμπορους HoReCa</span></li>
-            <li><span class="check">✓</span><span>Τροφοδότες δημόσιου τομέα</span></li>
-            <li><span class="check">✓</span><span>Βιομηχανίες</span></li>
-          </ul>
-        </div>
-
-        <div class="why-card" data-reveal>
-          <h2>Why Stanfood</h2>
-          <ul class="list">
-            <li><span class="check">✓</span><span>Αξιόπιστη προμήθεια προϊόντων</span></li>
-            <li><span class="check">✓</span><span>Σταθερή και συνεπής τροφοδοσία</span></li>
-            <li><span class="check">✓</span><span>Ευρεία γκάμα προϊόντων</span></li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="private-label">
-      <div class="container">
-        <div class="private-label" data-reveal>
-          <div class="private-label-grid">
-            <div>
-              <h2>Packaging & Private Label</h2>
-              <p>
-                Παρέχουμε υπηρεσίες συσκευασίας και ανάπτυξης ιδιωτικής ετικέτας
-                (private label), προσφέροντας στους συνεργάτες μας τη δυνατότητα να
-                δημιουργήσουν και να διαθέσουν τα προϊόντα με το δικό τους brand.
-              </p>
-              <p>
-                Η υπηρεσία απευθύνεται σε επαγγελματίες που χρειάζονται αξιόπιστο
-                συνεργάτη για εμπορική αξιοποίηση προϊόντων με σταθερότητα και σωστή παρουσίαση.
-              </p>
-
-              <div class="private-points">
-                <div class="point">Συσκευασία για επαγγελματική αγορά</div>
-                <div class="point">Ανάπτυξη προϊόντων με ιδιωτική ετικέτα</div>
-                <div class="point">Υποστήριξη εμπορικής διάθεσης</div>
-                <div class="point">Προσαρμογή στις ανάγκες του συνεργάτη</div>
-              </div>
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Assistant Accountant at Black Ice Inc</h3>
+              <span>Feb 2022 – Oct 2022</span>
             </div>
+            <p>
+              Worked with records, structured data, and detail-heavy workflows. It strengthened my precision and the
+              sense of responsibility I now bring into software work.
+            </p>
+          </div>
+        </article>
 
-            <div class="mini-gallery">
-              <div class="image-panel">
-                <img
-                  src="https://images.squarespace-cdn.com/content/5282e5f8e4b05ddf097866b8/be0db023-71dd-4281-8f16-602e200f0df7/WH%2Bcopy.png?content-type=image%2Fpng"
-                  alt="Αποθήκευση και διαχείριση αποθεμάτων για επαγγελματική τροφοδοσία"
-                />
-              </div>
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Sales Assistant at Black Ice Inc</h3>
+              <span>Feb 2022 – Oct 2022</span>
             </div>
+            <p>
+              Improved my communication, adaptability, and problem solving through direct customer-facing work.
+            </p>
+          </div>
+        </article>
+
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Waiter at Balloni Beach Bar</h3>
+              <span>Jun 2021 – Aug 2021</span>
+            </div>
+            <p>
+              A high-pressure role that built stamina, focus, and the ability to stay calm while many things happen at once.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="skills">
+      <div class="sectionIntro reveal">
+        <span class="sectionTag">Skills</span>
+        <h2>Broad enough to build full systems, not just one layer.</h2>
+        <p>
+          I want the page to reflect the real mix: frontend, backend, mobile, databases, infrastructure, and device communication.
+        </p>
+      </div>
+
+      <div class="skillColumns">
+        <article class="skillPanel reveal depth" data-depth="8">
+          <h3>Frontend and product UI</h3>
+          <p>Modern interfaces with React, Vite, TypeScript, JavaScript, CSS, Angular, and Three.js.</p>
+          <div class="skillList">
+            <div class="skill"><span>React + Vite</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>TypeScript</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>JavaScript</span><span class="dots" data-level="5"></span></div>
+            <div class="skill"><span>HTML / CSS</span><span class="dots" data-level="5"></span></div>
+            <div class="skill"><span>Angular / Three.js</span><span class="dots" data-level="3"></span></div>
+          </div>
+        </article>
+
+        <article class="skillPanel reveal depth" data-depth="10">
+          <h3>Backend, data, and systems</h3>
+          <p>Python, Node.js, APIs, Firebase, databases, Docker, NGINX, Raspberry Pi, and MQTT-style connected flows.</p>
+          <div class="skillList">
+            <div class="skill"><span>Python</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>Node.js / APIs</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>Databases</span><span class="dots" data-level="3"></span></div>
+            <div class="skill"><span>Firebase</span><span class="dots" data-level="3"></span></div>
+            <div class="skill"><span>MQTT / Dev infra</span><span class="dots" data-level="3"></span></div>
+          </div>
+        </article>
+
+        <article class="skillPanel reveal depth" data-depth="7">
+          <h3>Mobile, games, and hardware</h3>
+          <p>Flutter, Android Studio, Unity, C#, ESP32, prototyping, graphics, and product ideas that cross disciplines.</p>
+          <div class="tagRow tagRow--soft">
+            <span>Flutter</span>
+            <span>Android Studio</span>
+            <span>Unity</span>
+            <span>C#</span>
+            <span>ESP32</span>
+            <span>Firebase</span>
+            <span>WordPress</span>
+            <span>Git / GitHub</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="learning">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Now and next</span>
+          <h2>What I am building now, what I want next, and where I want to go.</h2>
+        </div>
+        <p>
+          I like learning while shipping. Right now that means mobile product work, stronger backend habits, and keeping the game dream alive.
+        </p>
+      </div>
+
+      <div class="learningGrid">
+        <article class="learningCard reveal">
+          <h3>Current focus</h3>
+          <ul>
+            <li>Building mobile apps with Flutter in Android Studio</li>
+            <li>Using Firebase for auth, data, and app workflows</li>
+            <li>Finishing TinyWins and preparing it for release</li>
+          </ul>
+        </article>
+
+        <article class="learningCard reveal">
+          <h3>Actively growing</h3>
+          <ul>
+            <li>Deeper backend work with Python and cleaner APIs</li>
+            <li>Better database modeling and data handling</li>
+            <li>More confidence in cloud, DevOps, and deployment pipelines</li>
+          </ul>
+        </article>
+
+        <article class="learningCard reveal">
+          <h3>Long-term dream</h3>
+          <ul>
+            <li>Be part of a team that publishes a successful game</li>
+            <li>Build products that people actually keep using</li>
+            <li>Keep combining technical depth with creative ambition</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="contact">
+      <div class="contactWrap">
+        <div class="contactCopy reveal">
+          <span class="sectionTag">Contact</span>
+          <h2>If you need someone who can think across product, backend, UI, and connected systems, let’s talk.</h2>
+          <p>
+            I am open to junior developer opportunities, freelance work, and teams where I can grow as a full-stack developer while contributing seriously from day one.
+          </p>
+
+          <div class="contactList">
+            <a href="mailto:stratosav1999@gmail.com">stratosav1999@gmail.com</a>
+            <a href="tel:+306971951090">+30 697 195 1090</a>
+            <a href="https://avagianos-dev.gr/" target="_blank" rel="noreferrer">avagianos-dev.gr</a>
+            <a href="https://github.com/ava1313" target="_blank" rel="noreferrer">github.com/ava1313</a>
+            <a href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn profile</a>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="section" id="contact">
-      <div class="container">
-        <div class="contact-card" data-reveal>
-          <div class="contact-top">
-            <div>
-              <h2>Contact</h2>
-              <p>
-                Για συνεργασίες χονδρικής, επαγγελματική τροφοδοσία, συσκευασία ή private label,
-                επικοινωνήστε μαζί μας.
-              </p>
+        <article class="contactCard reveal">
+          <h3>Send a quick message</h3>
+          <p>This opens your email client, so it works nicely on GitHub Pages too.</p>
 
-              <div class="contact-lines">
-                <div class="contact-item">
-                  <div class="contact-badge">🏢</div>
-                  <div>
-                    <strong>Stanfood – Ελλάδα</strong>
-                    <span>Σφακτηρίας 86, Πειραιάς, Τ.Κ. 18546</span>
-                  </div>
-                </div>
+          <form class="form" id="contactForm">
+            <label>
+              <span>Name</span>
+              <input class="input" id="cName" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input class="input" id="cEmail" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Message</span>
+              <textarea class="input" id="cMsg" rows="5" required></textarea>
+            </label>
 
-                <div class="contact-item">
-                  <div class="contact-badge">✉️</div>
-                  <div>
-                    <strong>Email</strong>
-                    <a href="mailto:stfpaschalis@gmail.com">stfpaschalis@gmail.com</a>
-                  </div>
-                </div>
-
-                <div class="contact-item">
-                  <div class="contact-badge">📞</div>
-                  <div>
-                    <strong>Τηλέφωνο</strong>
-                    <a href="tel:+302104623760">2104623760</a>
-                  </div>
-                </div>
-              </div>
+            <div class="formRow">
+              <button class="button button--primary" type="submit">Open email</button>
+              <button class="button button--ghost" type="button" id="copyEmail">Copy email</button>
             </div>
 
-            <div class="map-card">
-  <iframe
-    src="https://www.google.com/maps?q=%CE%A3%CF%86%CE%B1%CE%BA%CF%84%CE%B7%CF%81%CE%AF%CE%B1%CF%82%2086,%20%CE%A0%CE%B5%CE%B9%CF%81%CE%B1%CE%B9%CE%AC%CF%82,%2018546&z=16&output=embed"
-    width="100%"
-    height="100%"
-    style="border:0;"
-    allowfullscreen=""
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
-</div>
-          </div>
-        </div>
+            <div class="formHint" id="formHint" aria-live="polite"></div>
+          </form>
+        </article>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>© <span id="year"></span> Stanfood. All rights reserved.</div>
-      <div>Χονδρική επεξεργασία, τυποποίηση & συσκευασία τροφίμων</div>
-    </div>
+  <footer class="footer shell">
+    <span>© <span id="year"></span> Efstratios (Stratis) Avagianos</span>
+    <a href="#top">Back to top</a>
   </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.14 });
-
-    document.querySelectorAll("[data-reveal]").forEach((el) => observer.observe(el));
-
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-      link.addEventListener("click", function(e){
-        const id = this.getAttribute("href");
-        const target = document.querySelector(id);
-        if(target){
-          e.preventDefault();
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
