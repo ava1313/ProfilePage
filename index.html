@@ -1,530 +1,1180 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#10141d" />
-  <title>Stratis Avagianos — Full-Stack Developer</title>
-  <meta
-    name="description"
-    content="Portfolio of Stratis Avagianos, a full-stack developer building practical products across frontend, backend, mobile, databases, and connected devices."
-  />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="The Connected Workshop — an interactive 3D portfolio of Stratis Avagianos. Click the devices on the desk to explore projects across frontend, backend, mobile and hardware." />
+<meta name="theme-color" content="#10141d" />
+<title>Stratis Avagianos — The Connected Workshop</title>
+<style>
+  :root{
+    --bg:#10141d; --panel:#161c29; --line:#26304a;
+    --ink:#e8edf7; --muted:#9aa7bf; --teal:#4fd8c4; --amber:#ffb45e; --red:#ff5d5d;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  #scene{position:fixed;inset:0;display:block}
+  .noselect{user-select:none;-webkit-user-select:none}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
-    rel="stylesheet"
-  />
+  /* ---------- intro ---------- */
+  #intro{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(1200px 700px at 50% 40%,#141b2b 0%,#0b0f17 70%);
+    transition:opacity .9s ease;flex-direction:column;text-align:center;padding:24px}
+  #intro.hide{opacity:0;pointer-events:none}
+  #intro .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.35em;text-transform:uppercase;color:var(--teal);margin-bottom:18px}
+  #intro h1{font-size:clamp(30px,6vw,58px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  #intro h1 span{color:var(--teal)}
+  #intro p{margin-top:16px;max-width:520px;color:var(--muted);font-size:15px;line-height:1.6}
+  #introActions{margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+  #enter,#skip{width:min(330px,100%);min-height:54px;display:inline-flex;align-items:center;justify-content:center;
+    border-radius:999px;cursor:pointer;text-decoration:none;box-sizing:border-box;
+    transition:transform .2s,box-shadow .2s,background-color .2s,border-color .2s,color .2s}
+  #enter{padding:14px 28px;font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:#08110f;background:var(--teal);border:none;box-shadow:0 0 30px rgba(79,216,196,.35)}
+  #enter:hover{transform:translateY(-2px);box-shadow:0 0 46px rgba(79,216,196,.55)}
+  #intro .tiny{margin-top:20px;font-family:var(--mono);font-size:11px;color:#5d6b87}
 
-  <link rel="stylesheet" href="styles.css" />
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:flex-start;
+    padding:18px 22px;pointer-events:none}
+  #hud .brand{pointer-events:auto;display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink)}
+  #hud .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1d2740,#101625);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+    font-size:13px;color:var(--teal);font-weight:700}
+  #hud .brand b{display:block;font-size:14px}
+  #hud .brand small{display:block;color:var(--muted);font-size:11px;font-family:var(--mono)}
+  #hud .links{pointer-events:auto;display:flex;gap:10px}
+  #hud .links a{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--line);
+    padding:7px 12px;border-radius:999px;background:rgba(16,20,29,.7);backdrop-filter:blur(6px);transition:color .2s,border-color .2s}
+  #hud .links a:hover{color:var(--teal);border-color:var(--teal)}
+
+  #hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:20;font-family:var(--mono);font-size:11px;
+    color:var(--muted);background:rgba(16,20,29,.75);border:1px solid var(--line);padding:8px 16px;border-radius:999px;
+    backdrop-filter:blur(6px);pointer-events:none;white-space:nowrap;transition:opacity .5s}
+  #hint.hide{opacity:0}
+
+  /* ---------- mqtt log ---------- */
+  #log{position:fixed;left:22px;bottom:18px;z-index:20;width:min(330px,70vw);pointer-events:none;font-family:var(--mono);font-size:10.5px;line-height:1.7}
+  #log .row{color:#5f7292;opacity:0;transform:translateY(6px);transition:opacity .5s,transform .5s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #log .row.show{opacity:1;transform:none}
+  #log .row .t{color:var(--teal)}
+  @media (max-width:720px){#log{display:none}}
+
+  /* ---------- tooltip ---------- */
+  #tip{position:fixed;z-index:30;pointer-events:none;font-family:var(--mono);font-size:11px;color:#08110f;background:var(--teal);
+    padding:5px 10px;border-radius:6px;opacity:0;transform:translate(-50%,-160%);transition:opacity .15s;font-weight:600;white-space:nowrap}
+
+  /* ---------- project panel ---------- */
+  #panel{position:fixed;top:0;right:0;bottom:0;z-index:35;width:min(420px,100vw);background:rgba(17,22,34,.92);
+    border-left:1px solid var(--line);backdrop-filter:blur(14px);padding:30px 30px 40px;overflow-y:auto;
+    transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.9,.25,1)}
+  #panel.open{transform:none}
+  #panel .cat{font-family:var(--mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--teal)}
+  #panel h2{margin:10px 0 14px;font-size:26px;letter-spacing:-.01em;line-height:1.2}
+  #panel p{color:var(--muted);font-size:14.5px;line-height:1.7;margin-bottom:14px}
+  #panel .tags{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+  #panel .tags span{font-family:var(--mono);font-size:11px;color:var(--teal);border:1px solid rgba(79,216,196,.35);
+    padding:5px 10px;border-radius:999px}
+  #panel .actions{display:flex;flex-wrap:wrap;gap:10px}
+  #panel .actions a{font-size:13px;font-weight:600;text-decoration:none;padding:11px 18px;border-radius:10px}
+  #panel .actions a.primary{background:var(--teal);color:#08110f}
+  #panel .actions a.ghost{border:1px solid var(--line);color:var(--ink)}
+  #close{position:absolute;top:18px;right:18px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
+    background:transparent;color:var(--muted);font-size:16px;cursor:pointer;transition:color .2s,border-color .2s}
+  #close:hover{color:var(--teal);border-color:var(--teal)}
+
+  #fallback{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50;background:var(--bg);
+    text-align:center;padding:30px;color:var(--muted);line-height:1.7}
+  #fallback a{color:var(--teal)}
+
+  /* ---------- intro: secondary escape hatch ---------- */
+  #skip{padding:13px 24px;font-size:13.5px;font-weight:600;color:var(--ink);
+    background:rgba(255,255,255,.055);border:1px solid #36445f}
+  #skip:hover{transform:translateY(-2px);color:var(--teal);border-color:var(--teal);background:rgba(79,216,196,.1)}
+
+  /* ---------- hotspot pins ---------- */
+  #pins{position:fixed;inset:0;z-index:15;pointer-events:none}
+  .pin{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;padding:0;background:none;border:none;
+    display:flex;align-items:center;gap:9px;cursor:pointer;opacity:0;transition:opacity .45s}
+  .pin.show{opacity:1}
+  .pin i{position:relative;flex:0 0 auto;width:12px;height:12px;border-radius:50%;background:var(--teal);
+    box-shadow:0 0 0 4px rgba(79,216,196,.16),0 0 12px rgba(79,216,196,.5)}
+  .pin i::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--teal);
+    animation:ping 2.6s cubic-bezier(.2,.7,.3,1) infinite}
+  .pin.lamp i{background:var(--amber);box-shadow:0 0 0 4px rgba(255,180,94,.16),0 0 12px rgba(255,180,94,.55)}
+  .pin.lamp i::after{border-color:var(--amber)}
+  @keyframes ping{0%{transform:scale(.65);opacity:.85}70%{transform:scale(2.2);opacity:0}100%{opacity:0}}
+  .pin b{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--ink);background:rgba(11,15,23,.88);
+    border:1px solid var(--line);padding:5px 11px;border-radius:999px;white-space:nowrap;backdrop-filter:blur(6px);
+    opacity:0;transform:translateX(-8px);transition:opacity .25s,transform .25s}
+  .pin:hover b,.pin.reveal b{opacity:1;transform:none}
+  .pin.flip{flex-direction:row-reverse}
+  .pin.flip b{transform:translateX(8px)}
+  .pin.flip:hover b,.pin.flip.reveal b{transform:none}
+  .pin:hover i{background:#fff}
+  #pins.dim{opacity:.2;transition:opacity .3s}
+  @media (max-width:720px){ .pin b{display:none} }
+
+  /* ---------- lights toggle ---------- */
+  #lightsBtn{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);
+    padding:7px 12px;border-radius:999px;background:rgba(16,20,29,.7);backdrop-filter:blur(6px);cursor:pointer;
+    transition:color .2s,border-color .2s,box-shadow .2s}
+  #lightsBtn:hover{color:var(--amber);border-color:var(--amber)}
+  #lightsBtn.on{color:#08110f;background:var(--amber);border-color:var(--amber)}
+  #lightsBtn.nudge{animation:nudge 2.8s ease-in-out infinite}
+  @keyframes nudge{0%,100%{box-shadow:0 0 0 0 rgba(255,180,94,0)}50%{box-shadow:0 0 0 6px rgba(255,180,94,.14)}}
+</style>
 </head>
-<body>
-  <div class="pageGlow pageGlow--left" aria-hidden="true"></div>
-  <div class="pageGlow pageGlow--right" aria-hidden="true"></div>
-  <div class="gridOverlay" aria-hidden="true"></div>
+<body class="noselect">
 
-  <header class="siteHeader">
-    <nav class="nav shell" id="nav">
-      <a class="brand" href="#top" aria-label="Go to top">
-        <span class="brandMark">SA</span>
-        <span class="brandText">
-          <strong>Stratis Avagianos</strong>
-          <span>Full-Stack Developer</span>
-        </span>
-      </a>
+<canvas id="scene"></canvas>
 
-      <button class="navToggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+<div id="intro">
+  <div class="kicker">avagianos-dev.gr</div>
+  <h1>The Connected <span>Workshop</span></h1>
+  <p>Step into the desk of <strong style="color:var(--ink)">Stratis Avagianos</strong> — a full-stack developer who builds
+  from the interface, through the backend, all the way to the hardware. Every device on this desk is a real project. Click them.</p>
+  <div id="introActions">
+    <button id="enter">Enter the workshop</button>
+    <a id="skip" href="profile.html">Or jump directly to my profile →</a>
+  </div>
+  <div class="tiny">drag to orbit &nbsp;·&nbsp; scroll to zoom &nbsp;·&nbsp; click a device</div>
+</div>
 
-      <div class="navLinks" id="navLinks">
-        <a class="navLink" href="#projects">Projects</a>
-        <a class="navLink" href="#systems">Systems UI</a>
-        <a class="navLink" href="#experience">Experience</a>
-        <a class="navLink" href="#skills">Skills</a>
-        <a class="navLink" href="#learning">Now</a>
-        <a class="navLink" href="#contact">Contact</a>
-        <a class="button button--ghost" href="assets/resume.pdf" download>Resume</a>
-      </div>
-    </nav>
-  </header>
+<div id="hud">
+  <a class="brand" href="profile.html" target="_blank" rel="noopener">
+    <div class="logo">SA</div>
+    <div><b>Stratis Avagianos</b><small>full-stack · Piraeus, GR</small></div>
+  </a>
+  <div class="links">
+    <a href="profile.html" target="_blank" rel="noopener">portfolio</a>
+    <a href="https://github.com/ava1313" target="_blank" rel="noopener">github</a>
+    <a href="mailto:stratosav1999@gmail.com">email</a>
+    <button id="lightsBtn" class="nudge" title="Brighten the room">○ lights off</button>
+  </div>
+</div>
 
-  <main id="top">
-    <section class="hero shell">
-      <div class="heroCopy reveal">
-        <div class="eyebrowRow">
-          <span class="eyebrow">Available for junior and freelance roles</span>
-          <span class="eyebrow eyebrow--soft">Piraeus, Greece</span>
-        </div>
+<div id="hint" class="hide">drag to orbit · scroll to zoom · click any glowing marker</div>
+<div id="pins"></div>
+<div id="log"></div>
+<div id="tip"></div>
 
-        <h1 class="heroTitle">
-          Full-stack products,
-          <span>from interface to backend</span>
-          to connected devices.
-        </h1>
+<aside id="panel">
+  <button id="close" aria-label="Close">✕</button>
+  <div class="cat" id="p-cat"></div>
+  <h2 id="p-title"></h2>
+  <div id="p-body"></div>
+  <div class="tags" id="p-tags"></div>
+  <div class="actions" id="p-actions"></div>
+</aside>
 
-        <p class="heroLead">
-          I am Stratis, a full-stack developer who enjoys building complete systems: frontend experiences, backend
-          logic, databases, mobile apps, APIs, and hardware-connected flows. I care about polished UI, but I do not
-          stop there. I like making the whole thing work. I have also recently finished my Army service and I am fully
-          focused on building what comes next.
-        </p>
+<div id="fallback">
+  <div>This 3D experience needs WebGL.<br/>Visit the classic portfolio instead → <a href="profile.html">avagianos-dev.gr/profile.html</a></div>
+</div>
 
-        <div class="heroActions">
-          <a class="button button--primary" href="#projects">See selected work</a>
-          <a class="button button--ghost" href="mailto:stratosav1999@gmail.com">Email me</a>
-          <a class="button button--ghost" href="https://github.com/ava1313" target="_blank" rel="noreferrer">GitHub</a>
-          <a class="button button--ghost" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
-        </div>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 
-        <div class="heroMeta">
-          <div class="metric">
-            <span class="metricLabel">What I build</span>
-            <strong>Web apps, mobile apps, APIs, dashboards, and connected-device flows</strong>
-          </div>
-          <div class="metric">
-            <span class="metricLabel">Comfort zone</span>
-            <strong>React, Vite, TypeScript, Python, Firebase, databases, MQTT, Docker</strong>
-          </div>
-          <div class="metric">
-            <span class="metricLabel">Dream</span>
-            <strong>Create or join a team that publishes a successful game</strong>
-          </div>
-        </div>
-      </div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-      <div class="heroPanel reveal depth" data-depth="10">
-        <div class="portraitCard">
-          <div class="portraitFrame">
-            <img src="assets/profile.png" alt="Portrait of Stratis Avagianos" />
-          </div>
-          <div class="portraitCaption">
-            <p>UI sense, backend curiosity, mobile energy, and a real interest in systems that connect software with hardware.</p>
-          </div>
-        </div>
+/* =========================================================
+   PROJECT DATA
+========================================================= */
+const PROJECTS = {
+  pc: {
+    cat: 'The dev rig', title: 'Full-stack, from interface to backend',
+    body: `<p>This is where everything gets built: React, Vite and TypeScript on the front, Python, Node.js and Firebase behind it, databases and Docker underneath.</p>
+           <p>Previously front-end developer at <strong>Darc</strong> (2023–2025), shipping responsive, production-ready client sites. Now open to junior and freelance roles.</p>`,
+    tags: ['React + Vite','TypeScript','Python','Node.js','Firebase','Docker'],
+    actions: [['primary','profile.html','View full portfolio'],['ghost','assets/resume.pdf','Resume']]
+  },
+  phone: {
+    cat: 'Current mobile project', title: 'TinyWins — a 7-day challenge app',
+    body: `<p>A Flutter app that nudges people into small life-improving wins: drink water, take a walk, do something kind. Firebase handles auth, data and workflows.</p>
+           <p>Around <strong>70% complete</strong> — heading for release on both Android and iOS. Product thinking, mobile UX and the motivation to actually ship.</p>`,
+    tags: ['Flutter','Android Studio','Firebase','Mobile UX'],
+    actions: [['ghost','profile.html#projects','More on the portfolio']]
+  },
+  esp: {
+    cat: 'Embedded + mobile', title: 'Emergency Button for elderly users',
+    body: `<p>An ESP32-based physical emergency button with a companion Android app, talking through Firebase. One press triggers immediate help — no smartphone fluency required.</p>
+           <p>Simple and human by design, down to the 3D-printed enclosure.</p>`,
+    tags: ['ESP32','Firebase','Android Studio','3D Printing'],
+    actions: [['ghost','profile.html#projects','More on the portfolio']]
+  },
+  pi: {
+    cat: 'Infrastructure + automation', title: 'Self-hosted Raspberry Pi lab',
+    body: `<p>A self-hosted environment running multiple services behind Docker and NGINX — networking, reverse proxies, deployments, and keeping it all reliable over time.</p>
+           <p>It also runs <strong>Wake My PC</strong>: a Telegram bot command that powers on the desktop from anywhere. Small system, very real usefulness.</p>`,
+    tags: ['Raspberry Pi','Docker','NGINX','Telegram Bot','Networking'],
+    actions: [['ghost','profile.html#projects','More on the portfolio']]
+  },
+  plant: {
+    cat: 'Interactive systems UI', title: 'Greenhouse Node — sensor telemetry',
+    body: `<p>The kind of connected system I love: an ESP32 node reading temperature, humidity and soil moisture, publishing over MQTT to a live control-surface dashboard.</p>
+           <p>Watch the glowing packets leave this plant — that's the pipeline: device → transport → backend → UI.</p>`,
+    tags: ['ESP32','Sensors','MQTT','Dashboards'],
+    actions: [['ghost','profile.html#systems','See the systems UI']]
+  },
+  pad: {
+    cat: 'Creative ambition', title: 'Unity, games & the long-term dream',
+    body: `<p>Built a Unity gamification layer that reacts to live JSON streams — motion and feedback that make data feel alive instead of static.</p>
+           <p>The dream stays on the desk: <strong>be part of a team that publishes a successful game.</strong></p>`,
+    tags: ['Unity','C#','Real-time data','Game design'],
+    actions: [['ghost','profile.html#projects','More on the portfolio']]
+  },
+  window: {
+    cat: 'Piraeus, Greece', title: 'Let\'s build something together',
+    body: `<p>Based by the harbor in Piraeus. Recently finished Army service and fully focused on what comes next: junior roles, freelance work, and teams where I can contribute seriously from day one.</p>`,
+    tags: ['Open to junior roles','Freelance','On-site / remote'],
+    actions: [['primary','mailto:stratosav1999@gmail.com','Email me'],['ghost','https://www.linkedin.com/in/stratis-avagianos798753231/','LinkedIn']]
+  },
+  cert: {
+    cat: 'Certification', title: 'Novibet Backend Academy',
+    body: `<p>Certificate of Achievement for completing the <strong>Novibet Backend Academy</strong> training program in .NET Programming, held in July 2026.</p>
+           <p>Hands-on .NET and C#, focused on practical backend development — it gave proper shape to knowledge I had been collecting piece by piece across the projects on this desk.</p>`,
+    tags: ['C#','.NET','Backend','Hands-on training'],
+    actions: [['primary','profile.html#certifications','See it on the portfolio'],['ghost','assets/NoviCertificate.jpg','View full size']]
+  }
+};
 
-        <div class="signalCard">
-          <div class="signalRow">
-            <span>Frontend</span>
-            <strong>React, Vite, TypeScript, modern UI</strong>
-          </div>
-          <div class="signalRow">
-            <span>Backend</span>
-            <strong>Python, Node.js, Firebase, APIs, databases</strong>
-          </div>
-          <div class="signalRow">
-            <span>Connected systems</span>
-            <strong>ESP32, MQTT, Raspberry Pi, self-hosting</strong>
-          </div>
-          <div class="signalRow">
-            <span>Creative ambition</span>
-            <strong>Games, Unity, interactive systems, mobile ideas</strong>
-          </div>
-        </div>
-      </div>
-    </section>
+/* =========================================================
+   RENDERER / SCENE
+========================================================= */
+const canvas = document.getElementById('scene');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+} catch(e) {
+  document.getElementById('fallback').style.display='flex';
+  document.getElementById('intro').style.display='none';
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
 
-    <section class="section shell" id="projects">
-      <div class="sectionIntro reveal">
-        <span class="sectionTag">Selected work</span>
-        <h2>Projects that show both product thinking and technical range.</h2>
-        <p>
-          I want the portfolio to show more than visual design. These projects reflect embedded systems, mobile apps,
-          backend communication, real-time interaction, and practical infrastructure work.
-        </p>
-      </div>
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0f17);
+scene.fog = new THREE.Fog(0x0b0f17, 14, 30);
 
-      <div class="projectGrid">
-        <article class="projectCard projectCard--featured reveal depth" data-depth="12">
-          <div class="projectHeader">
-            <span class="projectType">Current mobile project</span>
-            <h3>TinyWins — a 7-day challenge app</h3>
-          </div>
-          <p>
-            My current programming hobby is building mobile apps with Flutter in Android Studio using Firebase. Right
-            now I am building <strong>TinyWins</strong>, a 7-day challenge app that encourages people to do small things
-            that improve their life, like drinking water, walking, or doing something kind.
-          </p>
-          <p>
-            The app is around 70% done and my goal is to publish it soon on both Android and iPhone. It is a project I
-            care about because it combines product thinking, mobile UX, backend services, and the motivation to ship.
-          </p>
-          <div class="tagRow">
-            <span>Flutter</span>
-            <span>Android Studio</span>
-            <span>Firebase</span>
-            <span>Mobile UX</span>
-          </div>
-        </article>
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 100);
+camera.position.set(11, 8, 13);
 
-        <article class="projectCard reveal depth" data-depth="10">
-          <div class="projectHeader">
-            <span class="projectType">Embedded + mobile</span>
-            <h3>Emergency Button for elderly users</h3>
-          </div>
-          <p>
-            Designed an ESP32-based emergency button with a companion Android app and Firebase communication. The goal
-            was simple and human: one physical press should trigger immediate help without relying on smartphone fluency.
-          </p>
-          <div class="tagRow">
-            <span>ESP32</span>
-            <span>Firebase</span>
-            <span>Android Studio</span>
-            <span>3D Printing</span>
-          </div>
-        </article>
+const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 1.7, 0);
+controls.enableDamping = true;
+controls.dampingFactor = .06;
+controls.minDistance = 3;
+controls.maxDistance = 16;
+controls.maxPolarAngle = Math.PI * .49;
+controls.enablePan = false;
+controls.enabled = false;
 
-        <article class="projectCard reveal depth" data-depth="9">
-          <div class="projectHeader">
-            <span class="projectType">Infrastructure</span>
-            <h3>Self-hosted Raspberry Pi environment</h3>
-          </div>
-          <p>
-            Built and maintained a self-hosted setup using Docker and NGINX to run multiple services. It taught me a
-            lot about networking, reverse proxies, deployment constraints, and keeping things reliable over time.
-          </p>
-          <div class="tagRow">
-            <span>Raspberry Pi</span>
-            <span>NGINX</span>
-            <span>Docker</span>
-            <span>Reverse Proxy</span>
-          </div>
-        </article>
+/* =========================================================
+   MATERIAL / TEXTURE HELPERS
+========================================================= */
+const mat = (color, opts={}) => new THREE.MeshStandardMaterial({ color, roughness:.85, metalness:.05, ...opts });
+function canvasTexture(w, h, draw){
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return { tex:t, canvas:c, ctx:c.getContext('2d') };
+}
+function box(w,h,d,material,x=0,y=0,z=0,shadow=true){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
+  m.position.set(x,y,z);
+  if(shadow){ m.castShadow = true; m.receiveShadow = true; }
+  return m;
+}
 
-        <article class="projectCard reveal depth" data-depth="8">
-          <div class="projectHeader">
-            <span class="projectType">Real-time interaction</span>
-            <h3>Gamification layer in Unity</h3>
-          </div>
-          <p>
-            Created an interactive Unity experience that reacts to live JSON data streams. It explored how motion,
-            feedback, and real-time behavior can make information feel more alive than a static dashboard.
-          </p>
-          <div class="tagRow">
-            <span>Unity</span>
-            <span>C#</span>
-            <span>JSON</span>
-            <span>Real-time Data</span>
-          </div>
-        </article>
+/* =========================================================
+   ROOM
+========================================================= */
+const room = new THREE.Group(); scene.add(room);
 
-        <article class="projectCard reveal depth" data-depth="7">
-          <div class="projectHeader">
-            <span class="projectType">Automation</span>
-            <h3>Wake My PC from anywhere</h3>
-          </div>
-          <p>
-            Built a Raspberry Pi service triggered by a Telegram bot command to power on my PC remotely. It was a small
-            but very practical system that combined automation, networking, and remote-control logic.
-          </p>
-          <div class="tagRow">
-            <span>Telegram Bot</span>
-            <span>Automation</span>
-            <span>Networking</span>
-            <span>Raspberry Pi</span>
-          </div>
-        </article>
-      </div>
-    </section>
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(26,26), mat(0x141926,{roughness:.95}));
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; room.add(floor);
 
-    <section class="section shell" id="systems">
-      <div class="splitIntro reveal">
-        <div>
-          <span class="sectionTag">Interactive systems UI</span>
-          <h2>A fake control surface for the kind of ESP32 and sensor systems I like building.</h2>
-        </div>
-        <p>
-          This is not a live deployment. It is an interactive UI concept that simulates how I would present board
-          status, telemetry, and sensor updates in a product dashboard.
-        </p>
-      </div>
+// subtle floor grid glow
+const grid = new THREE.GridHelper(26, 26, 0x1d2740, 0x161d2e);
+grid.position.y = .002; room.add(grid);
 
-      <div class="systemsGrid">
-        <article class="boardCard reveal depth" data-depth="8">
-          <div class="boardHeader">
-            <div>
-              <span class="projectType">Board A</span>
-              <h3>Greenhouse Node</h3>
-            </div>
-            <span class="boardState is-online" id="boardStatus">Online</span>
-          </div>
+const backWall = box(26,10,.3, mat(0x121724,{roughness:.95}), 0,5,-3.2);
+backWall.receiveShadow = true; room.add(backWall);
+const sideWall = box(.3,10,26, mat(0x10151f,{roughness:.95}), -7.6,5,0);
+room.add(sideWall);
 
-          <div class="telemetryGrid">
-            <div class="telemetryTile">
-              <span>Temperature</span>
-              <strong id="tempValue">24.6&#176;C</strong>
-            </div>
-            <div class="telemetryTile">
-              <span>Humidity</span>
-              <strong id="humidityValue">58%</strong>
-            </div>
-            <div class="telemetryTile">
-              <span>Soil Moisture</span>
-              <strong id="soilValue">71%</strong>
-            </div>
-            <div class="telemetryTile">
-              <span>MQTT Latency</span>
-              <strong id="latencyValue">42 ms</strong>
-            </div>
-          </div>
+// baseboard glow strip along back wall
+const strip = box(26,.06,.06, new THREE.MeshBasicMaterial({color:0x2affd8}), 0,.06,-3.03,false);
+room.add(strip);
+const stripLight = new THREE.PointLight(0x2affd8, 3, 8); stripLight.position.set(0,.4,-2.6); room.add(stripLight);
 
-          <div class="boardControls">
-            <button class="button button--ghost boardAction" type="button" data-mode="normal">Normal mode</button>
-            <button class="button button--ghost boardAction" type="button" data-mode="alert">Alert mode</button>
-            <button class="button button--ghost boardAction" type="button" data-mode="sleep">Sleep mode</button>
-          </div>
+/* ---------- window with Piraeus night view ---------- */
+const view = canvasTexture(1024, 640, (g,w,h)=>{
+  const sky = g.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,'#070b16'); sky.addColorStop(.55,'#0e1a30'); sky.addColorStop(.75,'#132441');
+  g.fillStyle = sky; g.fillRect(0,0,w,h);
+  // stars
+  g.fillStyle='rgba(255,255,255,.8)';
+  for(let i=0;i<130;i++){ g.globalAlpha = Math.random()*.8+.1; g.fillRect(Math.random()*w, Math.random()*h*.55, 1.6, 1.6); }
+  g.globalAlpha = 1;
+  // moon
+  g.fillStyle='#e8eefc'; g.beginPath(); g.arc(w*.78,h*.2,34,0,7); g.fill();
+  g.fillStyle='rgba(232,238,252,.15)'; g.beginPath(); g.arc(w*.78,h*.2,52,0,7); g.fill();
+  // sea
+  const sea = g.createLinearGradient(0,h*.72,0,h);
+  sea.addColorStop(0,'#0c1830'); sea.addColorStop(1,'#060a14');
+  g.fillStyle = sea; g.fillRect(0,h*.72,w,h*.28);
+  g.fillStyle='rgba(240,220,160,.25)';
+  for(let i=0;i<40;i++){ g.fillRect(w*.5+Math.random()*w*.4, h*.74+Math.random()*h*.2, 6+Math.random()*14, 1.4); }
+  // skyline silhouette + lit windows
+  g.fillStyle='#0a0f1b';
+  let x=0;
+  while(x<w){ const bw=30+Math.random()*70, bh=40+Math.random()*120; g.fillRect(x,h*.72-bh,bw,bh);
+    g.fillStyle='rgba(255,196,110,.85)';
+    for(let j=0;j<bh/16;j++) for(let k=0;k<bw/14;k++) if(Math.random()<.28) g.fillRect(x+4+k*14, h*.72-bh+5+j*16, 6,7);
+    g.fillStyle='#0a0f1b'; x+=bw+6; }
+  // harbor crane silhouettes
+  g.strokeStyle='#0a0f1b'; g.lineWidth=5;
+  [[.12],[.3]].forEach(([fx])=>{ const bx=w*fx, by=h*.72;
+    g.beginPath(); g.moveTo(bx,by); g.lineTo(bx,by-150); g.lineTo(bx+90,by-190); g.lineTo(bx+90,by-160); g.stroke(); });
+});
+const windowGroup = new THREE.Group();
+const pane = new THREE.Mesh(new THREE.PlaneGeometry(3.4,2.2), new THREE.MeshBasicMaterial({ map:view.tex }));
+pane.position.set(0.8,3.4,-3.02);
+windowGroup.add(pane);
+const frameMat = mat(0x1c2436,{roughness:.6});
+windowGroup.add(box(3.6,.12,.14,frameMat,0.8,4.55,-3.0), box(3.6,.12,.14,frameMat,0.8,2.25,-3.0),
+  box(.12,2.4,.14,frameMat,-0.98,3.4,-3.0), box(.12,2.4,.14,frameMat,2.58,3.4,-3.0),
+  box(.07,2.3,.1,frameMat,0.8,3.4,-3.0));
+windowGroup.userData.project='window';
+room.add(windowGroup);
+const moonLight = new THREE.DirectionalLight(0x9db8ff, .5);
+moonLight.position.set(3,8,2); moonLight.castShadow = true;
+moonLight.shadow.mapSize.set(1024,1024);
+scene.add(moonLight);
+const ambient = new THREE.AmbientLight(0x36415e, .8);
+scene.add(ambient);
+const ceilingLight = new THREE.PointLight(0xcadcff, 0, 26, 1.4);
+ceilingLight.position.set(0, 7.2, .5);
+scene.add(ceilingLight);
 
-          <div class="eventLog" id="eventLog">
-            <div><span>09:42</span><p>MQTT connection healthy. Sensor sync running.</p></div>
-            <div><span>09:45</span><p>Moisture threshold stable. No action required.</p></div>
-            <div><span>09:47</span><p>Dashboard waiting for next packet.</p></div>
-          </div>
-        </article>
+/* ---------- neon sign: "Hello World" ---------- */
+const NEON = '#ffb45e';
+const neonTex = canvasTexture(1024, 660, (g,w,h)=>{
+  g.clearRect(0,0,w,h);                       // transparent: only the tubes glow
+  g.textAlign='center'; g.textBaseline='middle';
+  g.lineJoin='round'; g.lineCap='round';
+  const tube = (text, y, size) => {
+    // broad stack: Segoe Script (Win), Snell Roundhand/Apple Chancery (mac), then generic cursive
+    g.font = `bold ${size}px "Segoe Script","Brush Script MT","Snell Roundhand",`
+           + `"Apple Chancery","Lucida Handwriting","Comic Sans MS",cursive`;
+    // successive bloom passes, widest and softest first
+    for (const [blur, lw, alpha] of [[78,20,.42],[46,13,.62],[24,8,.85]]) {
+      g.shadowColor=NEON; g.shadowBlur=blur; g.globalAlpha=alpha;
+      g.strokeStyle=NEON; g.lineWidth=lw; g.strokeText(text,w/2,y);
+    }
+    // hot near-white core, the way real neon reads
+    g.globalAlpha=1; g.shadowColor=NEON; g.shadowBlur=18;
+    g.strokeStyle='#fff6e6'; g.lineWidth=4.5; g.strokeText(text,w/2,y);
+    g.fillStyle='#fffaf0'; g.fillText(text,w/2,y);
+  };
+  tube('Hello', h*.34, 205);
+  tube('World', h*.72, 205);
+  g.shadowBlur=0; g.globalAlpha=1;
+});
+const neon = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.3, 1.48),
+  new THREE.MeshBasicMaterial({ map:neonTex.tex, transparent:true,
+    blending:THREE.AdditiveBlending, depthWrite:false })
+);
+neon.position.set(-5.2, 3.5, -3.02);
+room.add(neon);
+const neonLight = new THREE.PointLight(0xffb45e, 3.4, 6.5);
+neonLight.position.set(-5.2, 3.5, -2.45);
+room.add(neonLight);
 
-        <article class="protocolCard reveal">
-          <span class="sectionTag">How I think about it</span>
-          <h3>Full-stack means the pipeline, not just the screen.</h3>
-          <p>
-            For connected products I like thinking across the whole chain: device state, transport, backend, storage,
-            and finally the UI that makes the data useful.
-          </p>
-          <div class="protocolList">
-            <div>
-              <strong>Device layer</strong>
-              <p>ESP32, sensors, GPIO logic, battery-aware behavior.</p>
-            </div>
-            <div>
-              <strong>Transport</strong>
-              <p>MQTT or HTTP for communication, depending on the system need.</p>
-            </div>
-            <div>
-              <strong>Backend</strong>
-              <p>Python, Node.js, Firebase, auth, rules, and data handling.</p>
-            </div>
-            <div>
-              <strong>Frontend</strong>
-              <p>Dashboards and mobile UIs that turn raw values into useful decisions.</p>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
+/* =========================================================
+   DESK
+========================================================= */
+const desk = new THREE.Group(); scene.add(desk);
+const deskTop = box(6.4,.12,2.5, mat(0x3a2d22,{roughness:.6}), 0,1.5,0);
+desk.add(deskTop);
+[[-3,-1],[3,-1],[-3,1],[3,1]].forEach(([sx,sz])=>{
+  desk.add(box(.12,1.44,.12, mat(0x151a26,{metalness:.4,roughness:.4}), sx*.98, .72, sz*1.05));
+});
+// back cable tray
+desk.add(box(6.2,.1,.16, mat(0x151a26), 0,1.32,-1.1));
 
-    <section class="section shell" id="experience">
-      <div class="splitIntro reveal">
-        <div>
-          <span class="sectionTag">Experience</span>
-          <h2>Work that shaped how I communicate, prioritize, and ship.</h2>
-        </div>
-        <p>
-          My path includes client work and non-dev roles too, and that has helped me become more practical, more
-          reliable, and easier to work with under real constraints.
-        </p>
-      </div>
+/* =========================================================
+   INTERACTIVE OBJECT GROUPS
+========================================================= */
+const interactive = [];   // groups with userData.project
+function makeRing(radius, x, z){
+  const ring = new THREE.Mesh(new THREE.RingGeometry(radius, radius+.045, 48),
+    new THREE.MeshBasicMaterial({ color:0x4fd8c4, transparent:true, opacity:0, side:THREE.DoubleSide }));
+  ring.rotation.x = -Math.PI/2; ring.position.set(x, 1.575, z);
+  scene.add(ring); return ring;
+}
+function register(group, key, ring){ group.userData.project = key; group.userData.ring = ring; interactive.push(group); }
 
-      <div class="timeline">
-        <article class="timelineItem reveal">
-          <span class="timelineDot" aria-hidden="true"></span>
-          <div>
-            <div class="timelineTop">
-              <h3>Front-End Developer at Darc</h3>
-              <span>Apr 2023 – Feb 2025</span>
-            </div>
-            <p>
-              Built and maintained client websites in WordPress with a strong focus on responsive UI, performance, and
-              production-ready delivery while working with designers and stakeholders.
-            </p>
-          </div>
-        </article>
+/* ---------- MONITOR + PC (project: pc) ---------- */
+const pcGroup = new THREE.Group(); desk.add(pcGroup);
+pcGroup.add(box(.9,.06,.5, mat(0x11151f,{metalness:.5,roughness:.35}), 0,1.59,-.72));
+pcGroup.add(box(.12,.6,.12, mat(0x11151f,{metalness:.5,roughness:.35}), 0,1.9,-.78));
+pcGroup.add(box(2.5,1.45,.09, mat(0x0d1119,{metalness:.4,roughness:.35}), 0,2.75,-.75));
+const screenUI = canvasTexture(1024,576,()=>{});
+function drawScreen(g,w,h,t){
+  g.fillStyle='#0c1220'; g.fillRect(0,0,w,h);
+  g.fillStyle='#111a2e'; g.fillRect(0,0,w,54);
+  g.fillStyle='#4fd8c4'; g.font='bold 24px monospace'; g.textAlign='left';
+  g.fillText('● avagianos-dev — control surface', 24, 36);
+  g.fillStyle='#9aa7bf'; g.font='20px monospace'; g.textAlign='right';
+  g.fillText('MQTT: connected · 42ms', w-24, 36); g.textAlign='left';
+  // left: code lines
+  const colors=['#4fd8c4','#ffb45e','#c792ea','#82aaff','#5d6b87'];
+  for(let i=0;i<14;i++){
+    const y=94+i*34; let x=40;
+    const seed = Math.sin(i*13.7 + Math.floor(t/900))*.5+.5;
+    for(let s=0;s<3+Math.floor(seed*3);s++){
+      const len=30+((i*37+s*53+Math.floor(t/900)*17)%110);
+      g.fillStyle=colors[(i+s)%colors.length]; g.globalAlpha=.85;
+      g.fillRect(x,y,len,12); x+=len+16;
+      if(x>w*.5) break;
+    }
+  }
+  g.globalAlpha=1;
+  // right: telemetry card
+  g.fillStyle='#101830'; g.fillRect(w*.56,80,w*.4,200);
+  g.strokeStyle='#26304a'; g.strokeRect(w*.56,80,w*.4,200);
+  g.fillStyle='#9aa7bf'; g.font='18px monospace'; g.fillText('greenhouse-node / board A', w*.58, 112);
+  g.fillStyle='#e8edf7'; g.font='bold 30px monospace';
+  const temp=(24.2+Math.sin(t/2400)*.7).toFixed(1);
+  const hum=(57+Math.sin(t/3100)*3).toFixed(0);
+  g.fillText(temp+'°C', w*.58, 158); g.fillText(hum+'%', w*.74, 158);
+  g.fillStyle='#5d6b87'; g.font='16px monospace';
+  g.fillText('temp', w*.58, 182); g.fillText('humidity', w*.74, 182);
+  // sparkline
+  g.strokeStyle='#4fd8c4'; g.lineWidth=3; g.beginPath();
+  for(let i=0;i<=40;i++){
+    const x=w*.58+i*(w*.36/40);
+    const y=250-Math.sin(i*.45+t/700)*16-Math.sin(i*.13+t/1500)*8;
+    i?g.lineTo(x,y):g.moveTo(x,y);
+  }
+  g.stroke();
+  // bottom bar chart
+  for(let i=0;i<24;i++){
+    const v=Math.abs(Math.sin(i*.8+t/1600))*90+12;
+    g.fillStyle= i%5? '#22406b' : '#4fd8c4';
+    g.fillRect(w*.56+i*17, 300+ (110-v), 11, v);
+  }
+  g.fillStyle='#5d6b87'; g.font='16px monospace';
+  g.fillText('packets / min', w*.56, 440);
+}
+const screen = new THREE.Mesh(new THREE.PlaneGeometry(2.36,1.32), new THREE.MeshBasicMaterial({ map:screenUI.tex }));
+screen.position.set(0,2.75,-.7); pcGroup.add(screen);
+const screenLight = new THREE.PointLight(0x66d9ff, 6, 5);
+screenLight.position.set(0,2.6,.2); pcGroup.add(screenLight);
+// keyboard + mouse
+const kb = box(1.5,.05,.5, mat(0x151b29,{roughness:.5}), 0,1.585,.4); pcGroup.add(kb);
+for(let r=0;r<4;r++) for(let c=0;c<14;c++)
+  pcGroup.add(box(.077,.03,.077, mat(0x232c42,{roughness:.4}), -.65+c*.1, 1.62, .24+r*.105, false));
+pcGroup.add(box(.16,.05,.26, mat(0x151b29,{roughness:.4}), .95,1.585,.45));
+// tower on floor
+const tower = new THREE.Group();
+tower.add(box(.55,1.15,1.15, mat(0x11151f,{metalness:.4,roughness:.4}), 0,.58,0));
+const rgb = new THREE.Mesh(new THREE.BoxGeometry(.045,.9,.045), new THREE.MeshBasicMaterial({ color:0x4fd8c4 }));
+rgb.position.set(-.283,.58,.48); tower.add(rgb);
+tower.position.set(3.65,0,-.4); scene.add(tower);
+tower.userData.parentProject='pc';
+const pcRing = makeRing(.95, 0, -.15);
+register(pcGroup,'pc',pcRing);
 
-        <article class="timelineItem reveal">
-          <span class="timelineDot" aria-hidden="true"></span>
-          <div>
-            <div class="timelineTop">
-              <h3>Assistant Accountant at Black Ice Inc</h3>
-              <span>Feb 2022 – Oct 2022</span>
-            </div>
-            <p>
-              Worked with records, structured data, and detail-heavy workflows. It strengthened my precision and the
-              sense of responsibility I now bring into software work.
-            </p>
-          </div>
-        </article>
+/* ---------- PHONE (project: phone) ---------- */
+const phoneGroup = new THREE.Group(); desk.add(phoneGroup);
+const phoneUI = canvasTexture(256,512,(g,w,h)=>{
+  g.fillStyle='#0f1b24'; g.fillRect(0,0,w,h);
+  const grad=g.createLinearGradient(0,0,0,140); grad.addColorStop(0,'#124f46'); grad.addColorStop(1,'#0f1b24');
+  g.fillStyle=grad; g.fillRect(0,0,w,140);
+  g.fillStyle='#4fd8c4'; g.font='bold 34px sans-serif'; g.textAlign='center';
+  g.fillText('TinyWins',w/2,64);
+  g.fillStyle='#9aa7bf'; g.font='17px sans-serif'; g.fillText('Day 5 of 7',w/2,100);
+  for(let i=0;i<7;i++){
+    const x=28+i*33.5, y=180;
+    g.beginPath(); g.arc(x,y,13,0,7);
+    if(i<5){ g.fillStyle='#4fd8c4'; g.fill(); g.strokeStyle='#0f1b24'; g.lineWidth=3;
+      g.beginPath(); g.moveTo(x-5,y); g.lineTo(x-1,y+4); g.lineTo(x+6,y-4); g.stroke(); }
+    else { g.strokeStyle='#31435c'; g.lineWidth=2.5; g.stroke(); }
+  }
+  const rows=[['💧','Drink water','done'],['🚶','Take a walk','done'],['💛','Do something kind','today']];
+  rows.forEach(([ic,label,st],i)=>{
+    const y=240+i*74;
+    g.fillStyle= st==='today' ? '#13293a' : '#101f2d';
+    g.beginPath(); g.roundRect(16,y,w-32,58,12); g.fill();
+    g.font='26px sans-serif'; g.textAlign='left'; g.fillText(ic,30,y+38);
+    g.fillStyle='#e8edf7'; g.font='17px sans-serif'; g.fillText(label,70,y+30);
+    g.fillStyle= st==='today' ? '#ffb45e' : '#4fd8c4'; g.font='13px sans-serif';
+    g.fillText(st==='today'?'● in progress':'✓ complete',70,y+50);
+  });
+  g.fillStyle='#4fd8c4'; g.beginPath(); g.roundRect(16,h-56,w-32,40,20); g.fill();
+  g.fillStyle='#08110f'; g.font='bold 16px sans-serif'; g.textAlign='center';
+  g.fillText('Complete today\'s win', w/2, h-30);
+});
+phoneGroup.add(box(.42,.035,.8, mat(0x0d1119,{metalness:.5,roughness:.3}), 0,1.58,0));
+const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(.38,.74), new THREE.MeshBasicMaterial({ map:phoneUI.tex }));
+phoneScreen.rotation.x=-Math.PI/2; phoneScreen.position.set(0,1.6,0); phoneGroup.add(phoneScreen);
+const phoneGlow = new THREE.PointLight(0x4fd8c4,1.2,1.2); phoneGlow.position.set(0,1.75,0); phoneGroup.add(phoneGlow);
+phoneGroup.position.set(1.35,0,.45); phoneGroup.rotation.y=-.35;
+register(phoneGroup,'phone',makeRing(.42,1.35,.45));
 
-        <article class="timelineItem reveal">
-          <span class="timelineDot" aria-hidden="true"></span>
-          <div>
-            <div class="timelineTop">
-              <h3>Sales Assistant at Black Ice Inc</h3>
-              <span>Feb 2022 – Oct 2022</span>
-            </div>
-            <p>
-              Improved my communication, adaptability, and problem solving through direct customer-facing work.
-            </p>
-          </div>
-        </article>
+/* ---------- ESP32 BREADBOARD + EMERGENCY BUTTON (project: esp) ---------- */
+const espGroup = new THREE.Group(); desk.add(espGroup);
+espGroup.add(box(.95,.06,.55, mat(0xe8e4da,{roughness:.6}), 0,1.59,0)); // breadboard
+espGroup.add(box(.34,.05,.2, mat(0x11202c,{roughness:.4}), -.18,1.645,0)); // esp module
+espGroup.add(box(.14,.02,.14, new THREE.MeshStandardMaterial({color:0x8a8f98,metalness:.9,roughness:.3}), -.18,1.68,0)); // shield
+const espLed = new THREE.Mesh(new THREE.BoxGeometry(.03,.03,.03), new THREE.MeshBasicMaterial({color:0x4fd8c4}));
+espLed.position.set(-.02,1.675,.06); espGroup.add(espLed);
+// jumper wires
+const wireCols=[0xff5d5d,0xffb45e,0x4fd8c4,0x82aaff];
+wireCols.forEach((c,i)=>{
+  const curve=new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(-.05+i*.07,1.66,.1), new THREE.Vector3(.15+i*.05,1.85,.25), new THREE.Vector3(.42,1.62,.33+i*.04));
+  const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,12,.011,6), mat(c,{roughness:.5}));
+  espGroup.add(tube);
+});
+// big red emergency button
+const btnBase=new THREE.Mesh(new THREE.CylinderGeometry(.16,.18,.08,24), mat(0xd8d8d8,{metalness:.3,roughness:.4}));
+btnBase.position.set(.55,1.6,.32); btnBase.castShadow=true; espGroup.add(btnBase);
+const btnCap=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.09,24),
+  new THREE.MeshStandardMaterial({color:0xff3b3b,emissive:0xaa0000,emissiveIntensity:.8,roughness:.35}));
+btnCap.position.set(.55,1.68,.32); btnCap.castShadow=true; espGroup.add(btnCap);
+const btnLight=new THREE.PointLight(0xff4444,1.4,1.4); btnLight.position.set(.55,1.85,.32); espGroup.add(btnLight);
+espGroup.position.set(-1.75,0,.35); espGroup.rotation.y=.25;
+register(espGroup,'esp',makeRing(.62,-1.75,.35));
 
-        <article class="timelineItem reveal">
-          <span class="timelineDot" aria-hidden="true"></span>
-          <div>
-            <div class="timelineTop">
-              <h3>Waiter at Balloni Beach Bar</h3>
-              <span>Jun 2021 – Aug 2021</span>
-            </div>
-            <p>
-              A high-pressure role that built stamina, focus, and the ability to stay calm while many things happen at once.
-            </p>
-          </div>
-        </article>
-      </div>
-    </section>
+/* ---------- RASPBERRY PI (project: pi) ---------- */
+const piGroup = new THREE.Group(); desk.add(piGroup);
+piGroup.add(box(.5,.05,.34, mat(0x1a6b3c,{roughness:.5}), 0,1.59,0)); // board
+piGroup.add(box(.2,.07,.16, new THREE.MeshStandardMaterial({color:0x8a8f98,metalness:.85,roughness:.35}), -.06,1.65,0)); // heatsink
+piGroup.add(box(.09,.08,.1, mat(0xb9c0cc,{metalness:.7,roughness:.4}), .19,1.66,-.08)); // usb
+piGroup.add(box(.09,.08,.1, mat(0xb9c0cc,{metalness:.7,roughness:.4}), .19,1.66,.08));
+const piLedA=new THREE.Mesh(new THREE.BoxGeometry(.025,.025,.025), new THREE.MeshBasicMaterial({color:0x44ff66}));
+piLedA.position.set(-.21,1.63,.14); piGroup.add(piLedA);
+const piLedB=new THREE.Mesh(new THREE.BoxGeometry(.025,.025,.025), new THREE.MeshBasicMaterial({color:0xff4444}));
+piLedB.position.set(-.16,1.63,.14); piGroup.add(piLedB);
+// tiny "server rack" shelf
+piGroup.add(box(.6,.03,.42, mat(0x151a26), 0,1.555,0));
+piGroup.position.set(-2.45,0,-.35); piGroup.rotation.y=-.3;
+register(piGroup,'pi',makeRing(.45,-2.45,-.35));
 
-    <section class="section shell" id="skills">
-      <div class="sectionIntro reveal">
-        <span class="sectionTag">Skills</span>
-        <h2>Broad enough to build full systems, not just one layer.</h2>
-        <p>
-          I want the page to reflect the real mix: frontend, backend, mobile, databases, infrastructure, and device communication.
-        </p>
-      </div>
+/* ---------- PLANT / GREENHOUSE NODE (project: plant) ---------- */
+const plantGroup = new THREE.Group(); desk.add(plantGroup);
+const pot=new THREE.Mesh(new THREE.CylinderGeometry(.18,.13,.26,20), mat(0xb0603a,{roughness:.7}));
+pot.position.y=1.69; pot.castShadow=true; plantGroup.add(pot);
+const soil=new THREE.Mesh(new THREE.CylinderGeometry(.165,.165,.03,20), mat(0x2a1d14,{roughness:1}));
+soil.position.y=1.82; plantGroup.add(soil);
+for(let i=0;i<7;i++){
+  const a=i/7*Math.PI*2;
+  const leaf=new THREE.Mesh(new THREE.ConeGeometry(.055,.4,8), mat(0x2f9e57,{roughness:.7}));
+  leaf.position.set(Math.cos(a)*.08,2.02,Math.sin(a)*.08);
+  leaf.rotation.set(Math.sin(a)*.5, 0, -Math.cos(a)*.5);
+  leaf.castShadow=true; plantGroup.add(leaf);
+}
+const midLeaf=new THREE.Mesh(new THREE.ConeGeometry(.06,.5,8), mat(0x37b565,{roughness:.7}));
+midLeaf.position.y=2.1; midLeaf.castShadow=true; plantGroup.add(midLeaf);
+// sensor stick
+plantGroup.add(box(.03,.3,.015, mat(0xe8e4da), .1,1.92,.05));
+const sensorLed=new THREE.Mesh(new THREE.BoxGeometry(.028,.028,.028), new THREE.MeshBasicMaterial({color:0x4fd8c4}));
+sensorLed.position.set(.1,2.08,.05); plantGroup.add(sensorLed);
+plantGroup.position.set(2.45,0,-.55);
+register(plantGroup,'plant',makeRing(.4,2.45,-.55));
 
-      <div class="skillColumns">
-        <article class="skillPanel reveal depth" data-depth="8">
-          <h3>Frontend and product UI</h3>
-          <p>Modern interfaces with React, Vite, TypeScript, JavaScript, CSS, Angular, and Three.js.</p>
-          <div class="skillList">
-            <div class="skill"><span>React + Vite</span><span class="dots" data-level="4"></span></div>
-            <div class="skill"><span>TypeScript</span><span class="dots" data-level="4"></span></div>
-            <div class="skill"><span>JavaScript</span><span class="dots" data-level="5"></span></div>
-            <div class="skill"><span>HTML / CSS</span><span class="dots" data-level="5"></span></div>
-            <div class="skill"><span>Angular / Three.js</span><span class="dots" data-level="3"></span></div>
-          </div>
-        </article>
+/* ---------- GAMEPAD (project: pad) ---------- */
+const padGroup=new THREE.Group(); desk.add(padGroup);
+padGroup.add(box(.52,.09,.3, mat(0x1b2233,{roughness:.45}), 0,1.6,0));
+const gripL=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.16,14), mat(0x1b2233,{roughness:.45}));
+gripL.position.set(-.2,1.58,.1); gripL.rotation.x=.5; padGroup.add(gripL);
+const gripR=gripL.clone(); gripR.position.x=.2; padGroup.add(gripR);
+[-.1,.03].forEach(sx=>{
+  const stick=new THREE.Mesh(new THREE.CylinderGeometry(.032,.026,.05,12), mat(0x2a3450,{roughness:.4}));
+  stick.position.set(sx,1.665,.02); padGroup.add(stick);
+});
+padGroup.add(box(.04,.04,.04, new THREE.MeshBasicMaterial({color:0xffb45e}), .13,1.66,-.05,false));
+padGroup.add(box(.04,.04,.04, new THREE.MeshBasicMaterial({color:0x4fd8c4}), .2,1.66,.01,false));
+padGroup.add(box(.04,.04,.04, new THREE.MeshBasicMaterial({color:0xff5d5d}), .13,1.66,.07,false));
+padGroup.add(box(.04,.04,.04, new THREE.MeshBasicMaterial({color:0x82aaff}), .06,1.66,.01,false));
+padGroup.position.set(2.05,0,.55); padGroup.rotation.y=-.5;
+register(padGroup,'pad',makeRing(.42,2.05,.55));
 
-        <article class="skillPanel reveal depth" data-depth="10">
-          <h3>Backend, data, and systems</h3>
-          <p>Python, Node.js, APIs, Firebase, databases, Docker, NGINX, Raspberry Pi, and MQTT-style connected flows.</p>
-          <div class="skillList">
-            <div class="skill"><span>Python</span><span class="dots" data-level="4"></span></div>
-            <div class="skill"><span>Node.js / APIs</span><span class="dots" data-level="4"></span></div>
-            <div class="skill"><span>Databases</span><span class="dots" data-level="3"></span></div>
-            <div class="skill"><span>Firebase</span><span class="dots" data-level="3"></span></div>
-            <div class="skill"><span>MQTT / Dev infra</span><span class="dots" data-level="3"></span></div>
-          </div>
-        </article>
+/* ---------- desk lamp + mug (decor) ---------- */
+const lamp=new THREE.Group();
+// warm brass body: the room is cool blue, so a warm lamp reads instantly as "light source"
+const brass = mat(0xc9955a,{metalness:.72,roughness:.34});
+const brassDark = mat(0x8d6234,{metalness:.7,roughness:.4});
 
-        <article class="skillPanel reveal depth" data-depth="7">
-          <h3>Mobile, games, and hardware</h3>
-          <p>Flutter, Android Studio, Unity, C#, ESP32, prototyping, graphics, and product ideas that cross disciplines.</p>
-          <div class="tagRow tagRow--soft">
-            <span>Flutter</span>
-            <span>Android Studio</span>
-            <span>Unity</span>
-            <span>C#</span>
-            <span>ESP32</span>
-            <span>Firebase</span>
-            <span>WordPress</span>
-            <span>Git / GitHub</span>
-          </div>
-        </article>
-      </div>
-    </section>
+const lampBase=new THREE.Mesh(new THREE.CylinderGeometry(.20,.22,.055,24), brassDark);
+lampBase.position.set(0,1.588,0); lampBase.castShadow=true; lamp.add(lampBase);
+lamp.add(box(.065,.66,.065, brass, 0,1.945,0));               // post 1.615 -> 2.275
+const elbow=new THREE.Mesh(new THREE.SphereGeometry(.062,14,12), brassDark);
+elbow.position.set(0,2.275,0); lamp.add(elbow);
 
-    <section class="section shell" id="learning">
-      <div class="splitIntro reveal">
-        <div>
-          <span class="sectionTag">Now and next</span>
-          <h2>What I am building now, what I want next, and where I want to go.</h2>
-        </div>
-        <p>
-          I like learning while shipping. Right now that means mobile product work, stronger backend habits, and keeping the game dream alive.
-        </p>
-      </div>
+// arm lives in its own group so it provably starts at the elbow
+const ARM_L=.66, ARM_A=-1.02;
+const armG=new THREE.Group();
+armG.position.set(0,2.275,0); armG.rotation.z=ARM_A;
+armG.add(box(.052,ARM_L,.052, brass, 0,ARM_L/2,0));
+lamp.add(armG);
+const armEnd=new THREE.Vector3(0,ARM_L,0)
+  .applyEuler(new THREE.Euler(0,0,ARM_A))
+  .add(new THREE.Vector3(0,2.275,0));
 
-      <div class="learningGrid">
-        <article class="learningCard reveal">
-          <h3>Current focus</h3>
-          <ul>
-            <li>Building mobile apps with Flutter in Android Studio</li>
-            <li>Using Firebase for auth, data, and app workflows</li>
-            <li>Finishing TinyWins and preparing it for release</li>
-          </ul>
-        </article>
+// head group hangs off armEnd and is aimed straight down the cone's own axis
+const LAMP_AIM=new THREE.Vector3(1.5,1.56,.45);               // a point on the desk, lamp-local
+const headG=new THREE.Group();
+headG.position.copy(armEnd);
+headG.quaternion.setFromUnitVectors(
+  new THREE.Vector3(0,-1,0),                                  // cone mouth faces -Y
+  LAMP_AIM.clone().sub(armEnd).normalize());
+lamp.add(headG);
 
-        <article class="learningCard reveal">
-          <h3>Actively growing</h3>
-          <ul>
-            <li>Deeper backend work with Python and cleaner APIs</li>
-            <li>Better database modeling and data handling</li>
-            <li>More confidence in cloud, DevOps, and deployment pipelines</li>
-          </ul>
-        </article>
+const shade=new THREE.Mesh(new THREE.ConeGeometry(.21,.30,22,1,true),
+  new THREE.MeshStandardMaterial({color:0xc9955a, metalness:.62, roughness:.35,
+    emissive:0xffb45e, emissiveIntensity:.38, side:THREE.DoubleSide}));
+shade.castShadow=true; headG.add(shade);                      // local y -.15 (mouth) .. +.15
+const shadeCap=new THREE.Mesh(new THREE.SphereGeometry(.05,12,10), brassDark);
+shadeCap.position.set(0,.15,0); headG.add(shadeCap);
+// bulb now sits INSIDE the shade instead of floating past the rim
+const bulb=new THREE.Mesh(new THREE.SphereGeometry(.072,14,12),
+  new THREE.MeshBasicMaterial({color:0xfff1d4}));
+bulb.position.set(0,-.045,0); headG.add(bulb);
 
-        <article class="learningCard reveal">
-          <h3>Long-term dream</h3>
-          <ul>
-            <li>Be part of a team that publishes a successful game</li>
-            <li>Build products that people actually keep using</li>
-            <li>Keep combining technical depth with creative ambition</li>
-          </ul>
-        </article>
-      </div>
-    </section>
+const haloTex = canvasTexture(128,128,(g,w,hh)=>{
+  const r=g.createRadialGradient(w/2,hh/2,0,w/2,hh/2,w/2);
+  r.addColorStop(0,'rgba(255,214,150,.95)'); r.addColorStop(.45,'rgba(255,180,94,.32)');
+  r.addColorStop(1,'rgba(255,180,94,0)');
+  g.fillStyle=r; g.fillRect(0,0,w,hh);
+});
+const lampHalo=new THREE.Sprite(new THREE.SpriteMaterial({map:haloTex.tex,
+  transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:.9}));
+lampHalo.scale.set(.8,.8,1); lampHalo.position.set(0,-.13,0);
+lampHalo.raycast=()=>{};
+headG.add(lampHalo);
 
-    <section class="section shell" id="contact">
-      <div class="contactWrap">
-        <div class="contactCopy reveal">
-          <span class="sectionTag">Contact</span>
-          <h2>If you need someone who can think across product, backend, UI, and connected systems, let’s talk.</h2>
-          <p>
-            I am open to junior developer opportunities, freelance work, and teams where I can grow as a full-stack developer while contributing seriously from day one.
-          </p>
+const lampLight=new THREE.SpotLight(0xffc07a, 40, 6, .70, .55, 1.3);
+lampLight.position.set(0,-.10,0); lampLight.castShadow=true;
+lampLight.shadow.mapSize.set(1024,1024);
+const lampTarget=new THREE.Object3D(); lampTarget.position.set(0,-2.0,0);  // straight down the axis
+headG.add(lampLight, lampTarget); lampLight.target=lampTarget;
+lamp.position.set(-2.9,0,-.75); scene.add(lamp);
 
-          <div class="contactList">
-            <a href="mailto:stratosav1999@gmail.com">stratosav1999@gmail.com</a>
-            <a href="tel:+306971951090">+30 697 195 1090</a>
-            <a href="https://avagianos-dev.gr/" target="_blank" rel="noreferrer">avagianos-dev.gr</a>
-            <a href="https://github.com/ava1313" target="_blank" rel="noreferrer">github.com/ava1313</a>
-            <a href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn profile</a>
-          </div>
-        </div>
+// faked pool where the cone actually meets the desk; on the scene, so it is not clickable
+const poolTex = canvasTexture(256,256,(g,w,hh)=>{
+  const r=g.createRadialGradient(w/2,hh/2,0,w/2,hh/2,w/2);
+  r.addColorStop(0,'rgba(255,196,130,.5)'); r.addColorStop(.55,'rgba(255,180,94,.16)');
+  r.addColorStop(1,'rgba(255,180,94,0)');
+  g.fillStyle=r; g.fillRect(0,0,w,hh);
+});
+const lampPool=new THREE.Mesh(new THREE.PlaneGeometry(2.3,2.3),
+  new THREE.MeshBasicMaterial({map:poolTex.tex, transparent:true,
+    blending:THREE.AdditiveBlending, depthWrite:false}));
+lampPool.rotation.x=-Math.PI/2; lampPool.position.set(-1.40,1.567,-.30);
+lampPool.raycast=()=>{};
+scene.add(lampPool);
+// the lamp itself is the light switch
+lamp.userData.project = 'lamp';
+lamp.userData.toggleLights = true;
+lamp.userData.ring = makeRing(.42, -2.9, -.75);
+interactive.push(lamp);
 
-        <article class="contactCard reveal">
-          <h3>Send a quick message</h3>
-          <p>This opens your email client, so it works nicely on GitHub Pages too.</p>
+const mug=new THREE.Group();
+const cup=new THREE.Mesh(new THREE.CylinderGeometry(.09,.08,.16,18,1,true), mat(0x3563a8,{roughness:.5,side:THREE.DoubleSide}));
+cup.position.y=1.64; cup.castShadow=true; mug.add(cup);
+const coffee=new THREE.Mesh(new THREE.CircleGeometry(.08,18), mat(0x2a1a0d,{roughness:.9}));
+coffee.rotation.x=-Math.PI/2; coffee.position.y=1.7; mug.add(coffee);
+const handle=new THREE.Mesh(new THREE.TorusGeometry(.05,.013,8,16,Math.PI), mat(0x3563a8,{roughness:.5}));
+handle.position.set(.1,1.64,0); handle.rotation.z=-Math.PI/2; mug.add(handle);
+mug.position.set(-.85,0,.68); desk.add(mug);
 
-          <form class="form" id="contactForm">
-            <label>
-              <span>Name</span>
-              <input class="input" id="cName" autocomplete="name" required />
-            </label>
-            <label>
-              <span>Email</span>
-              <input class="input" id="cEmail" type="email" autocomplete="email" required />
-            </label>
-            <label>
-              <span>Message</span>
-              <textarea class="input" id="cMsg" rows="5" required></textarea>
-            </label>
 
-            <div class="formRow">
-              <button class="button button--primary" type="submit">Open email</button>
-              <button class="button button--ghost" type="button" id="copyEmail">Copy email</button>
-            </div>
+/* =========================================================
+   LOUNGE: couch + coffee table + laptop (left, under the neon)
+   and a reading corner (right): arc lamp, pouf, rug
+========================================================= */
+const fabric     = mat(0x35405c,{roughness:.94});
+const fabricDark = mat(0x2b3449,{roughness:.96});
+const wood       = mat(0x4a3728,{roughness:.68});
 
-            <div class="formHint" id="formHint" aria-live="polite"></div>
-          </form>
-        </article>
-      </div>
-    </section>
-  </main>
+/* ---------- couch ---------- */
+const couch=new THREE.Group();
+// scaled up: next to a 6.4-wide desk the old 2.6 couch read as doll furniture
+couch.add(box(3.60,.40,1.25, fabric,      0,  .46,  0));      // seat block
+couch.add(box(3.60,.92,.24,  fabric,      0, 1.02, -.50));    // backrest
+couch.add(box(.28,.62,1.25,  fabricDark, -1.66,.74,  0));     // arms
+couch.add(box(.28,.62,1.25,  fabricDark,  1.66,.74,  0));
+for(const cx of [-1.02,0,1.02]) couch.add(box(.96,.19,1.06, fabricDark, cx,.755,.04));
+for(const [lx,lz] of [[-1.52,-.48],[1.52,-.48],[-1.52,.48],[1.52,.48]])
+  couch.add(box(.10,.26,.10, brassDark, lx,.13,lz));
+const cushionA=box(.50,.50,.16, mat(0x4c5f86,{roughness:.95}), -1.12,1.06,-.30);
+cushionA.rotation.z=.22; couch.add(cushionA);
+const cushionB=box(.47,.47,.16, mat(0x8d6234,{roughness:.95}),  1.14,1.05,-.30);
+cushionB.rotation.z=-.18; couch.add(cushionB);
+couch.position.set(-5.20,0,-2.30);
+scene.add(couch);
 
-  <footer class="footer shell">
-    <span>© <span id="year"></span> Efstratios (Stratis) Avagianos</span>
-    <a href="#top">Back to top</a>
-  </footer>
+/* ---------- coffee table ---------- */
+const ctable=new THREE.Group();
+ctable.add(box(1.90,.08,1.00, wood, 0,.52,0));
+ctable.add(box(1.72,.05,.84,  mat(0x2f2419,{roughness:.8}), 0,.31,0));   // lower shelf
+for(const [lx,lz] of [[-.86,-.41],[.86,-.41],[-.86,.41],[.86,.41]])
+  ctable.add(box(.075,.52,.075, brassDark, lx,.26,lz));
+ctable.position.set(-5.20,0,-.75);
+scene.add(ctable);
 
-  <script src="script.js"></script>
+/* ---------- laptop on the coffee table ---------- */
+const alu=mat(0x9aa3b2,{metalness:.75,roughness:.35});
+const laptop=new THREE.Group();
+laptop.add(box(.60,.028,.40, alu, 0,.572,.02));                          // deck
+const lidG=new THREE.Group();
+lidG.position.set(0,.586,-.18); lidG.rotation.x=-.35;                    // hinged open
+lidG.add(box(.60,.40,.018, alu, 0,.20,0));
+const lapTex=canvasTexture(480,320,(g,w,hh)=>{
+  g.fillStyle='#0c1220'; g.fillRect(0,0,w,hh);
+  g.fillStyle='#111a2e'; g.fillRect(0,0,w,30);
+  g.fillStyle='#4fd8c4'; g.font='bold 14px monospace'; g.textAlign='left';
+  g.fillText('tinywins / lib/main.dart', 12, 20);
+  const cols=['#4fd8c4','#ffb45e','#c792ea','#82aaff','#5d6b87'];
+  for(let i=0;i<11;i++){
+    let x=18; const y=52+i*23;
+    for(let s=0;s<2+((i*7)%3);s++){
+      const len=26+((i*31+s*47)%120);
+      g.fillStyle=cols[(i+s)%cols.length]; g.globalAlpha=.85;
+      g.fillRect(x,y,len,8); x+=len+12; if(x>w-40) break;
+    }
+  }
+  g.globalAlpha=1;
+});
+const lapScreen=new THREE.Mesh(new THREE.PlaneGeometry(.55,.35),
+  new THREE.MeshBasicMaterial({map:lapTex.tex}));
+lapScreen.position.set(0,.20,.011); lidG.add(lapScreen);
+laptop.add(lidG);
+laptop.position.set(-5.20,0,-.75);
+// screen faces the couch; the small offset from PI keeps a sliver readable from the room
+laptop.rotation.y=Math.PI-0.40;
+scene.add(laptop);
+
+/* ---------- rug ---------- */
+const rugTex=canvasTexture(512,512,(g,w,hh)=>{
+  g.fillStyle='#3d3547'; g.fillRect(0,0,w,hh);
+  g.strokeStyle='rgba(255,255,255,.05)'; g.lineWidth=6;
+  for(let r=34;r<w/2;r+=34){ g.beginPath(); g.arc(w/2,hh/2,r,0,7); g.stroke(); }
+  g.strokeStyle='rgba(255,180,94,.14)'; g.lineWidth=10;
+  g.beginPath(); g.arc(w/2,hh/2,w*.36,0,7); g.stroke();
+  g.beginPath(); g.arc(w/2,hh/2,w*.20,0,7); g.stroke();
+});
+const rug=new THREE.Mesh(new THREE.CircleGeometry(1.15,56),
+  new THREE.MeshStandardMaterial({map:rugTex.tex, roughness:.97}));
+rug.rotation.x=-Math.PI/2; rug.position.set(5.20,.012,-1.75);
+rug.receiveShadow=true; scene.add(rug);
+
+/* ---------- pouf ---------- */
+const pouf=new THREE.Group();
+const poufBody=new THREE.Mesh(new THREE.CylinderGeometry(.40,.45,.36,26),
+  mat(0x8a6247,{roughness:.95}));
+poufBody.position.y=.20; poufBody.castShadow=true; pouf.add(poufBody);
+const poufTop=new THREE.Mesh(new THREE.SphereGeometry(.40,22,12,0,Math.PI*2,0,Math.PI/2),
+  mat(0x9a6f50,{roughness:.95}));
+poufTop.position.y=.38; poufTop.scale.y=.42; poufTop.castShadow=true; pouf.add(poufTop);
+pouf.position.set(5.20,0,-1.75); scene.add(pouf);
+
+/* ---------- arc floor lamp, shade hanging over the pouf ---------- */
+const floorLamp=new THREE.Group();
+const flBase=new THREE.Mesh(new THREE.CylinderGeometry(.28,.32,.055,26), brassDark);
+flBase.position.y=.028; flBase.castShadow=true; floorLamp.add(flBase);
+floorLamp.add(box(.06,2.05,.06, brass, 0,1.05,0));                       // pole 0.03 -> 2.08
+const arcCurve=new THREE.QuadraticBezierCurve3(
+  new THREE.Vector3(0,2.05,0), new THREE.Vector3(0,2.95,-.40), new THREE.Vector3(-.85,2.62,-.80));
+const arcTube=new THREE.Mesh(new THREE.TubeGeometry(arcCurve,26,.032,10), brass);
+arcTube.castShadow=true; floorLamp.add(arcTube);
+const FL_HEAD=new THREE.Vector3(-.85,2.62,-.80);
+const flShade=new THREE.Mesh(new THREE.CylinderGeometry(.20,.30,.34,26,1,true),
+  new THREE.MeshStandardMaterial({color:0xe6d2ab, emissive:0xffcf8a, emissiveIntensity:.55,
+    roughness:.85, side:THREE.DoubleSide}));
+flShade.position.copy(FL_HEAD).y-=.17; floorLamp.add(flShade);
+const flBulb=new THREE.Mesh(new THREE.SphereGeometry(.075,14,12),
+  new THREE.MeshBasicMaterial({color:0xfff0d2}));
+flBulb.position.copy(FL_HEAD).y-=.20; floorLamp.add(flBulb);
+const flHalo=new THREE.Sprite(new THREE.SpriteMaterial({map:haloTex.tex,
+  transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:.75}));
+flHalo.scale.set(.9,.9,1); flHalo.position.copy(FL_HEAD).y-=.24;
+flHalo.raycast=()=>{}; floorLamp.add(flHalo);
+const flLight=new THREE.PointLight(0xffc98a, 13, 6.5);
+flLight.position.copy(FL_HEAD).y-=.26; floorLamp.add(flLight);
+floorLamp.position.set(6.05,0,-.95);
+scene.add(floorLamp);
+
+// warm pool on the rug beneath the arc lamp
+const rugPool=new THREE.Mesh(new THREE.PlaneGeometry(2.6,2.6),
+  new THREE.MeshBasicMaterial({map:poolTex.tex, transparent:true,
+    blending:THREE.AdditiveBlending, depthWrite:false}));
+rugPool.rotation.x=-Math.PI/2; rugPool.position.set(5.20,.02,-1.75);
+rugPool.raycast=()=>{}; scene.add(rugPool);
+
+/* =========================================================
+   FRAMED CERTIFICATE  (back wall, project: cert)
+   Inlined as a data URL so it also renders from file://,
+   where browsers block texture loads from disk.
+========================================================= */
+const CERT_DATA_URL = 'data:image/jpeg;base64,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nXWZJaBV2mu6uPKYxzWoLRY4QRWyOlS29LzEFJoUqyqeV/KMKmiaNBRarf0lg3ZD8lszYFcaoHy+iJzyxQCyLzaL+UsBaO63vU7N8VAAPfHFd6P1S7IBxV2FnLbbEuMqru3yLfmYQgO3V0NigVdxodjTasX84EdoA9p5xEvHWzUYy4NpY2ZFuXZx6w4Z3JZYP0j2mjpHQgAy6nXWV12WHKXz7q4hNbzYgVR2Bv3luwHVACNehXH9AAFGheZ+pZ+oZ+oZ+oZ+oY5cpRf8he1cf1NP9J1+KOj/AFPb9H+kXtXH9TT/AEnX4o6P9T2/R/kMkUoOk/SP5n6R/M/SP5n6R/M/SP5hpYyof6mn+k6/FHR/mb0bhyf9YxjGDrIbB/X/AP/aAAwDAQACAAMAAAAQ88199/8APPPPKTzz3/PPPPPPPPPPPPPPPPPAQggggggggggggggggggggggggggggvPF/PPfPO884PPPPPPPPPPPPPPPPPPPPPPAQggggggggggggggggggggggggggggvPe8fO8soPPPPPPPPPPPPPPPPPPPPPPPO+hAggggggggggggggggggggggggggggvfL9fPPPPPPPPPPPPPPPPPPPPN/fffffYLbQggghvwhjDDDDDDDCDTTTTTTTTTDDPbdVed/PPPPPPPPPPPPPPPPnLDl1+mgWP8AzmWEPceqRb33333332oIIIIIIIJf3333/wAV9288888888888888885x8mrcu5M/iA4/zJ1erCW99999999qCCCCCCCCX9999/0V888888888888888888oOXfp5hKxMasv1H9sOtpW99999999qCCCCCCCCX9999+9e888888888888888888t/tjCiCQgCRyxySRSixCW99999999qCCCCCCCCX999/wDPPPPPPPPPPPPPPPPPPPPPPPBBgijiihgijhgiggglvfffffffaggggggggl/fff8AzzzzzzzzzzzzzzzzzzzzzzzyKFHgMRzdRFTn+QIIJb33333332oIIIIIIIJf333zzzzzzzzzzzzzzzzzzzzzzzTx+Ft0h3H6XG/H6EIoJb33333332oIIIIIIIJf333zzzzzzzzzzzzzzzzzzzzzym4fFiXhEGtSVXHetzEwJb33333332oIIIIIIIJf333zzzzzzzzzzzzzzzz/AO++++8d7LCsWaqKq4vRZZLNrPb99999999qCCCCCCCCV+++8888888888888888qCCCCCCCCCCCCCCCCC/9999999999999999qCCCCCCCCCCCC8888888888888888qCCCCCCTNEIIFMAIME/977zxx9999999999qCCCCCCCCCCCC8888888888888888qCCCCCC9x/B9NV1JDPC0yIcS29999999999qCCCCCCCCCCCC8888888888888888qCCCCCCAwELVELHFPHwQ20++19999999999qCCCCCCCCCCCC8888888888888888qCCCCCCEwF5cs0Tpo58ESuoj39999999999qCCCCCCCCCCCC8888888888888888qAICCCCAACCAEKCIEKB531997/8Af/ffffffaggggggggggggvPPPPPPPPPPPPPPPKgIRyafQbRSaeVX1SWNppJq6otCt0nnffffaggggggggggggvPPPPPPPPPPPPPPPKgkeUVQ9VdX0zXeyTZWKFC0PDXD5rn/AH3332oIIIIIIIIIIILzzzzzzyvPPPPPPPPMIIIIAALAIIIIIJIALPHPHHHGHPHGEEEEEEL777777777777zzzzzzysIIIIIIIIIIIIIIIIIIIIIYTFImAIIIIIIIIIIIIIIIIP/AP8A/wD/AP8A/wD/AP8A/wDzzzzzzysIIIIIIIIIIIIIIIIIIIIIeywd/wCCCCCCCCCCCCCCCCCD/wD/AP8A/wD/AP8A/wD/AP8A8888888rCCCCCCCCCCCCCCCCCCCCOMCk4HPOCCCCCCCCCCCCCCCD/wD/AP8A/wD/AP8A/wD/AP8A8888888rCCCCCCCCCCCCCCCCCCCC7bcDyEk3CCCCCCCCCCCCCCCD/wD/AP8A/wD/AP8A/wD/AP8A8888888rCCCCCCCCCCCCCCCCCCCCQt0oHYGlCCCCCCCCCCCCCCCD/wD/AP8A/wD/AP8A/wD/AP3zzzzzzysIIIIIIIIIIIIIIIIIIIKKyoxE4QUIIIIIIIIIIIIIIIP/AP8A/wD/AP8A/wD/AP8A/wDzzzzzzysIIIIIIIIIIIIIIIIIIIJd+IENCUAIIIIIIIIIIIIIIIP/AP8A/wD/AP8A/wD/AP8AVPPPPPPPKwggggggggggggggggggggvgv0m6gggggggggggg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';
+
+const certGroup = new THREE.Group();
+const CERT_X = -2.35, CERT_Y = 3.5, CERT_W = 2.0, CERT_H = 1.125;
+
+// teal halo behind the frame - the wall equivalent of the floor hover rings
+const certGlow = new THREE.Mesh(
+  new THREE.PlaneGeometry(CERT_W + .46, CERT_H + .46),
+  new THREE.MeshBasicMaterial({ color:0x4fd8c4, transparent:true, opacity:0, depthWrite:false })
+);
+certGlow.position.set(CERT_X, CERT_Y, -3.048);
+certGroup.add(certGlow);
+
+const certTex = new THREE.TextureLoader().load(CERT_DATA_URL);
+certTex.colorSpace = THREE.SRGBColorSpace;
+certTex.anisotropy = 4;
+const certPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(CERT_W, CERT_H),
+  new THREE.MeshBasicMaterial({ map:certTex, color:0xd6dae2 })   // tinted down so it doesn't blow out the dim room
+);
+certPlane.position.set(CERT_X, CERT_Y, -3.03);
+certGroup.add(certPlane);
+
+// frame, matching the window mullions
+const hw = CERT_W/2, hh = CERT_H/2, fb = .05;
+certGroup.add(
+  box(CERT_W + .18, .1, .12, frameMat, CERT_X, CERT_Y + hh + fb, -3.0),
+  box(CERT_W + .18, .1, .12, frameMat, CERT_X, CERT_Y - hh - fb, -3.0),
+  box(.1, CERT_H + .18, .12, frameMat, CERT_X - hw - fb, CERT_Y, -3.0),
+  box(.1, CERT_H + .18, .12, frameMat, CERT_X + hw + fb, CERT_Y, -3.0)
+);
+
+// soft picture light so the frame reads as lit artwork
+const certLight = new THREE.PointLight(0xbfe6ff, 1.6, 3.4);
+certLight.position.set(CERT_X, CERT_Y + .95, -2.55);
+certGroup.add(certLight);
+
+room.add(certGroup);
+certGroup.userData.project = 'cert';
+certGroup.userData.ring = certGlow;
+certGroup.userData.flatGlow = true;   // a wall halo: fade it, but never spin it
+interactive.push(certGroup);
+
+/* =========================================================
+   MQTT PACKETS
+========================================================= */
+const packetGroup=new THREE.Group(); scene.add(packetGroup);
+const P = (x,y,z)=>new THREE.Vector3(x,y,z);
+const ROUTES=[
+  { from:P(2.45,2.1,-.55), to:P(-2.45,1.75,-.35), color:0x4fd8c4 },   // plant -> pi
+  { from:P(-1.6,1.75,.3),  to:P(-2.45,1.75,-.35), color:0xff8f5d },  // esp -> pi
+  { from:P(1.35,1.7,.45),  to:P(-2.45,1.8,-.35),  color:0x82aaff },  // phone -> pi
+  { from:P(-2.45,1.75,-.35), to:P(3.65,1.0,-.4),  color:0x4fd8c4 },  // pi -> tower
+  { from:P(3.65,1.2,-.4),  to:P(0,2.7,-.7),       color:0xffd166 }   // tower -> screen
+];
+const packets=[];
+function spawnPacket(){
+  const r=ROUTES[Math.floor(Math.random()*ROUTES.length)];
+  const mid=r.from.clone().lerp(r.to,.5); mid.y+=.9+Math.random()*.7;
+  const curve=new THREE.QuadraticBezierCurve3(r.from,mid,r.to);
+  const m=new THREE.Mesh(new THREE.SphereGeometry(.035,8,8), new THREE.MeshBasicMaterial({color:r.color}));
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({color:r.color,transparent:true,opacity:.35,depthWrite:false}));
+  halo.scale.set(.22,.22,1); m.add(halo);
+  packetGroup.add(m);
+  packets.push({mesh:m,curve,t:0,speed:.25+Math.random()*.2});
+}
+setInterval(()=>{ if(!document.hidden && packets.length<9) spawnPacket(); }, 700);
+
+/* dust particles */
+const dustGeo=new THREE.BufferGeometry();
+const dustPos=new Float32Array(240*3);
+for(let i=0;i<240;i++){ dustPos[i*3]=(Math.random()-.5)*12; dustPos[i*3+1]=Math.random()*5+.3; dustPos[i*3+2]=(Math.random()-.5)*8; }
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos,3));
+const dust=new THREE.Points(dustGeo, new THREE.PointsMaterial({color:0x8fa3c8,size:.02,transparent:true,opacity:.35}));
+scene.add(dust);
+
+/* =========================================================
+   UI: log, tooltip, panel
+========================================================= */
+const LOG_LINES=[
+  'esp32/greenhouse › temp 24.6°C · hum 58%',
+  'mqtt › publish ok (42 ms)',
+  'pi › docker: 6 services healthy',
+  'tinywins › day 5/7 completed ✓',
+  'wakemypc › telegram trigger armed',
+  'nginx › reverse proxy: all routes 200',
+  'esp32/sos-button › heartbeat ok',
+  'firebase › sync complete',
+  'unity › json stream: 60 fps',
+  'soil moisture › 71% · no action needed'
+];
+const logEl=document.getElementById('log');
+let logIdx=0;
+function pushLog(){
+  const row=document.createElement('div'); row.className='row';
+  const now=new Date();
+  row.innerHTML=`<span class="t">${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}</span> ${LOG_LINES[logIdx++ % LOG_LINES.length]}`;
+  logEl.appendChild(row);
+  requestAnimationFrame(()=>row.classList.add('show'));
+  while(logEl.children.length>5) logEl.removeChild(logEl.firstChild);
+}
+setInterval(()=>{ if(!document.hidden) pushLog(); }, 2600);
+
+const tip=document.getElementById('tip');
+const TIP_LABELS={pc:'The dev rig',phone:'TinyWins (Flutter)',esp:'Emergency Button (ESP32)',pi:'Raspberry Pi lab',plant:'Greenhouse node',pad:'Unity & the game dream',window:'Piraeus · contact',cert:'Novibet certificate',
+  lamp:'Desk lamp · click for light'};
+
+/* ---------- hotspot pins: HTML markers projected from 3D ---------- */
+const PIN_ANCHORS = {
+  pc:     new THREE.Vector3(   0, 3.62, -.72),
+  phone:  new THREE.Vector3(1.35, 1.90,  .45),
+  esp:    new THREE.Vector3(-1.6, 1.95,  .30),
+  pi:     new THREE.Vector3(-2.45,1.82, -.35),
+  plant:  new THREE.Vector3(2.45, 2.42, -.55),
+  pad:    new THREE.Vector3(2.05, 1.88,  .55),
+  cert:   new THREE.Vector3(-2.35,4.30, -3.0),
+  window: new THREE.Vector3( .80, 4.32, -3.0),
+  lamp:   new THREE.Vector3(-2.72, 2.98, -.72)
+};
+const pinsEl = document.getElementById('pins');
+const pins = [];
+let pinHovered = null;
+for (const [key, anchor] of Object.entries(PIN_ANCHORS)) {
+  const el = document.createElement('button');
+  el.className = 'pin' + (key === 'lamp' ? ' lamp' : '');
+  el.innerHTML = `<i></i><b>${TIP_LABELS[key]}</b>`;
+  el.onclick = () => { key === 'lamp' ? setLights(!lightsOn) : openPanel(key); };
+  el.onpointerenter = () => { pinHovered = interactive.find(g => g.userData.project === key) || null; };
+  el.onpointerleave = () => { pinHovered = null; };
+  pinsEl.appendChild(el);
+  pins.push({ key, anchor, el });
+}
+const _proj = new THREE.Vector3();
+function updatePins(){
+  for (const p of pins) {
+    _proj.copy(p.anchor).project(camera);
+    if (_proj.z > 1) { p.el.classList.remove('show'); continue; }
+    p.el.classList.add('show');
+    const sx = (_proj.x * .5 + .5) * innerWidth;
+    p.el.style.left = sx + 'px';
+    p.el.style.top  = ((-_proj.y * .5 + .5) * innerHeight) + 'px';
+    p.el.classList.toggle('flip', sx < innerWidth * .34);   // label opens away from the edge
+  }
+}
+
+/* ---------- room lighting ---------- */
+const lightsBtn = document.getElementById('lightsBtn');
+const LIGHTS = {
+  off: { amb:.80, ceil: 0, moon:.50, expo:1.10 },
+  on:  { amb:1.55, ceil:46, moon:.90, expo:1.28 }
+};
+let lightsOn = false;
+function setLights(on){
+  lightsOn = on;
+  lightsBtn.classList.toggle('on', on);
+  lightsBtn.classList.remove('nudge');
+  lightsBtn.textContent = on ? '● lights on' : '○ lights off';
+}
+lightsBtn.onclick = () => setLights(!lightsOn);
+
+const panel=document.getElementById('panel');
+function openPanel(key){
+  const d=PROJECTS[key];
+  document.getElementById('p-cat').textContent=d.cat;
+  document.getElementById('p-title').textContent=d.title;
+  document.getElementById('p-body').innerHTML=d.body;
+  document.getElementById('p-tags').innerHTML=d.tags.map(t=>`<span>${t}</span>`).join('');
+  document.getElementById('p-actions').innerHTML=d.actions.map(([cls,href,label])=>
+    `<a class="${cls}" href="${href}" target="_blank" rel="noopener">${label}</a>`).join('');
+  panel.classList.add('open');
+  pinsEl.classList.add('dim');
+}
+document.getElementById('close').onclick=()=>{ panel.classList.remove('open'); pinsEl.classList.remove('dim'); };
+
+/* =========================================================
+   INTERACTION (raycast)
+========================================================= */
+const raycaster=new THREE.Raycaster();
+const pointer=new THREE.Vector2();
+let hovered=null;
+function findProject(obj){
+  while(obj){ if(obj.userData.project) return obj; if(obj.userData.parentProject) return interactive.find(g=>g.userData.project===obj.userData.parentProject); obj=obj.parent; }
+  return null;
+}
+const pickTargets=[...interactive, tower, windowGroup];
+function updatePointer(e){
+  pointer.x=(e.clientX/innerWidth)*2-1;
+  pointer.y=-(e.clientY/innerHeight)*2+1;
+}
+addEventListener('pointermove', e=>{
+  if(e.target.closest('.pin')) return;      // pin handles its own hover
+  updatePointer(e);
+  raycaster.setFromCamera(pointer,camera);
+  const hits=raycaster.intersectObjects(pickTargets,true);
+  const g=hits.length?findProject(hits[0].object):null;
+  if(g!==hovered){
+    hovered=g;
+    document.body.style.cursor=g?'pointer':'default';
+    tip.style.opacity=g?1:0;
+    if(g) tip.textContent=TIP_LABELS[g.userData.project]||'';
+  }
+  if(g){ tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px'; }
+});
+let downXY=null;
+addEventListener('pointerdown', e=>{ downXY=[e.clientX,e.clientY]; });
+addEventListener('pointerup', e=>{
+  if(!downXY) return;
+  const moved=Math.hypot(e.clientX-downXY[0], e.clientY-downXY[1]);
+  downXY=null;
+  if(moved>6) return;                       // it was a drag, not a click
+  if(e.target.closest('#panel,#hud,#intro,.pin')) return;
+  updatePointer(e);
+  raycaster.setFromCamera(pointer,camera);
+  const hits=raycaster.intersectObjects(pickTargets,true);
+  const g=hits.length?findProject(hits[0].object):null;
+  if(g){
+    if(g.userData.toggleLights) setLights(!lightsOn);
+    else openPanel(g.userData.project);
+  } else {
+    panel.classList.remove('open');
+    pinsEl.classList.remove('dim');
+  }
+});
+
+/* =========================================================
+   INTRO + ANIMATION LOOP
+========================================================= */
+let entered=false, enterStart=0, attractUntil=0;
+const camFrom=new THREE.Vector3(11,8,13);
+const camTo=new THREE.Vector3(0.6,4.0,10.2);
+document.getElementById('enter').onclick=()=>{
+  document.getElementById('intro').classList.add('hide');
+  document.getElementById('hint').classList.remove('hide');
+  entered=true; enterStart=performance.now();
+  attractUntil = enterStart + 2400 + 9000;               // rings pulse while the eye settles
+  setTimeout(()=>document.getElementById('hint').classList.add('hide'), 12000);
+  // introduce the labels in two waves so neighbouring ones never overlap,
+  // then collapse everything back to quiet pulsing dots
+  const WAVE_A = ['pc','esp','plant','cert','phone'];
+  const wave = keys => pins.forEach(p=>p.el.classList.toggle('reveal', keys.includes(p.key)));
+  setTimeout(()=>wave(WAVE_A), 2300);
+  setTimeout(()=>wave(Object.keys(PIN_ANCHORS).filter(k=>!WAVE_A.includes(k))), 6100);
+  setTimeout(()=>wave([]), 9900);
+  pushLog();
+};
+const ease=t=>1-Math.pow(1-t,3);
+
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now();
+  const dt=Math.min(clock.getDelta(),.05);
+
+  // intro camera fly-in
+  if(entered && enterStart){
+    const k=Math.min((t-enterStart)/2400,1);
+    camera.position.lerpVectors(camFrom,camTo,ease(k));
+    if(k>=1){ enterStart=0; controls.enabled=true; }
+  } else if(!entered){
+    // idle drift behind intro
+    const a=t*.00008;
+    camera.position.set(Math.sin(a)*12, 8, Math.cos(a)*12+2);
+    camera.lookAt(0,1.7,0);
+  }
+
+  // screen redraw (~5fps is plenty)
+  if(!animate.lastDraw || t-animate.lastDraw>200){
+    drawScreen(screenUI.ctx,1024,576,t);
+    screenUI.tex.needsUpdate=true;
+    animate.lastDraw=t;
+  }
+
+  // blink / pulse
+  espLed.material.color.setHex( Math.floor(t/500)%2 ? 0x4fd8c4 : 0x1c5a50 );
+  piLedA.material.color.setHex( Math.floor(t/300)%2 ? 0x44ff66 : 0x114422 );
+  sensorLed.material.color.setHex( Math.floor(t/800)%2 ? 0x4fd8c4 : 0x1c5a50 );
+  btnCap.material.emissiveIntensity=.5+Math.sin(t/450)*.4;
+  btnLight.intensity=1+Math.sin(t/450)*.7;
+  rgb.material.color.setHSL((t/9000)%1,.7,.6);
+  screenLight.intensity=5.4+Math.sin(t/180)*.5;
+
+  // hover rings (floor) and halos (wall) - now with a resting glow so hotspots read as clickable
+  const active = pinHovered || hovered;
+  interactive.forEach((g,i)=>{
+    const ring = g.userData.ring;
+    if(!ring) return;
+    const flat = g.userData.flatGlow;
+    let idle = flat ? .06 : .13;
+    if(t < attractUntil) idle += (flat ? .05 : .13) * (.5 + .5*Math.sin(t/420 - i*.9));
+    const target = (active===g) ? (flat ? .34 : .85) : idle;
+    ring.material.opacity += (target-ring.material.opacity)*.12;
+    if(!flat) ring.rotation.z = t*.0006;
+  });
+
+  // room lighting eases toward the chosen state
+  {
+    const L = lightsOn ? LIGHTS.on : LIGHTS.off;
+    ambient.intensity      += (L.amb  - ambient.intensity)      * .07;
+    ceilingLight.intensity += (L.ceil - ceilingLight.intensity) * .07;
+    moonLight.intensity    += (L.moon - moonLight.intensity)    * .07;
+    renderer.toneMappingExposure += (L.expo - renderer.toneMappingExposure) * .07;
+  }
+
+  // packets
+  for(let i=packets.length-1;i>=0;i--){
+    const p=packets[i];
+    p.t+=dt*p.speed;
+    if(p.t>=1){ packetGroup.remove(p.mesh); packets.splice(i,1); continue; }
+    p.curve.getPoint(p.t, p.mesh.position);
+    const s=1+Math.sin(p.t*Math.PI)*.6;
+    p.mesh.scale.setScalar(s);
+  }
+
+  // neon: slow breathing, with a brief stutter every few seconds
+  {
+    const breathe = .93 + .07*Math.sin(t/900);
+    const stutter = (t % 8600) < 210 ? (Math.floor(t/58)%2 ? .32 : 1) : 1;
+    neon.material.opacity = breathe * stutter;
+    neonLight.intensity   = 3.4 * breathe * stutter;
+  }
+
+  // dust drift
+  dust.rotation.y = t*.00002;
+
+  if(entered) updatePins();
+
+  if(controls.enabled) controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize', ()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
 </body>
 </html>

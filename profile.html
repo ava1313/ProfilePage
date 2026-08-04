@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10141d" />
+  <title>Stratis Avagianos — Full-Stack Developer</title>
+  <meta
+    name="description"
+    content="Portfolio of Stratis Avagianos, a full-stack developer building practical products across frontend, backend, mobile, databases, and connected devices."
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="pageGlow pageGlow--left" aria-hidden="true"></div>
+  <div class="pageGlow pageGlow--right" aria-hidden="true"></div>
+  <div class="gridOverlay" aria-hidden="true"></div>
+
+  <header class="siteHeader">
+    <nav class="nav shell" id="nav">
+      <a class="brand" href="#top" aria-label="Go to top">
+        <span class="brandMark">SA</span>
+        <span class="brandText">
+          <strong>Stratis Avagianos</strong>
+          <span>Full-Stack Developer</span>
+        </span>
+      </a>
+
+      <button class="navToggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="navLinks" id="navLinks">
+        <a class="navLink" href="#projects">Projects</a>
+        <a class="navLink" href="#systems">Systems UI</a>
+        <a class="navLink" href="#experience">Experience</a>
+        <a class="navLink" href="#certifications">Certificate</a>
+        <a class="navLink" href="#skills">Skills</a>
+        <a class="navLink" href="#learning">Now</a>
+        <a class="navLink" href="#contact">Contact</a>
+        <a class="button button--ghost" href="assets/resume.pdf" download>Resume</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="heroCopy reveal">
+        <div class="eyebrowRow">
+          <span class="eyebrow">Available for junior and freelance roles</span>
+          <span class="eyebrow eyebrow--soft">Piraeus, Greece</span>
+        </div>
+
+        <h1 class="heroTitle">
+          Full-stack products,
+          <span>from interface to backend</span>
+          to connected devices.
+        </h1>
+
+        <p class="heroLead">
+          I am Stratis, a full-stack developer who enjoys building complete systems: frontend experiences, backend
+          logic, databases, mobile apps, APIs, and hardware-connected flows. I care about polished UI, but I do not
+          stop there. I like making the whole thing work. I have also recently finished my Army service and I am fully
+          focused on building what comes next.
+        </p>
+
+        <div class="heroActions">
+          <a class="button button--3d" href="index.html">Explore the 3D workshop →</a>
+          <a class="button button--primary" href="#projects">See selected work</a>
+          <a class="button button--ghost" href="mailto:stratosav1999@gmail.com">Email me</a>
+          <a class="button button--ghost" href="https://github.com/ava1313" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="button button--ghost" href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
+
+        <div class="heroMeta">
+          <div class="metric">
+            <span class="metricLabel">What I build</span>
+            <strong>Web apps, mobile apps, APIs, dashboards, and connected-device flows</strong>
+          </div>
+          <div class="metric">
+            <span class="metricLabel">Comfort zone</span>
+            <strong>React, Vite, TypeScript, Python, Firebase, databases, MQTT, Docker</strong>
+          </div>
+          <div class="metric">
+            <span class="metricLabel">Dream</span>
+            <strong>Create or join a team that publishes a successful game</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="heroPanel reveal depth" data-depth="10">
+        <div class="portraitCard">
+          <div class="portraitFrame">
+            <img src="assets/profile.png" alt="Portrait of Stratis Avagianos" />
+          </div>
+          <div class="portraitCaption">
+            <p>UI sense, backend curiosity, mobile energy, and a real interest in systems that connect software with hardware.</p>
+          </div>
+        </div>
+
+        <div class="signalCard">
+          <div class="signalRow">
+            <span>Frontend</span>
+            <strong>React, Vite, TypeScript, modern UI</strong>
+          </div>
+          <div class="signalRow">
+            <span>Backend</span>
+            <strong>Python, Node.js, Firebase, APIs, databases</strong>
+          </div>
+          <div class="signalRow">
+            <span>Connected systems</span>
+            <strong>ESP32, MQTT, Raspberry Pi, self-hosting</strong>
+          </div>
+          <div class="signalRow">
+            <span>Creative ambition</span>
+            <strong>Games, Unity, interactive systems, mobile ideas</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell" id="projects">
+      <div class="sectionIntro reveal">
+        <span class="sectionTag">Selected work</span>
+        <h2>Projects that show both product thinking and technical range.</h2>
+        <p>
+          I want the portfolio to show more than visual design. These projects reflect embedded systems, mobile apps,
+          backend communication, real-time interaction, and practical infrastructure work.
+        </p>
+      </div>
+
+      <div class="projectGrid">
+        <article class="projectCard projectCard--featured reveal depth" data-depth="12">
+          <div class="projectHeader">
+            <span class="projectType">Current mobile project</span>
+            <h3>TinyWins — a 7-day challenge app</h3>
+          </div>
+          <p>
+            My current programming hobby is building mobile apps with Flutter in Android Studio using Firebase. Right
+            now I am building <strong>TinyWins</strong>, a 7-day challenge app that encourages people to do small things
+            that improve their life, like drinking water, walking, or doing something kind.
+          </p>
+          <p>
+            The app is around 70% done and my goal is to publish it soon on both Android and iPhone. It is a project I
+            care about because it combines product thinking, mobile UX, backend services, and the motivation to ship.
+          </p>
+          <div class="tagRow">
+            <span>Flutter</span>
+            <span>Android Studio</span>
+            <span>Firebase</span>
+            <span>Mobile UX</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="10">
+          <div class="projectHeader">
+            <span class="projectType">Embedded + mobile</span>
+            <h3>Emergency Button for elderly users</h3>
+          </div>
+          <p>
+            Designed an ESP32-based emergency button with a companion Android app and Firebase communication. The goal
+            was simple and human: one physical press should trigger immediate help without relying on smartphone fluency.
+          </p>
+          <div class="tagRow">
+            <span>ESP32</span>
+            <span>Firebase</span>
+            <span>Android Studio</span>
+            <span>3D Printing</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="9">
+          <div class="projectHeader">
+            <span class="projectType">Infrastructure</span>
+            <h3>Self-hosted Raspberry Pi environment</h3>
+          </div>
+          <p>
+            Built and maintained a self-hosted setup using Docker and NGINX to run multiple services. It taught me a
+            lot about networking, reverse proxies, deployment constraints, and keeping things reliable over time.
+          </p>
+          <div class="tagRow">
+            <span>Raspberry Pi</span>
+            <span>NGINX</span>
+            <span>Docker</span>
+            <span>Reverse Proxy</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="8">
+          <div class="projectHeader">
+            <span class="projectType">Real-time interaction</span>
+            <h3>Gamification layer in Unity</h3>
+          </div>
+          <p>
+            Created an interactive Unity experience that reacts to live JSON data streams. It explored how motion,
+            feedback, and real-time behavior can make information feel more alive than a static dashboard.
+          </p>
+          <div class="tagRow">
+            <span>Unity</span>
+            <span>C#</span>
+            <span>JSON</span>
+            <span>Real-time Data</span>
+          </div>
+        </article>
+
+        <article class="projectCard reveal depth" data-depth="7">
+          <div class="projectHeader">
+            <span class="projectType">Automation</span>
+            <h3>Wake My PC from anywhere</h3>
+          </div>
+          <p>
+            Built a Raspberry Pi service triggered by a Telegram bot command to power on my PC remotely. It was a small
+            but very practical system that combined automation, networking, and remote-control logic.
+          </p>
+          <div class="tagRow">
+            <span>Telegram Bot</span>
+            <span>Automation</span>
+            <span>Networking</span>
+            <span>Raspberry Pi</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="systems">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Interactive systems UI</span>
+          <h2>A fake control surface for the kind of ESP32 and sensor systems I like building.</h2>
+        </div>
+        <p>
+          This is not a live deployment. It is an interactive UI concept that simulates how I would present board
+          status, telemetry, and sensor updates in a product dashboard.
+        </p>
+      </div>
+
+      <div class="systemsGrid">
+        <article class="boardCard reveal depth" data-depth="8">
+          <div class="boardHeader">
+            <div>
+              <span class="projectType">Board A</span>
+              <h3>Greenhouse Node</h3>
+            </div>
+            <span class="boardState is-online" id="boardStatus">Online</span>
+          </div>
+
+          <div class="telemetryGrid">
+            <div class="telemetryTile">
+              <span>Temperature</span>
+              <strong id="tempValue">24.6&#176;C</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>Humidity</span>
+              <strong id="humidityValue">58%</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>Soil Moisture</span>
+              <strong id="soilValue">71%</strong>
+            </div>
+            <div class="telemetryTile">
+              <span>MQTT Latency</span>
+              <strong id="latencyValue">42 ms</strong>
+            </div>
+          </div>
+
+          <div class="boardControls">
+            <button class="button button--ghost boardAction" type="button" data-mode="normal">Normal mode</button>
+            <button class="button button--ghost boardAction" type="button" data-mode="alert">Alert mode</button>
+            <button class="button button--ghost boardAction" type="button" data-mode="sleep">Sleep mode</button>
+          </div>
+
+          <div class="eventLog" id="eventLog">
+            <div><span>09:42</span><p>MQTT connection healthy. Sensor sync running.</p></div>
+            <div><span>09:45</span><p>Moisture threshold stable. No action required.</p></div>
+            <div><span>09:47</span><p>Dashboard waiting for next packet.</p></div>
+          </div>
+        </article>
+
+        <article class="protocolCard reveal">
+          <span class="sectionTag">How I think about it</span>
+          <h3>Full-stack means the pipeline, not just the screen.</h3>
+          <p>
+            For connected products I like thinking across the whole chain: device state, transport, backend, storage,
+            and finally the UI that makes the data useful.
+          </p>
+          <div class="protocolList">
+            <div>
+              <strong>Device layer</strong>
+              <p>ESP32, sensors, GPIO logic, battery-aware behavior.</p>
+            </div>
+            <div>
+              <strong>Transport</strong>
+              <p>MQTT or HTTP for communication, depending on the system need.</p>
+            </div>
+            <div>
+              <strong>Backend</strong>
+              <p>Python, Node.js, Firebase, auth, rules, and data handling.</p>
+            </div>
+            <div>
+              <strong>Frontend</strong>
+              <p>Dashboards and mobile UIs that turn raw values into useful decisions.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="experience">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Experience</span>
+          <h2>Work that shaped how I communicate, prioritize, and ship.</h2>
+        </div>
+        <p>
+          My path includes client work and non-dev roles too, and that has helped me become more practical, more
+          reliable, and easier to work with under real constraints.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Front-End Developer at Darc</h3>
+              <span>Apr 2023 – Feb 2025</span>
+            </div>
+            <p>
+              Built and maintained client websites in WordPress with a strong focus on responsive UI, performance, and
+              production-ready delivery while working with designers and stakeholders.
+            </p>
+          </div>
+        </article>
+
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Assistant Accountant at Black Ice Inc</h3>
+              <span>Feb 2022 – Oct 2022</span>
+            </div>
+            <p>
+              Worked with records, structured data, and detail-heavy workflows. It strengthened my precision and the
+              sense of responsibility I now bring into software work.
+            </p>
+          </div>
+        </article>
+
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Sales Assistant at Black Ice Inc</h3>
+              <span>Feb 2022 – Oct 2022</span>
+            </div>
+            <p>
+              Improved my communication, adaptability, and problem solving through direct customer-facing work.
+            </p>
+          </div>
+        </article>
+
+        <article class="timelineItem reveal">
+          <span class="timelineDot" aria-hidden="true"></span>
+          <div>
+            <div class="timelineTop">
+              <h3>Waiter at Balloni Beach Bar</h3>
+              <span>Jun 2021 – Aug 2021</span>
+            </div>
+            <p>
+              A high-pressure role that built stamina, focus, and the ability to stay calm while many things happen at once.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="certifications">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Certification</span>
+          <h2>Structured training behind the self-taught work.</h2>
+        </div>
+        <p>
+          Most of what I know came from building things and breaking them. This one came with a structured
+          curriculum and real industry practice behind it, and it sharpened how I write C# and think about .NET.
+        </p>
+      </div>
+
+      <div class="certGrid">
+        <article class="certCard reveal depth" data-depth="10">
+          <div class="certContent">
+            <div class="certMeta">
+              <span class="projectType">.NET Programming</span>
+              <span class="certDate">July 2026</span>
+            </div>
+
+            <h3>Novibet Backend Academy</h3>
+            <p class="certIssuer">Certificate of Achievement · Issued by Novibet</p>
+
+            <p class="certBlurb">
+              A hands-on .NET training program run by Novibet, focused on practical backend development with C#.
+              It gave proper shape to knowledge I had been collecting piece by piece across my own projects, and
+              it is the direction I want to keep growing in: clean backend code, solid APIs, and systems that hold
+              up in production.
+            </p>
+
+            <div class="tagRow tagRow--soft">
+              <span>C#</span>
+              <span>.NET</span>
+              <span>Backend</span>
+              <span>Hands-on training</span>
+            </div>
+
+            <div class="certActions">
+              <a class="button button--primary" href="assets/NoviCertificate.jpg" target="_blank" rel="noreferrer">View certificate</a>
+            </div>
+          </div>
+
+          <a
+            class="certPreview"
+            href="assets/NoviCertificate.jpg"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="View the full Novibet Backend Academy certificate"
+          >
+            <img
+              src="assets/NoviCertificate.jpg"
+              alt="Novibet Certificate of Achievement awarded to Stratis Avagianos for completing the Novibet Backend Academy training program in .NET Programming, July 2026"
+              loading="lazy"
+              width="1920"
+              height="1080"
+            />
+            <span class="certPreviewHint">View full size</span>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="skills">
+      <div class="sectionIntro reveal">
+        <span class="sectionTag">Skills</span>
+        <h2>Broad enough to build full systems, not just one layer.</h2>
+        <p>
+          I want the page to reflect the real mix: frontend, backend, mobile, databases, infrastructure, and device communication.
+        </p>
+      </div>
+
+      <div class="skillColumns">
+        <article class="skillPanel reveal depth" data-depth="8">
+          <h3>Frontend and product UI</h3>
+          <p>Modern interfaces with React, Vite, TypeScript, JavaScript, CSS, Angular, and Three.js.</p>
+          <div class="skillList">
+            <div class="skill"><span>React + Vite</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>TypeScript</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>JavaScript</span><span class="dots" data-level="5"></span></div>
+            <div class="skill"><span>HTML / CSS</span><span class="dots" data-level="5"></span></div>
+            <div class="skill"><span>Angular / Three.js</span><span class="dots" data-level="3"></span></div>
+          </div>
+        </article>
+
+        <article class="skillPanel reveal depth" data-depth="10">
+          <h3>Backend, data, and systems</h3>
+          <p>Python, Node.js, APIs, Firebase, databases, Docker, NGINX, Raspberry Pi, and MQTT-style connected flows.</p>
+          <div class="skillList">
+            <div class="skill"><span>Python</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>Node.js / APIs</span><span class="dots" data-level="4"></span></div>
+            <div class="skill"><span>Databases</span><span class="dots" data-level="3"></span></div>
+            <div class="skill"><span>Firebase</span><span class="dots" data-level="3"></span></div>
+            <div class="skill"><span>MQTT / Dev infra</span><span class="dots" data-level="3"></span></div>
+          </div>
+        </article>
+
+        <article class="skillPanel reveal depth" data-depth="7">
+          <h3>Mobile, games, and hardware</h3>
+          <p>Flutter, Android Studio, Unity, C#, ESP32, prototyping, graphics, and product ideas that cross disciplines.</p>
+          <div class="tagRow tagRow--soft">
+            <span>Flutter</span>
+            <span>Android Studio</span>
+            <span>Unity</span>
+            <span>C#</span>
+            <span>ESP32</span>
+            <span>Firebase</span>
+            <span>WordPress</span>
+            <span>Git / GitHub</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="learning">
+      <div class="splitIntro reveal">
+        <div>
+          <span class="sectionTag">Now and next</span>
+          <h2>What I am building now, what I want next, and where I want to go.</h2>
+        </div>
+        <p>
+          I like learning while shipping. Right now that means mobile product work, stronger backend habits, and keeping the game dream alive.
+        </p>
+      </div>
+
+      <div class="learningGrid">
+        <article class="learningCard reveal">
+          <h3>Current focus</h3>
+          <ul>
+            <li>Building mobile apps with Flutter in Android Studio</li>
+            <li>Using Firebase for auth, data, and app workflows</li>
+            <li>Finishing TinyWins and preparing it for release</li>
+          </ul>
+        </article>
+
+        <article class="learningCard reveal">
+          <h3>Actively growing</h3>
+          <ul>
+            <li>Deeper backend work with Python and cleaner APIs</li>
+            <li>Better database modeling and data handling</li>
+            <li>More confidence in cloud, DevOps, and deployment pipelines</li>
+          </ul>
+        </article>
+
+        <article class="learningCard reveal">
+          <h3>Long-term dream</h3>
+          <ul>
+            <li>Be part of a team that publishes a successful game</li>
+            <li>Build products that people actually keep using</li>
+            <li>Keep combining technical depth with creative ambition</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell" id="contact">
+      <div class="contactWrap">
+        <div class="contactCopy reveal">
+          <span class="sectionTag">Contact</span>
+          <h2>If you need someone who can think across product, backend, UI, and connected systems, let’s talk.</h2>
+          <p>
+            I am open to junior developer opportunities, freelance work, and teams where I can grow as a full-stack developer while contributing seriously from day one.
+          </p>
+
+          <div class="contactList">
+            <a href="mailto:stratosav1999@gmail.com">stratosav1999@gmail.com</a>
+            <a href="tel:+306971951090">+30 697 195 1090</a>
+            <a href="https://avagianos-dev.gr/" target="_blank" rel="noreferrer">avagianos-dev.gr</a>
+            <a href="https://github.com/ava1313" target="_blank" rel="noreferrer">github.com/ava1313</a>
+            <a href="https://www.linkedin.com/in/stratis-avagianos798753231/" target="_blank" rel="noreferrer">LinkedIn profile</a>
+          </div>
+        </div>
+
+        <article class="contactCard reveal">
+          <h3>Send a quick message</h3>
+          <p>This opens your email client, so it works nicely on GitHub Pages too.</p>
+
+          <form class="form" id="contactForm">
+            <label>
+              <span>Name</span>
+              <input class="input" id="cName" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input class="input" id="cEmail" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Message</span>
+              <textarea class="input" id="cMsg" rows="5" required></textarea>
+            </label>
+
+            <div class="formRow">
+              <button class="button button--primary" type="submit">Open email</button>
+              <button class="button button--ghost" type="button" id="copyEmail">Copy email</button>
+            </div>
+
+            <div class="formHint" id="formHint" aria-live="polite"></div>
+          </form>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer shell">
+    <span>© <span id="year"></span> Efstratios (Stratis) Avagianos</span>
+    <a href="#top">Back to top</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

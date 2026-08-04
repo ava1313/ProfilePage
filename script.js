@@ -29,7 +29,7 @@
   }, { threshold: 0.12 });
   revealItems.forEach((item) => revealObserver.observe(item));
 
-  const navSectionIds = ["projects", "systems", "experience", "skills", "learning", "contact"];
+  const navSectionIds = ["projects", "systems", "experience", "certifications", "skills", "learning", "contact"];
   const sections = navSectionIds.map((id) => document.getElementById(id)).filter(Boolean);
   const navAnchors = $$(".navLink");
 
