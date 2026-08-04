@@ -261,10 +261,17 @@ try {
   document.getElementById('intro').style.display='none';
   throw e;
 }
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const PR_HI = Math.min(devicePixelRatio, 1.5);            // 2x on a hi-dpi panel is 4x the fragments
+const PR_LO = 1;
+function quality(pr){ renderer.setPixelRatio(pr); renderer.setSize(innerWidth, innerHeight); }
+renderer.setPixelRatio(PR_LO);
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;      // the Soft variant costs noticeably more per fragment
+// the lights never move, so bake the shadow maps for a few frames then stop
+// re-rendering them every frame - this is the single biggest win in the scene
+renderer.shadowMap.autoUpdate = false;
+let shadowWarmup = 4;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
@@ -317,17 +324,24 @@ floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; room.add(floor);
 const grid = new THREE.GridHelper(26, 26, 0x1d2740, 0x161d2e);
 grid.position.y = .002; room.add(grid);
 
-const backWall = box(26,10,.3, mat(0x121724,{roughness:.95}), 0,5,-3.2);
-backWall.receiveShadow = true; room.add(backWall);
-const sideWall = box(.3,10,26, mat(0x10151f,{roughness:.95}), -7.6,5,0);
-room.add(sideWall);
-const sideWallR = box(.3,10,26, mat(0x10151f,{roughness:.95}), 7.6,5,0);
-room.add(sideWallR);
+// Walls are single-sided planes with their normals pointing INTO the room, so they
+// draw from inside and are back-face culled from outside. Orbit past one and it
+// simply vanishes, giving a dolls-house view instead of the camera punching through.
+function wall(w,h,mtl,x,y,z,ry){
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),
+    new THREE.MeshStandardMaterial({color:mtl, roughness:.95, side:THREE.FrontSide}));
+  m.position.set(x,y,z); m.rotation.y=ry; m.receiveShadow=true; m.raycast=()=>{};
+  room.add(m); return m;
+}
+const backWall  = wall(26,10, 0x121724, 0, 5, -3.05, 0);              // normal +z
+backWall.material.side = THREE.DoubleSide;   // the art wall stays solid from behind
+const sideWall  = wall(26,10, 0x10151f, -7.45, 5, 0,  Math.PI/2);     // normal +x
+const sideWallR = wall(26,10, 0x10151f,  7.45, 5, 0, -Math.PI/2);     // normal -x
 
 // baseboard glow strip along back wall
 const strip = box(26,.06,.06, new THREE.MeshBasicMaterial({color:0x2affd8}), 0,.06,-3.03,false);
 room.add(strip);
-const stripLight = new THREE.PointLight(0x2affd8, 3, 8); stripLight.position.set(0,.4,-2.6); room.add(stripLight);
+// baseboard PointLight removed - the strip is MeshBasicMaterial and lights itself
 
 /* ---------- window: Piraeus, drawn for both night and day ---------- */
 function drawPiraeus(day){
@@ -582,7 +596,7 @@ const phoneUI = canvasTexture(256,512,(g,w,h)=>{
 phoneGroup.add(box(.42,.035,.8, mat(0x0d1119,{metalness:.5,roughness:.3}), 0,1.58,0));
 const phoneScreen = new THREE.Mesh(new THREE.PlaneGeometry(.38,.74), new THREE.MeshBasicMaterial({ map:phoneUI.tex }));
 phoneScreen.rotation.x=-Math.PI/2; phoneScreen.position.set(0,1.6,0); phoneGroup.add(phoneScreen);
-const phoneGlow = new THREE.PointLight(0x4fd8c4,1.2,1.2); phoneGlow.position.set(0,1.75,0); phoneGroup.add(phoneGlow);
+// phone PointLight removed - its screen is MeshBasicMaterial
 phoneGroup.position.set(1.35,0,.45); phoneGroup.rotation.y=-.35;
 register(phoneGroup,'phone',makeRing(.42,1.35,.45));
 
@@ -607,7 +621,7 @@ btnBase.position.set(.55,1.6,.32); btnBase.castShadow=true; espGroup.add(btnBase
 const btnCap=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.09,24),
   new THREE.MeshStandardMaterial({color:0xff3b3b,emissive:0xaa0000,emissiveIntensity:.8,roughness:.35}));
 btnCap.position.set(.55,1.68,.32); btnCap.castShadow=true; espGroup.add(btnCap);
-const btnLight=new THREE.PointLight(0xff4444,1.4,1.4); btnLight.position.set(.55,1.85,.32); espGroup.add(btnLight);
+// button PointLight removed - the cap is emissive and pulses on its own
 espGroup.position.set(-1.75,0,.35); espGroup.rotation.y=.25;
 register(espGroup,'esp',makeRing(.62,-1.75,.35));
 
@@ -765,17 +779,19 @@ const wood       = mat(0x4a3728,{roughness:.68});
 
 /* ---------- couch ---------- */
 const couch=new THREE.Group();
-// scaled up: next to a 6.4-wide desk the old 2.6 couch read as doll furniture
-couch.add(box(3.60,.40,1.25, fabric,      0,  .46,  0));      // seat block
-couch.add(box(3.60,.92,.24,  fabric,      0, 1.02, -.50));    // backrest
-couch.add(box(.28,.62,1.25,  fabricDark, -1.66,.74,  0));     // arms
-couch.add(box(.28,.62,1.25,  fabricDark,  1.66,.74,  0));
-for(const cx of [-1.02,0,1.02]) couch.add(box(.96,.19,1.06, fabricDark, cx,.755,.04));
-for(const [lx,lz] of [[-1.52,-.48],[1.52,-.48],[-1.52,.48],[1.52,.48]])
-  couch.add(box(.10,.26,.10, brassDark, lx,.13,lz));
-const cushionA=box(.50,.50,.16, mat(0x4c5f86,{roughness:.95}), -1.12,1.06,-.30);
+// Every abutting pair now interpenetrates instead of sharing a face. Coplanar
+// surfaces render at identical depth and fight for pixels - that was the flicker.
+couch.add(box(3.20,.40,1.22, fabric,      0,   .46, .02));   // seat  x+-1.60  y .26-.66   z -.59-.63
+couch.add(box(3.10,.96,.26,  fabric,      0,  1.01,-.50));   // back  x+-1.55  y .53-1.49  z -.63--.37
+couch.add(box(.30,.68,1.34,  fabricDark, -1.67,.73, .01));   // arms  x-1.82--1.52 y .39-1.07 z -.66-.68
+couch.add(box(.30,.68,1.34,  fabricDark,  1.67,.73, .01));   // arms wrap the seat on every axis
+for(const cx of [-1.02,0,1.02])
+  couch.add(box(.94,.20,1.04, fabricDark, cx,.72,.04));      // cushions sunk .04 into the seat
+for(const [lx,lz] of [[-1.45,-.46],[1.45,-.46],[-1.45,.46],[1.45,.46]])
+  couch.add(box(.10,.30,.10, brassDark, lx,.16,lz));         // legs run up into the seat block
+const cushionA=box(.50,.50,.16, mat(0x4c5f86,{roughness:.95}), -1.12,1.06,-.24);
 cushionA.rotation.z=.22; couch.add(cushionA);
-const cushionB=box(.47,.47,.16, mat(0x8d6234,{roughness:.95}),  1.14,1.05,-.30);
+const cushionB=box(.47,.47,.16, mat(0x8d6234,{roughness:.95}),  1.14,1.05,-.24);
 cushionB.rotation.z=-.18; couch.add(cushionB);
 couch.position.set(-5.20,0,-2.30);
 scene.add(couch);
@@ -915,10 +931,7 @@ certGroup.add(
   box(.1, CERT_H + .18, .12, frameMat, CERT_X + hw + fb, CERT_Y, -3.0)
 );
 
-// soft picture light so the frame reads as lit artwork
-const certLight = new THREE.PointLight(0xbfe6ff, 1.6, 3.4);
-certLight.position.set(CERT_X, CERT_Y + .95, -2.55);
-certGroup.add(certLight);
+// certificate PointLight removed - the print itself is MeshBasicMaterial
 
 room.add(certGroup);
 certGroup.userData.project = 'cert';
@@ -1000,7 +1013,6 @@ recLed.position.set(-.13,.06,.066); dslr.add(recLed);
 dslr.position.set(4.30,2.50,SHELF_Z); dslr.rotation.y=-.55;
 dslr.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
 scene.add(dslr);
-animators.push(t=>{ recLed.material.color.setHex(Math.floor(t/700)%2 ? 0xff4444 : 0x3a1010); });
 
 /* ---------- TARS ---------- */
 const tars=new THREE.Group();
@@ -1028,7 +1040,7 @@ const d20=new THREE.Mesh(new THREE.IcosahedronGeometry(.115,0),
   new THREE.MeshStandardMaterial({color:0x5a3fa8, roughness:.35, metalness:.35,
     emissive:0x2a1a5a, emissiveIntensity:.6}));
 d20.position.set(SHELF_X-1.02,3.20,SHELF_Z); d20.castShadow=true; scene.add(d20);
-animators.push(t=>{ d20.rotation.y=t*.00035; d20.rotation.x=Math.sin(t/2600)*.25; });
+animators.push(t=>{ if(d20.userData.falling) return; d20.rotation.y=t*.00035; d20.rotation.x=Math.sin(t/2600)*.25; });
 scene.add(glowSprite(0x8a6fff,.55,.45).translateX(SHELF_X-1.02).translateY(3.20).translateZ(SHELF_Z));
 
 /* ---------- headphones hanging off the lower shelf ---------- */
@@ -1058,8 +1070,7 @@ const halo=new THREE.Mesh(new THREE.RingGeometry(.30,.40,64),
 halo.scale.set(1,2.42,1); gar.add(halo);                              // the vertical lensed arc
 gar.position.set(SHELF_X,4.32,-3.015); gar.traverse(o=>o.raycast=()=>{});
 room.add(gar);
-const garLight=new THREE.PointLight(0xffb45e,2.2,5.5);
-garLight.position.set(SHELF_X,4.32,-2.5); room.add(garLight);
+// Gargantua PointLight removed - the ring is additive and glows on its own
 animators.push(t=>{ ring.rotation.z=t*.00012; halo.material.opacity=.72+.18*Math.sin(t/1400); });
 
 /* ---------- aquarium ---------- */
@@ -1110,9 +1121,12 @@ aq.position.set(7.00,0,-1.20); aq.rotation.y=-Math.PI/2;
 aq.traverse(o=>{ if(o.isMesh) o.raycast=()=>{}; });
 scene.add(aq);
 animators.push(t=>{
+  const sh=aq.userData.shake||0;
   for(const o of fish){
     const a=(t*.001*o.sp+o.ph)%(Math.PI*2);
-    o.f.position.set(Math.sin(a)*.50, o.yy+Math.sin(a*2)*.05, o.zz+Math.cos(a)*.09);
+    o.f.position.set(Math.sin(a)*.50 + Math.sin(t/38+o.ph)*.07*sh,
+                     o.yy+Math.sin(a*2)*.05 + Math.cos(t/31+o.ph)*.05*sh,
+                     o.zz+Math.cos(a)*.09);
     o.f.rotation.y=Math.cos(a)>0 ? 0 : Math.PI;
   }
   for(const o of bubbles){
@@ -1146,13 +1160,18 @@ const tailCurve=new THREE.QuadraticBezierCurve3(
   new THREE.Vector3(-.24,-.02,.02), new THREE.Vector3(-.40,.02,.24), new THREE.Vector3(-.10,-.02,.30));
 const catTail=new THREE.Mesh(new THREE.TubeGeometry(tailCurve,18,.036,8), furDark);
 catTail.castShadow=true; catG.add(catTail);
-catG.position.set(-4.10,1.00,-2.25); catG.rotation.y=-.65;
+catG.position.set(-4.10,.96,-2.25); catG.rotation.y=-.65;
 catG.traverse(o=>{ if(o.isMesh) o.raycast=()=>{}; });
 scene.add(catG);
-animators.push(t=>{                                    // slow sleeping breath
+animators.push((t,dt)=>{                               // slow sleeping breath, plus a stretch on a meow
   const b=1+Math.sin(t/1150)*.035;
+  let m=catG.userData.meow||0;
+  if(m>0) catG.userData.meow=m=Math.max(0,m-dt*1.15);
+  const lift=Math.sin((1-m)*Math.PI)*(m>0?1:0);
   catBody.scale.set(1.35*b,.78*b,1*b);
-  catHead.position.y=.03+Math.sin(t/1150)*.006;
+  catHead.position.y=.03+Math.sin(t/1150)*.006+lift*.10;
+  catHead.position.x=.21+lift*.05;
+  catG.rotation.z=lift*.16;
 });
 
 /* ---------- studio mic (desk stand; arm anchored by a group, like the lamp) ---------- */
@@ -1191,6 +1210,7 @@ animators.push(t=>{ micLed.material.color.setHex(Math.floor(t/1100)%2 ? 0x4fd8c4
 
 /* ---------- D&D dice on the coffee table ---------- */
 const diceMat=[0x8d6234,0x4c5f86,0x2f9e57];
+const tableDice=[];
 for(let i=0;i<3;i++){
   const die=new THREE.Mesh(
     i===0 ? new THREE.IcosahedronGeometry(.075,0)
@@ -1198,8 +1218,8 @@ for(let i=0;i<3;i++){
     new THREE.MeshStandardMaterial({color:diceMat[i], roughness:.4, metalness:.3,
       emissive:diceMat[i], emissiveIntensity:.18}));
   die.position.set(-5.90+i*.15, .60, -.60+(i%2)*.13);
-  die.rotation.set(i*.7, i*1.1, i*.4); die.castShadow=true;
-  die.raycast=()=>{}; scene.add(die);
+  die.rotation.set(i*.7, i*1.1, i*.4);
+  scene.add(die); tableDice.push(die);
 }
 
 /* ---------- RGB: under the desk, and bias light behind the monitor ---------- */
@@ -1240,6 +1260,7 @@ bshelf.add(box(BS_W,2.10,.03, mat(0x241c15,{roughness:.92}), 0,1.05,-.16));
 const bookMats=[0x8d6234,0x4c5f86,0x2f9e57,0xc63b30,0xe0a33a,0x5a3fa8,0x46b6c4,0xd06a9c]
   .map(c=>mat(c,{roughness:.86}));
 const BS_IN=BS_HALF-.06;                       // inner face of each side panel
+const shelfBooks=[];
 BS_ROWS.forEach((sy,row)=>{
   let bx=-BS_IN, i=0;
   // keep laying spines until the row is genuinely full, widening the last one to close the gap
@@ -1250,13 +1271,13 @@ BS_ROWS.forEach((sy,row)=>{
     const bh=.28+((row+i)%3)*.055;
     const bk=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,.20), bookMats[(row*3+i)%bookMats.length]);
     bk.position.set(bx+bw/2, sy+.025+bh/2, .02);
-    bk.raycast=()=>{};                          // no tilted spines: a rotated book intersects its
-    bshelf.add(bk);                             // neighbours and z-fights, which is the flicker
+    bshelf.add(bk); shelfBooks.push(bk);        // no tilted spines: a rotated book intersects its
+                                                // neighbours and z-fights, which is the flicker
     bx += bw + .008; i++;
   }
 });
 bshelf.position.set(SHELF_X,0,-2.85);           // tucked directly beneath the wall shelves
-bshelf.traverse(o=>{ if(o.isMesh) o.raycast=()=>{}; });   // books don't cast shadows: 90 casters is a lot
+bshelf.traverse(o=>{ if(o.isMesh && !shelfBooks.includes(o)) o.raycast=()=>{}; });  // frame inert, books clickable
 scene.add(bshelf);
 
 /* ---------- diving mask + snorkel on the right wall ---------- */
@@ -1348,13 +1369,17 @@ wallClock.add(new THREE.Mesh(new THREE.CircleGeometry(.022,14), clockDark).trans
 wallClock.position.set(-2.35,4.72,-3.015);
 wallClock.traverse(o=>{ if(o.isMesh) o.raycast=()=>{}; });
 room.add(wallClock);
-animators.push(()=>{
+animators.push((t,dt)=>{
   const d=new Date();
-  minG.rotation.z  = -(d.getMinutes()/60)*Math.PI*2;
-  hourG.rotation.z = -((((d.getHours()%12)+d.getMinutes()/60))/12)*Math.PI*2;
+  let sp=wallClock.userData.spin||0;
+  if(sp>0) wallClock.userData.spin = sp = Math.max(0, sp-dt*.55);
+  const whirl = sp*sp*38;
+  minG.rotation.z  = -(d.getMinutes()/60)*Math.PI*2 - whirl;
+  hourG.rotation.z = -((((d.getHours()%12)+d.getMinutes()/60))/12)*Math.PI*2 - whirl/12;
 });
 
 /* ---------- studio monitor speakers, flanking the screen ---------- */
+const speakers=[], spkCones=[];
 for(const sx of [-1.78, 1.78]){
   const spk=new THREE.Group();
   spk.add(box(.26,.36,.22, mat(0x23262d,{roughness:.7}), 0,.18,0));
@@ -1365,9 +1390,251 @@ for(const sx of [-1.78, 1.78]){
   const spkLed=new THREE.Mesh(new THREE.SphereGeometry(.012,8,8), new THREE.MeshBasicMaterial({color:0x4fd8c4}));
   spkLed.position.set(.085,.05,.112); spk.add(spkLed);
   spk.position.set(sx,1.56,-.95); spk.rotation.y = sx<0 ? .28 : -.28;
-  spk.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.raycast=()=>{}; } });
-  scene.add(spk);
+  spk.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
+  scene.add(spk); speakers.push(spk); spkCones.push(cone);
 }
+
+/* =========================================================
+   INTERACTIVE PROPS
+   Click behaviours for everything that isn't a project hotspot.
+   No physics engine: a ~30-line integrator handles the few things
+   that genuinely fall, and Web Audio synthesises every sound, so
+   there are still zero asset files.
+========================================================= */
+const propTargets = [];
+function addProp(root, label, action){
+  root.userData.prop = action;
+  root.userData.propLabel = label;
+  propTargets.push(root);
+}
+function enablePick(root){ root.traverse(o=>{ if(o.isMesh) delete o.raycast; }); }
+
+/* ---------- audio ---------- */
+let AC=null;
+function audio(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+function tone(freq, dur=1.1, type='triangle', vol=.15, glideTo=null){
+  const c=audio(), t0=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t0);
+  if(glideTo) o.frequency.exponentialRampToValueAtTime(glideTo,t0+dur*.9);
+  g.gain.setValueAtTime(0,t0);
+  g.gain.linearRampToValueAtTime(vol,t0+.012);
+  g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+dur+.05);
+}
+function noise(dur=.05, vol=.2, hp=1200){
+  const c=audio(), n=Math.max(1,Math.floor(c.sampleRate*dur));
+  const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=c.createBufferSource(); s.buffer=buf;
+  const f=c.createBiquadFilter(); f.type='highpass'; f.frequency.value=hp;
+  const g=c.createGain(); g.gain.value=vol;
+  s.connect(f); f.connect(g); g.connect(c.destination); s.start();
+}
+
+/* ---------- minimal rigid-body-ish integrator ---------- */
+const bodies=[];
+function drop(obj, v, a, floorY, opts){
+  opts=opts||{};
+  obj.userData.falling=true;
+  bodies.push({obj, v, a, floorY,
+    rest: opts.rest!==undefined?opts.rest:.42,
+    damp: opts.damp!==undefined?opts.damp:.72,
+    g:    opts.g!==undefined?opts.g:7.5,
+    bounds: opts.bounds||null, onRest: opts.onRest||null});
+}
+animators.push((t,dt)=>{
+  const step=Math.min(dt,.033);
+  for(let i=bodies.length-1;i>=0;i--){
+    const b=bodies[i], o=b.obj;
+    b.v.y -= b.g*step;
+    o.position.x+=b.v.x*step; o.position.y+=b.v.y*step; o.position.z+=b.v.z*step;
+    o.rotation.x+=b.a.x*step; o.rotation.y+=b.a.y*step; o.rotation.z+=b.a.z*step;
+    if(b.bounds){
+      const B=b.bounds;
+      if(o.position.x<B[0]){ o.position.x=B[0]; b.v.x= Math.abs(b.v.x)*.5; }
+      if(o.position.x>B[1]){ o.position.x=B[1]; b.v.x=-Math.abs(b.v.x)*.5; }
+      if(o.position.z<B[2]){ o.position.z=B[2]; b.v.z= Math.abs(b.v.z)*.5; }
+      if(o.position.z>B[3]){ o.position.z=B[3]; b.v.z=-Math.abs(b.v.z)*.5; }
+    }
+    if(o.position.y<=b.floorY){
+      o.position.y=b.floorY;
+      if(Math.abs(b.v.y)<.6){
+        bodies.splice(i,1); o.userData.falling=false;
+        if(b.onRest) b.onRest();
+        continue;
+      }
+      b.v.y=-b.v.y*b.rest; b.v.x*=b.damp; b.v.z*=b.damp;
+      b.a.multiplyScalar(.55);
+      noise(.03,.045,2200);
+    }
+  }
+});
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const rnd=(s)=>(Math.random()-.5)*s;
+
+/* ---------- dice: click any one and all three roll ---------- */
+const TABLE_TOP=.56, TABLE_B=[-6.02,-4.38,-1.12,-0.38];
+function rollDie(d){
+  const r=d.geometry.parameters.radius||.07;
+  d.position.y=TABLE_TOP+r+.28;
+  drop(d, V(rnd(1.5), 1.9+Math.random()*.7, rnd(1.5)),
+          V(rnd(17), rnd(17), rnd(17)), TABLE_TOP+r, {bounds:TABLE_B, rest:.45});
+}
+for(const d of tableDice)
+  addProp(d,'roll', ()=>{ noise(.05,.13,900); tableDice.forEach(rollDie); });
+
+/* ---------- the shelf d20 hops in place ---------- */
+const D20_REST=3.20;
+addProp(d20,'roll', ()=>{
+  if(d20.userData.falling) return;
+  noise(.05,.13,900);
+  drop(d20, V(rnd(.9), 2.1, rnd(.5)), V(rnd(20), rnd(20), rnd(20)), D20_REST,
+       {bounds:[3.12,5.68,-2.96,-2.74], rest:.5,
+        onRest:()=>{ d20.userData.spinFrom=performance.now(); }});
+});
+
+/* ---------- books topple off the shelf ---------- */
+for(const bk of shelfBooks)
+  addProp(bk,'knock off', ()=>{
+    const i=shelfBooks.indexOf(bk);
+    shelfBooks.slice(Math.max(0,i-1), i+3)
+      .filter(b=>!b.userData.falling && b.position.y>.18)   // fallen books rest at .10
+      .forEach((b,n)=>setTimeout(()=>{
+        noise(.06,.08,600);
+        drop(b, V(rnd(.8), .55+Math.random()*.5, 1.15+Math.random()*.7),
+                V(rnd(10), rnd(10), rnd(10)), .10, {rest:.18, damp:.5});
+      }, n*70));
+  });
+
+/* ---------- guitar: a pentatonic pluck with a second harmonic ---------- */
+const PENTA=[196.0,220.0,246.9,293.7,329.6,392.0,440.0,493.9];
+let noteIx=0;
+enablePick(guitar);
+addProp(guitar,'play', ()=>{
+  const f=PENTA[noteIx++ % PENTA.length];
+  tone(f,1.7,'triangle',.13);
+  tone(f*2,1.1,'sine',.05);
+  noise(.02,.06,3000);
+  guitar.userData.wob=1;
+});
+
+/* ---------- laptop lid ---------- */
+let lidOpen=true, lidK=1;
+const LID_OPEN=-.35, LID_SHUT=1.50;
+addProp(laptop,'open / close', ()=>{ lidOpen=!lidOpen; noise(.05,.10,700); });
+
+/* ---------- cat ---------- */
+enablePick(catG);
+addProp(catG,'pet me', ()=>{
+  const c=audio(), t0=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain(), f=c.createBiquadFilter();
+  o.type='sawtooth'; f.type='bandpass'; f.frequency.value=950; f.Q.value=4.5;
+  o.frequency.setValueAtTime(430,t0);
+  o.frequency.exponentialRampToValueAtTime(780,t0+.17);
+  o.frequency.exponentialRampToValueAtTime(340,t0+.62);
+  g.gain.setValueAtTime(0,t0);
+  g.gain.linearRampToValueAtTime(.12,t0+.05);
+  g.gain.exponentialRampToValueAtTime(.0001,t0+.72);
+  o.connect(f); f.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+.78);
+  catG.userData.meow=1;
+});
+
+/* ---------- plants sway ---------- */
+enablePick(bigPlant);
+addProp(bigPlant,'shake', ()=>{ noise(.14,.05,2800); bigPlant.userData.sway=1; });
+
+/* ---------- DSLR fires the shutter ---------- */
+const flashS=glowSprite(0xffffff,1.3,0);
+flashS.position.set(.01,-.01,.30); dslr.add(flashS);
+addProp(dslr,'shoot', ()=>{
+  noise(.026,.30,2600);
+  setTimeout(()=>noise(.05,.22,1500), 75);
+  dslr.userData.flash=1;
+});
+
+/* ---------- one animator drives all the prop reactions ---------- */
+animators.push((t,dt)=>{
+  // guitar shake
+  let w=guitar.userData.wob||0;
+  if(w>0){ guitar.userData.wob=w=Math.max(0,w-dt*1.7); guitar.rotation.z=-.09+Math.sin(t/38)*.022*w; }
+  // laptop lid
+  lidK += ((lidOpen?1:0)-lidK)*Math.min(1,dt*6);
+  lidG.rotation.x = LID_SHUT + (LID_OPEN-LID_SHUT)*lidK;
+  lapScreen.visible = lidK>.35;
+  // plants
+  for(const pg of [bigPlant, plantGroup]){
+    let s=pg.userData.sway||0;
+    if(s>0){
+      pg.userData.sway=s=Math.max(0,s-dt*.85);
+      pg.rotation.z=Math.sin(t/95)*.06*s;
+      pg.rotation.x=Math.cos(t/112)*.045*s;
+    }
+  }
+  // camera flash
+  let f=dslr.userData.flash||0;
+  if(f>0) dslr.userData.flash=f=Math.max(0,f-dt*3.2);
+  flashS.material.opacity=f*.9;
+  recLed.material.color.setHex(f>.3 ? 0xffffff : (Math.floor(t/700)%2 ? 0xff4444 : 0x3a1010));
+});
+
+/* ---------- more clickable cosmetics ---------- */
+enablePick(aq); enablePick(wallClock);
+delete bean.raycast; delete beanTop.raycast;
+
+addProp(hp,'listen', ()=>{                       // headphones: bass thump + swing
+  tone(58,.75,'sine',.30); tone(116,.5,'sine',.10);
+  hp.userData.swing=1;
+});
+addProp(hat,'spin', ()=>{                        // straw hat
+  noise(.28,.05,300); hat.userData.spin=1;
+});
+addProp(tars,'ping', ()=>{                       // TARS: two dry square beeps
+  tone(660,.10,'square',.10);
+  setTimeout(()=>tone(880,.13,'square',.09),130);
+  tars.userData.wob=1;
+});
+addProp(aq,'tap the glass', ()=>{                // fish scatter
+  tone(180,.22,'sine',.16); noise(.05,.10,1400);
+  aq.userData.shake=1;
+});
+for(const s of speakers) addProp(s,'test tone', ()=>{
+  [261.6,329.6,392.0].forEach((f,i)=>setTimeout(()=>tone(f,.9,'sine',.10), i*70));
+  speakers.forEach(x=>{ x.userData.pulse=1; });
+});
+addProp(mug,'clink', ()=>{
+  tone(1750,.30,'sine',.09); tone(2600,.18,'sine',.04); noise(.02,.07,4000);
+  mug.userData.wob=1;
+});
+addProp(wallClock,'wind it', ()=>{
+  for(let i=0;i<7;i++) setTimeout(()=>noise(.015,.10,3200), i*95);
+  wallClock.userData.spin=1;
+});
+addProp(pouf,'squish', ()=>{ noise(.18,.09,180); pouf.userData.squish=1; });
+addProp(bean,'squish', ()=>{ noise(.20,.09,160); bean.userData.squish=1; });
+addProp(neon,'buzz', ()=>{ noise(.30,.05,120); tone(120,.35,'sawtooth',.05); neon.userData.zap=1; });
+
+const BEAN_S=bean.scale.clone(), POUF_S=pouf.scale.clone();
+animators.push((t,dt)=>{
+  const decay=(o,k,r)=>{ let v=o.userData[k]||0; if(v>0) o.userData[k]=v=Math.max(0,v-dt*r); return v; };
+  const sw=decay(hp,'swing',1.5);
+  if(sw>0) hp.rotation.z=Math.sin(t/70)*.30*sw;
+  const sp=decay(hat,'spin',.9);
+  if(sp>0) hat.rotation.y += dt*10*sp;
+  const tw=decay(tars,'wob',1.6);
+  if(tw>0) tars.rotation.z=Math.sin(t/55)*.13*tw;
+  decay(aq,'shake',1.1);
+  const pu=decay(speakers[0],'pulse',3.0); decay(speakers[1],'pulse',3.0);
+  for(const c of spkCones) c.scale.setScalar(1+Math.sin(t/28)*.22*pu);
+  const mw=decay(mug,'wob',1.8);
+  if(mw>0) mug.rotation.z=Math.sin(t/48)*.14*mw;
+  const sq=decay(pouf,'squish',2.2);
+  pouf.scale.set(POUF_S.x*(1+sq*.12), POUF_S.y*(1-sq*.30), POUF_S.z*(1+sq*.12));
+  const sb=decay(bean,'squish',2.2);
+  bean.scale.set(BEAN_S.x*(1+sb*.10), BEAN_S.y*(1-sb*.34), BEAN_S.z*(1+sb*.10));
+});
 
 /* MQTT packet motes and the ambient dust field were removed:
    the only moving markers left are the ones tied to interactive objects. */
@@ -1480,6 +1747,7 @@ function openPanel(key){
   document.getElementById('p-tags').innerHTML=d.tags.map(t=>`<span>${t}</span>`).join('');
   document.getElementById('p-actions').innerHTML=d.actions.map(([cls,href,label])=>
     `<a class="${cls}" href="${href}" target="_blank" rel="noopener">${label}</a>`).join('');
+  if(key==='plant') plantGroup.userData.sway=1;
   panel.classList.add('open');
   pinsEl.classList.add('dim');
 }
@@ -1490,29 +1758,44 @@ document.getElementById('close').onclick=()=>{ panel.classList.remove('open'); p
 ========================================================= */
 const raycaster=new THREE.Raycaster();
 const pointer=new THREE.Vector2();
-let hovered=null;
-function findProject(obj){
-  while(obj){ if(obj.userData.project) return obj; if(obj.userData.parentProject) return interactive.find(g=>g.userData.project===obj.userData.parentProject); obj=obj.parent; }
+let hovered=null, hoveredProp=null;
+function findTarget(obj){
+  while(obj){
+    if(obj.userData.prop) return {kind:'prop', obj};
+    if(obj.userData.project) return {kind:'project', obj};
+    if(obj.userData.parentProject)
+      return {kind:'project', obj:interactive.find(g=>g.userData.project===obj.userData.parentProject)};
+    obj=obj.parent;
+  }
   return null;
 }
 const pickTargets=[...interactive, tower, windowGroup];
+const allTargets=[...pickTargets, ...propTargets];
 function updatePointer(e){
   pointer.x=(e.clientX/innerWidth)*2-1;
   pointer.y=-(e.clientY/innerHeight)*2+1;
 }
+let lastPick=0;
 addEventListener('pointermove', e=>{
   if(e.target.closest('.pin')) return;      // pin handles its own hover
   updatePointer(e);
+  if(hovered||hoveredProp){ tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px'; }
+  const now=performance.now();
+  if(now-lastPick < 55) return;             // ~18 picks/sec instead of one per mouse event
+  lastPick=now;
   raycaster.setFromCamera(pointer,camera);
-  const hits=raycaster.intersectObjects(pickTargets,true);
-  const g=hits.length?findProject(hits[0].object):null;
-  if(g!==hovered){
-    hovered=g;
-    document.body.style.cursor=g?'pointer':'default';
-    tip.style.opacity=g?1:0;
-    if(g) tip.textContent=TIP_LABELS[g.userData.project]||'';
+  const hits=raycaster.intersectObjects(allTargets,true);
+  const f=hits.length?findTarget(hits[0].object):null;
+  const g  = f && f.kind==='project' ? f.obj : null;
+  const pr = f && f.kind==='prop'    ? f.obj : null;
+  if(g!==hovered || pr!==hoveredProp){
+    hovered=g; hoveredProp=pr;
+    document.body.style.cursor=(g||pr)?'pointer':'default';
+    tip.style.opacity=(g||pr)?1:0;
+    if(g)       tip.textContent=TIP_LABELS[g.userData.project]||'';
+    else if(pr) tip.textContent=pr.userData.propLabel||'';
   }
-  if(g){ tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px'; }
+  if(g||pr){ tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px'; }
 });
 let downXY=null;
 addEventListener('pointerdown', e=>{ downXY=[e.clientX,e.clientY]; });
@@ -1524,11 +1807,13 @@ addEventListener('pointerup', e=>{
   if(e.target.closest('#panel,#hud,#intro,.pin')) return;
   updatePointer(e);
   raycaster.setFromCamera(pointer,camera);
-  const hits=raycaster.intersectObjects(pickTargets,true);
-  const g=hits.length?findProject(hits[0].object):null;
-  if(g){
-    if(g.userData.toggleLights) setLights(!lightsOn);
-    else openPanel(g.userData.project);
+  const hits=raycaster.intersectObjects(allTargets,true);
+  const f=hits.length?findTarget(hits[0].object):null;
+  if(f && f.kind==='prop'){
+    f.obj.userData.prop();
+  } else if(f && f.kind==='project'){
+    if(f.obj.userData.toggleLights) setLights(!lightsOn);
+    else openPanel(f.obj.userData.project);
   } else {
     panel.classList.remove('open');
     pinsEl.classList.remove('dim');
@@ -1539,21 +1824,27 @@ addEventListener('pointerup', e=>{
    INTRO + ANIMATION LOOP
 ========================================================= */
 let entered=false, enterStart=0, attractUntil=0;
-const camFrom=new THREE.Vector3(11,8,13);
+const FLY_MS=4600;                                   // slow pull-back
+const camFrom=new THREE.Vector3(0,2.78,1.05);        // nose to the screen
 const camTo=new THREE.Vector3(0.6,4.0,10.2);
+const lookFrom=new THREE.Vector3(0,2.75,-.70);       // the monitor panel
+const lookTo=new THREE.Vector3(0,1.7,0);             // room centre = controls.target
+const _look=new THREE.Vector3();
 document.getElementById('enter').onclick=()=>{
   document.getElementById('intro').classList.add('hide');
   document.getElementById('hint').classList.remove('hide');
   entered=true; enterStart=performance.now();
-  attractUntil = enterStart + 2400 + 9000;               // rings pulse while the eye settles
-  setTimeout(()=>document.getElementById('hint').classList.add('hide'), 12000);
-  // introduce the labels in two waves so neighbouring ones never overlap,
-  // then collapse everything back to quiet pulsing dots
+  quality(PR_LO);                                      // fly at low res, sharpen on landing
+  camFrom.copy(camera.position);                       // continue from the idle float, no jump
+  attractUntil = enterStart + FLY_MS + 9000;
+  setTimeout(()=>document.getElementById('hint').classList.add('hide'), FLY_MS+9000);
+  // labels introduce themselves once the camera has landed, in two waves so
+  // neighbouring ones never overlap, then collapse back to quiet pulsing dots
   const WAVE_A = ['pc','esp','plant','cert','phone'];
   const wave = keys => pins.forEach(p=>p.el.classList.toggle('reveal', keys.includes(p.key)));
-  setTimeout(()=>wave(WAVE_A), 2300);
-  setTimeout(()=>wave(Object.keys(PIN_ANCHORS).filter(k=>!WAVE_A.includes(k))), 6100);
-  setTimeout(()=>wave([]), 9900);
+  setTimeout(()=>wave(WAVE_A), FLY_MS+300);
+  setTimeout(()=>wave(Object.keys(PIN_ANCHORS).filter(k=>!WAVE_A.includes(k))), FLY_MS+4100);
+  setTimeout(()=>wave([]), FLY_MS+7900);
   pushLog();
 };
 const ease=t=>1-Math.pow(1-t,3);
@@ -1566,18 +1857,22 @@ function animate(){
 
   // intro camera fly-in
   if(entered && enterStart){
-    const k=Math.min((t-enterStart)/2400,1);
-    camera.position.lerpVectors(camFrom,camTo,ease(k));
-    if(k>=1){ enterStart=0; controls.enabled=true; }
+    const k=Math.min((t-enterStart)/FLY_MS,1), e=ease(k);
+    camera.position.lerpVectors(camFrom,camTo,e);
+    _look.lerpVectors(lookFrom,lookTo,e);              // aim eases off the screen onto the room
+    camera.lookAt(_look);
+    if(k>=1){ enterStart=0; controls.target.copy(lookTo); controls.enabled=true; quality(PR_HI); }
   } else if(!entered){
-    // idle drift behind intro
-    const a=t*.00008;
-    camera.position.set(Math.sin(a)*12, 8, Math.cos(a)*12+2);
-    camera.lookAt(0,1.7,0);
+    // idle: float gently in front of the monitor so Enter starts from here
+    const a=t*.00022;
+    camera.position.set(Math.sin(a)*.30, 2.78+Math.sin(a*1.4)*.05, 1.05+Math.cos(a)*.10);
+    camera.lookAt(lookFrom);
   }
 
-  // screen redraw (~5fps is plenty)
-  if(!animate.lastDraw || t-animate.lastDraw>200){
+  if(shadowWarmup > 0){ renderer.shadowMap.needsUpdate = true; shadowWarmup--; }
+
+  // screen redraw (a 1024x576 texture upload, so keep it infrequent)
+  if(!animate.lastDraw || t-animate.lastDraw>380){
     drawScreen(screenUI.ctx,1024,576,t);
     screenUI.tex.needsUpdate=true;
     animate.lastDraw=t;
@@ -1587,8 +1882,7 @@ function animate(){
   espLed.material.color.setHex( Math.floor(t/500)%2 ? 0x4fd8c4 : 0x1c5a50 );
   piLedA.material.color.setHex( Math.floor(t/300)%2 ? 0x44ff66 : 0x114422 );
   sensorLed.material.color.setHex( Math.floor(t/800)%2 ? 0x4fd8c4 : 0x1c5a50 );
-  btnCap.material.emissiveIntensity=.5+Math.sin(t/450)*.4;
-  btnLight.intensity=1+Math.sin(t/450)*.7;
+  btnCap.material.emissiveIntensity=1.15+Math.sin(t/450)*.75;
   rgb.material.color.setHSL((t/9000)%1,.7,.6);
   screenLight.intensity=5.4+Math.sin(t/180)*.5;
 
@@ -1625,23 +1919,25 @@ function animate(){
 
     // daylight washes out glowing things, so pull them back
     const glowK = 1 - dayAmt * .62;
-    garLight.intensity = 2.2 * glowK;
-    aqLight.intensity  = 4.2 * glowK;
-    stripLight.intensity = 3 * glowK;
+    aqLight.intensity = 4.2 * glowK;
+    strip.material.color.setHex(dayAmt > .5 ? 0x1a5f55 : 0x2affd8);
   }
 
-  for (const fn of animators) fn(t);
+  for (const fn of animators) fn(t, dt);
 
   // neon: slow breathing, with a brief stutter every few seconds
   {
     const breathe = .93 + .07*Math.sin(t/900);
     const stutter = (t % 8600) < 210 ? (Math.floor(t/58)%2 ? .32 : 1) : 1;
     const dim = 1 - dayAmt * .62;
-    neon.material.opacity = breathe * stutter * dim;
-    neonLight.intensity   = 3.4 * breathe * stutter * dim;
+    let z = neon.userData.zap||0;
+    if(z>0){ neon.userData.zap = z = Math.max(0, z-dt*1.6); }
+    const zap = z>0 ? (Math.floor(t/45)%2 ? .25 : 1.35) : 1;
+    neon.material.opacity = Math.min(1, breathe * stutter * dim * zap);
+    neonLight.intensity   = 3.4 * breathe * stutter * dim * zap;
   }
 
-  if(entered) updatePins();
+  if(entered && !enterStart) updatePins();        // pins only once the camera has landed
 
   if(controls.enabled) controls.update();
   renderer.render(scene,camera);
@@ -1651,7 +1947,7 @@ animate();
 addEventListener('resize', ()=>{
   camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
+  quality(entered && !enterStart ? PR_HI : PR_LO);
 });
 </script>
 </body>
