@@ -1236,9 +1236,11 @@ rgbStrips.push({mat:bias.material, light:null, offset:1.2});
 // shelf-edge glow so the shelf reads at a distance
 scene.add(glowSprite(0x4fd8c4,1.1,.25).translateX(SHELF_X).translateY(2.30).translateZ(SHELF_Z+.2));
 
-animators.push(t=>{
+let partyAmt=0, rgbPhase=0;
+animators.push((t,dt)=>{
+  rgbPhase += dt*(.04 + partyAmt*.95);        // phase accumulates, so changing rate never jumps the hue
   for(const s of rgbStrips){
-    const hue=((t*.00004)+s.offset*.13)%1;
+    const hue=(rgbPhase + s.offset*.13)%1;
     s.mat.color.setHSL(hue,.72,.58);
     if(s.light) s.light.color.setHSL(hue,.72,.58);
   }
@@ -1883,6 +1885,321 @@ animators.push((t,dt)=>{
   if(rl>0) for(const w of wheels) w.rotation.y += dt*18*rl;
   const tl=decay(poster,'tilt',1.5);
   if(tl>0) poster.rotation.z=Math.sin(t/70)*.07*tl;
+});
+
+/* =========================================================
+   THE FUN DEPARTMENT
+========================================================= */
+
+/* ---------- Roomba, patrolling the floor on its own ---------- */
+const roomba=new THREE.Group();
+roomba.add(new THREE.Mesh(new THREE.CylinderGeometry(.21,.21,.07,26), mat(0x2a2f3a,{roughness:.5,metalness:.2})));
+roomba.add(new THREE.Mesh(new THREE.CylinderGeometry(.155,.155,.02,22), mat(0x3a4152,{roughness:.45}))
+  .translateY(.045));
+const rbLed=new THREE.Mesh(new THREE.CylinderGeometry(.028,.028,.012,12),
+  new THREE.MeshBasicMaterial({color:0x4fd8c4}));
+rbLed.position.set(.10,.056,0); roomba.add(rbLed);
+roomba.add(box(.13,.03,.015, mat(0x1b1e26,{roughness:.6}), -.13,.05,0));
+const rbBrush=[];
+for(const sx of [-1,1]){
+  const br=new THREE.Group(); br.position.set(.15*sx,-.015,.15);
+  for(let i=0;i<3;i++){
+    const bl=box(.012,.008,.10, mat(0xe0a33a,{roughness:.9}), 0,0,.05);
+    bl.rotation.y=i/3*Math.PI*2; br.add(bl);
+  }
+  roomba.add(br); rbBrush.push(br);
+}
+roomba.position.set(.4,.04,2.2);
+roomba.traverse(o=>{ if(o.isMesh) o.castShadow=false; });   // shadow maps are baked; a real one would lag
+scene.add(roomba);
+// ...so it gets a blob shadow that tracks it instead
+const blobTex=canvasTexture(128,128,(g,w,hh)=>{
+  const r=g.createRadialGradient(w/2,hh/2,0,w/2,hh/2,w/2);
+  r.addColorStop(0,'rgba(0,0,0,.55)'); r.addColorStop(.55,'rgba(0,0,0,.22)'); r.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=r; g.fillRect(0,0,w,hh);
+});
+const rbShadow=new THREE.Mesh(new THREE.PlaneGeometry(.62,.62),
+  new THREE.MeshBasicMaterial({map:blobTex.tex, transparent:true, depthWrite:false}));
+rbShadow.rotation.x=-Math.PI/2; rbShadow.position.y=.014; rbShadow.raycast=()=>{};
+scene.add(rbShadow);
+const RB_B=[-1.40,2.00,-.80,3.30];              // patrol box: clear of every desk leg and every prop
+let rbHeading=.8;
+addProp(roomba,'turbo', ()=>{
+  [440,554,659].forEach((f,i)=>setTimeout(()=>tone(f,.09,'square',.07), i*90));
+  roomba.userData.turbo=1;
+});
+
+/* ---------- rubber duck (the debugging kind) ---------- */
+const duck=new THREE.Group();
+const duckY=mat(0xf2c53d,{roughness:.55});
+const dBody=new THREE.Mesh(new THREE.SphereGeometry(.062,16,12), duckY);
+dBody.scale.set(1.25,1,1); duck.add(dBody);
+const dHead=new THREE.Mesh(new THREE.SphereGeometry(.042,14,12), duckY);
+dHead.position.set(.055,.062,0); duck.add(dHead);
+duck.add(new THREE.Mesh(new THREE.ConeGeometry(.018,.05,8), mat(0xe07a2e,{roughness:.6}))
+  .translateX(.098).translateY(.056).rotateZ(-Math.PI/2));
+for(const sz of [-.016,.016]){
+  const eye=new THREE.Mesh(new THREE.SphereGeometry(.008,8,6), mat(0x141821,{roughness:.4}));
+  eye.position.set(.072,.078,sz); duck.add(eye);
+}
+duck.position.set(-.75,1.60,-1.05); duck.rotation.y=-.5;
+duck.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
+scene.add(duck);
+addProp(duck,'squeak', ()=>{
+  const c=audio(), t0=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type='square';
+  o.frequency.setValueAtTime(700,t0);
+  o.frequency.exponentialRampToValueAtTime(1500,t0+.09);
+  o.frequency.exponentialRampToValueAtTime(620,t0+.24);
+  g.gain.setValueAtTime(.10,t0); g.gain.exponentialRampToValueAtTime(.0001,t0+.26);
+  o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0+.28);
+  duck.userData.squeak=1;
+});
+
+/* ---------- paper bin, and paper to miss it with ---------- */
+const BIN=new THREE.Vector3(-3.15,0,1.62);   // clear of the desk overhang, the beanbag and the roomba's box
+const bin=new THREE.Group();
+bin.add(new THREE.Mesh(new THREE.CylinderGeometry(.20,.16,.34,20,1,true),
+  new THREE.MeshStandardMaterial({color:0x3a4152, roughness:.6, metalness:.3, side:THREE.DoubleSide})));
+bin.children[0].position.y=.17;
+bin.add(new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.02,20), mat(0x2a2f3a,{roughness:.7})).translateY(.01));
+bin.position.copy(BIN);
+bin.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
+scene.add(bin);
+const paper=[], PAPER_N=8;
+for(let i=0;i<PAPER_N;i++){
+  const b=new THREE.Mesh(new THREE.DodecahedronGeometry(.055,0), mat(0xe9e4d6,{roughness:.95}));
+  b.visible=false; b.raycast=()=>{}; scene.add(b); paper.push(b);   // moves too, so no baked shadow
+}
+let paperIx=0, hoops=0, shots=0;
+addProp(bin,'take a shot', ()=>{
+  const b=paper[paperIx++ % PAPER_N];
+  b.visible=true; b.position.set(-1.70,1.85,.95);
+  shots++;
+  noise(.05,.06,1500);
+  drop(b, V(-1.45+rnd(.60), 2.20+rnd(.34), .67+rnd(.50)),   // tuned to ~35% - makeable, not automatic
+          V(rnd(9), rnd(9), rnd(9)), .055, {rest:.30, damp:.55,
+    onRest:()=>{
+      const d=Math.hypot(b.position.x-BIN.x, b.position.z-BIN.z);
+      if(d<.19){ hoops++; b.position.y=.10; tone(880,.12,'square',.09);
+        setTimeout(()=>tone(1320,.16,'square',.08),110);
+        pushLog(`bin → SCORE! ${hoops}/${shots}`);
+      } else pushLog(`bin → missed by ${(d-.19).toFixed(2)}m (${hoops}/${shots})`);
+    }});
+});
+
+/* ---------- energy drink pyramid ---------- */
+const DESK_TOP=1.56, CAN_H=.135;
+const cans=[];
+const canCols=[0x4fd8c4,0xff5db1,0xffb45e,0x82aaff,0x2f9e57,0xc63b30];
+let ci=0;
+for(let row=0; row<3; row++){
+  for(let i=0;i<3-row;i++){
+    const can=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,CAN_H,14),
+      mat(canCols[ci%canCols.length],{roughness:.35,metalness:.5}));
+    can.position.set(2.62+ i*.072 + row*.036, DESK_TOP+CAN_H/2 + row*CAN_H, .90);
+    can.castShadow=true; scene.add(can); cans.push(can); ci++;
+  }
+}
+for(const c of cans) addProp(c,'topple', ()=>{
+  noise(.07,.10,1800);
+  cans.forEach((x,i)=>setTimeout(()=>drop(x,
+    V(rnd(1.5), .8+Math.random()*.5, .5+rnd(.8)), V(rnd(14),rnd(14),rnd(14)),
+    DESK_TOP+.032, {bounds:[-3.0,3.0,-1.05,1.05], rest:.35, damp:.6}), i*45));
+});
+
+/* ---------- sticky notes on the monitor bezel ---------- */
+const JOKES=[['TODO','sleep (?)'],['it works','on my machine'],['// TODO','fix this properly']];
+const notes=[];
+JOKES.forEach((jk,i)=>{
+  const tex=canvasTexture(128,128,(g,w,hh)=>{
+    g.fillStyle=['#ffe066','#a8e6a1','#ffb3c6'][i]; g.fillRect(0,0,w,hh);
+    g.fillStyle='#3a3020'; g.font='bold 17px sans-serif'; g.textAlign='center';
+    g.fillText(jk[0], w/2, 52); g.font='14px sans-serif'; g.fillText(jk[1], w/2, 78);
+  });
+  const n=new THREE.Mesh(new THREE.PlaneGeometry(.17,.17),
+    new THREE.MeshBasicMaterial({map:tex.tex}));
+  n.position.set(1.34, 3.06 - i*.30, -.695);
+  n.rotation.z=(i%2?1:-1)*.10;
+  scene.add(n); notes.push(n);
+  addProp(n,'read it', ()=>{ noise(.09,.04,1100); n.userData.flap=1; });
+});
+
+/* ---------- disco ball + party mode ---------- */
+const disco=new THREE.Group();
+const ball=new THREE.Mesh(new THREE.IcosahedronGeometry(.19,1),
+  new THREE.MeshStandardMaterial({color:0xc9d4e6, metalness:.95, roughness:.12, flatShading:true}));
+disco.add(ball);
+disco.add(box(.012,1.6,.012, mat(0x6b7183,{roughness:.8}), 0,.98,0));
+disco.add(glowSprite(0xffffff,1.0,.35));
+disco.position.set(-5.20,3.40,-.40);
+scene.add(disco);
+addProp(disco,'PARTY', ()=>{
+  partyAmt=1;
+  const seq=[110,110,146.8,110,164.8,110,146.8,130.8];
+  for(let i=0;i<24;i++) setTimeout(()=>tone(seq[i%seq.length], .22,'sawtooth',.07), i*260);
+  for(let i=0;i<24;i++) setTimeout(()=>noise(.03,.10,2600), i*260 + 130);
+});
+
+/* ---------- drives all of the above ---------- */
+animators.push((t,dt)=>{
+  const decay=(o,k,r)=>{ let v=o.userData[k]||0; if(v>0) o.userData[k]=v=Math.max(0,v-dt*r); return v; };
+
+  // roomba wanders, reflecting off its patrol box
+  const tb=decay(roomba,'turbo',.45);
+  const spd=.55*(1+tb*2.6);
+  roomba.position.x += Math.sin(rbHeading)*spd*dt;
+  roomba.position.z += Math.cos(rbHeading)*spd*dt;
+  let bumped=false;
+  if(roomba.position.x<RB_B[0]||roomba.position.x>RB_B[1]){ rbHeading=-rbHeading+Math.PI; bumped=true; }
+  if(roomba.position.z<RB_B[2]||roomba.position.z>RB_B[3]){ rbHeading=Math.PI-rbHeading; bumped=true; }
+  if(bumped){
+    roomba.position.x=Math.max(RB_B[0],Math.min(RB_B[1],roomba.position.x));
+    roomba.position.z=Math.max(RB_B[2],Math.min(RB_B[3],roomba.position.z));
+    rbHeading += (Math.random()-.5)*.9;
+    noise(.05,.05,500);
+  }
+  roomba.rotation.y = -rbHeading + Math.PI/2;
+  rbShadow.position.x=roomba.position.x; rbShadow.position.z=roomba.position.z;
+  for(const br of rbBrush) br.rotation.y += dt*(9+tb*20);
+  rbLed.material.color.setHex(Math.floor(t/(tb>0?180:900))%2 ? 0x4fd8c4 : 0x14453f);
+
+  // duck squash
+  const sq=decay(duck,'squeak',2.6);
+  duck.scale.set(1+sq*.16, 1-sq*.22, 1+sq*.16);
+
+  // sticky notes flap
+  for(const n of notes){
+    const f=decay(n,'flap',2.2);
+    if(f>0) n.rotation.x=Math.sin(t/45)*.5*f;
+  }
+
+  // disco ball + party
+  if(partyAmt>0) partyAmt=Math.max(0, partyAmt-dt*.16);     // ~6s of party
+  ball.rotation.y += dt*(.5+partyAmt*7);
+  disco.children[2].material.opacity=.35+partyAmt*.5;
+  if(partyAmt>0){
+    const st=Math.floor(t/110)%2 ? 1.5 : .45;
+    neon.material.opacity=Math.min(1,neon.material.opacity*st);
+    neon2.material.opacity=Math.min(1,neon2.material.opacity*st);
+    marquee.material.color.setHSL((t*.0012)%1,.9,.6);
+  }
+});
+
+/* ---------- DAYS SINCE LAST BUG ---------- */
+let bugDays=0;
+const signTex=canvasTexture(320,220,()=>{});
+function drawSign(){
+  const g=signTex.ctx, w=320, hh=220;
+  g.fillStyle='#141a26'; g.fillRect(0,0,w,hh);
+  g.strokeStyle='#3a4152'; g.lineWidth=8; g.strokeRect(6,6,w-12,hh-12);
+  g.fillStyle='#9aa7bf'; g.font='bold 19px monospace'; g.textAlign='center';
+  g.fillText('DAYS SINCE', w/2, 48); g.fillText('LAST BUG', w/2, 72);
+  g.fillStyle='#101520'; g.fillRect(60,90,200,86);
+  g.fillStyle=bugDays?'#4fd8c4':'#ff5d5d'; g.font='bold 68px monospace';
+  g.fillText(String(bugDays), w/2, 156);
+  signTex.tex.needsUpdate=true;
+}
+drawSign();
+const sign=new THREE.Mesh(new THREE.PlaneGeometry(.78,.54),
+  new THREE.MeshBasicMaterial({map:signTex.tex}));
+sign.position.set(7.42,2.75,-2.50); sign.rotation.y=-Math.PI/2;
+room.add(sign);
+addProp(sign,'reset the counter', ()=>{
+  if(bugDays===0){                                   // sad trombone
+    [311,294,277,262].forEach((f,i)=>setTimeout(()=>tone(f,.34,'sawtooth',.09), i*170));
+    bugDays=0;
+  } else { tone(660,.14,'square',.08); bugDays=0; }
+  drawSign(); sign.userData.shake=1;
+});
+animators.push((t,dt)=>{
+  let s=sign.userData.shake||0;
+  if(s>0){ sign.userData.shake=s=Math.max(0,s-dt*2); sign.position.y=2.75+Math.sin(t/40)*.02*s; }
+});
+
+/* ---------- magic 8-ball on the coffee table ---------- */
+const EIGHT=['it is certain','reply hazy, try again','outlook not so good','without a doubt',
+             'ask again later','my sources say no','signs point to yes','very doubtful',
+             'ship it','absolutely not'];
+const eightBall=new THREE.Group();
+eightBall.add(new THREE.Mesh(new THREE.SphereGeometry(.075,18,14), mat(0x14171f,{roughness:.25,metalness:.15})));
+const eightFace=new THREE.Mesh(new THREE.CircleGeometry(.032,18), mat(0xe9edf4,{roughness:.5}));
+eightFace.position.set(0,.03,.069); eightBall.add(eightFace);
+eightBall.position.set(-4.60,.635,-.55);
+eightBall.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
+scene.add(eightBall);
+addProp(eightBall,'ask it', ()=>{
+  noise(.16,.05,900);
+  const a=EIGHT[Math.floor(Math.random()*EIGHT.length)];
+  setTimeout(()=>{ pushLog('8-ball › ' + a); tone(520,.2,'sine',.07); }, 420);
+  eightBall.userData.shake=1;
+});
+
+/* ---------- delivery drone on patrol above the lounge ---------- */
+const drone=new THREE.Group();
+const droneBody=mat(0x2a2f3a,{roughness:.45,metalness:.3});
+drone.add(box(.20,.06,.14, droneBody, 0,0,0));
+const rotors=[];
+for(const [ax,az] of [[-.15,-.11],[.15,-.11],[-.15,.11],[.15,.11]]){
+  drone.add(box(.16,.018,.018, droneBody, ax*.55,0,az*.55));
+  drone.add(new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.03,8), droneBody).translateX(ax).translateZ(az));
+  const rot=new THREE.Mesh(new THREE.BoxGeometry(.15,.004,.02), mat(0x6b7183,{roughness:.6}));
+  rot.position.set(ax,.024,az); drone.add(rot); rotors.push(rot);
+}
+const droneLed=new THREE.Mesh(new THREE.SphereGeometry(.012,8,6), new THREE.MeshBasicMaterial({color:0xff5d5d}));
+droneLed.position.set(0,-.035,.07); drone.add(droneLed);
+drone.add(glowSprite(0xff5d5d,.30,.5).translateY(-.035).translateZ(.07));
+scene.add(drone);
+const DRONE_C=new THREE.Vector3(-5.00,2.80,-.80), DRONE_R=1.15;
+addProp(drone,'barrel roll', ()=>{
+  tone(240,.5,'sawtooth',.06,520); drone.userData.roll=1;
+});
+
+/* ---------- a plant that did not make it ---------- */
+const deadPlant=new THREE.Group();
+deadPlant.add(new THREE.Mesh(new THREE.CylinderGeometry(.20,.16,.30,18), mat(0x9c5a38,{roughness:.85}))
+  .translateY(.15));
+deadPlant.add(new THREE.Mesh(new THREE.CylinderGeometry(.175,.175,.03,18), mat(0x3a2a1c,{roughness:1}))
+  .translateY(.30));
+const twigs=[];
+for(let i=0;i<7;i++){
+  const a=i/7*Math.PI*2;
+  const tw=box(.02,.42+ (i%3)*.09,.02, mat(0x6b5535,{roughness:.95}),
+    Math.cos(a)*.06, .50+ (i%3)*.05, Math.sin(a)*.06);
+  tw.rotation.set(Math.sin(a)*.75, 0, -Math.cos(a)*.75);
+  deadPlant.add(tw); twigs.push(tw);
+}
+deadPlant.position.set(-3.20,0,2.75);
+deadPlant.traverse(o=>{ if(o.isMesh) o.castShadow=true; });
+scene.add(deadPlant);
+addProp(deadPlant,'water it (too late)', ()=>{
+  noise(.30,.05,600);
+  [392,349,311].forEach((f,i)=>setTimeout(()=>tone(f,.3,'sine',.06), i*200));
+  deadPlant.userData.hope=1;
+});
+
+animators.push((t,dt)=>{
+  const decay=(o,k,r)=>{ let v=o.userData[k]||0; if(v>0) o.userData[k]=v=Math.max(0,v-dt*r); return v; };
+  // 8-ball shake
+  const eb=decay(eightBall,'shake',2.4);
+  if(eb>0){ eightBall.position.y=.635+Math.abs(Math.sin(t/45))*.05*eb;
+            eightBall.rotation.z=Math.sin(t/38)*.5*eb; }
+  // drone patrol
+  const ro=decay(drone,'roll',1.1);
+  const a=t*.00034;
+  drone.position.set(DRONE_C.x+Math.cos(a)*DRONE_R, DRONE_C.y+Math.sin(a*2.3)*.13,
+                     DRONE_C.z+Math.sin(a)*DRONE_R*.75);
+  drone.rotation.y=-a+Math.PI/2;
+  drone.rotation.z=ro>0 ? ro*Math.PI*2 : Math.sin(a)*.12;
+  for(const r of rotors) r.rotation.y += dt*(60+ro*90);
+  droneLed.material.color.setHex(Math.floor(t/420)%2 ? 0xff5d5d : 0x401518);
+  // the dead plant briefly hopes
+  const hp2=decay(deadPlant,'hope',.75);
+  for(let i=0;i<twigs.length;i++){
+    const base=-Math.cos(i/7*Math.PI*2)*.75;
+    twigs[i].rotation.z = base*(1-hp2*.55);
+  }
 });
 
 /* MQTT packet motes and the ambient dust field were removed:
