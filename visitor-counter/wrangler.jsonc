@@ -1,6 +1,7 @@
 {
   "name": "portfolio-visit-counter",
   "main": "worker.js",
+  "workers_dev": false,
   "compatibility_date": "2026-05-22",
   "routes": [
     {
