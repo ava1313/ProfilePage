@@ -118,6 +118,10 @@ img {
   box-shadow: var(--shadow);
 }
 
+.nav.shell {
+  width: min(1320px, calc(100% - 40px));
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -498,6 +502,21 @@ img {
   background:
     radial-gradient(circle at top right, rgba(255, 140, 105, 0.14), transparent 35%),
     rgba(19, 24, 35, 0.86);
+}
+
+.projectCard--spotlight {
+  grid-column: 1 / -1;
+  background:
+    radial-gradient(circle at top right, rgba(125, 207, 255, 0.16), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(255, 140, 105, 0.13), transparent 32%),
+    rgba(19, 24, 35, 0.9);
+}
+
+.projectActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .projectHeader {
@@ -992,7 +1011,11 @@ textarea.input {
   }
 }
 
-@media (min-width: 1001px) and (max-width: 1180px) {
+@media (min-width: 1001px) and (max-width: 1320px) {
+  .nav {
+    gap: 12px;
+  }
+
   .navLinks {
     gap: 4px;
   }
