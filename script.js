@@ -5,6 +5,50 @@
   const year = $("#year");
   if (year) year.textContent = new Date().getFullYear();
 
+  const visitorCounter = $("#visitorCounter");
+  const visitorCount = $("#visitorCount");
+  const visitorCountNote = $("#visitorCountNote");
+
+  if (visitorCounter && visitorCount && visitorCountNote) {
+    const endpoint = visitorCounter.dataset.counterEndpoint;
+    const sessionKey = "portfolio-visit-counted";
+    let shouldIncrement = true;
+
+    try {
+      shouldIncrement = sessionStorage.getItem(sessionKey) !== "yes";
+    } catch {
+      // The counter still works when browser storage is unavailable.
+    }
+
+    fetch(endpoint, {
+      method: shouldIncrement ? "POST" : "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Counter unavailable");
+        return response.json();
+      })
+      .then(({ count }) => {
+        if (!Number.isFinite(count)) throw new Error("Invalid counter response");
+        visitorCount.textContent = new Intl.NumberFormat("en-US").format(count);
+        visitorCountNote.textContent = "Public and privacy-friendly";
+        visitorCounter.dataset.counterState = "ready";
+
+        if (shouldIncrement) {
+          try {
+            sessionStorage.setItem(sessionKey, "yes");
+          } catch {
+            // No persistent browser identifier is required.
+          }
+        }
+      })
+      .catch(() => {
+        visitorCountNote.textContent = "Counter coming online";
+        visitorCounter.dataset.counterState = "offline";
+      });
+  }
+
   const navToggle = $("#navToggle");
   const navLinks = $("#navLinks");
   if (navToggle && navLinks) {

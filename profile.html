@@ -17,7 +17,7 @@
     rel="stylesheet"
   />
 
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <div class="pageGlow pageGlow--left" aria-hidden="true"></div>
@@ -106,6 +106,19 @@
             <p>UI sense, backend curiosity, mobile energy, and a real interest in systems that connect software with hardware.</p>
           </div>
         </div>
+
+        <aside
+          class="visitorCard"
+          id="visitorCounter"
+          data-counter-endpoint="https://counter.avagianos-dev.gr/api/visits"
+          aria-label="Public portfolio visit count"
+        >
+          <div class="visitorCard__copy">
+            <span class="visitorCard__status"><i aria-hidden="true"></i> Live portfolio signal</span>
+            <strong><span id="visitorCount" aria-live="polite">—</span> visits</strong>
+          </div>
+          <span class="visitorCard__note" id="visitorCountNote">Connecting counter…</span>
+        </aside>
 
         <div class="signalCard">
           <div class="signalRow">
@@ -617,7 +630,7 @@
     <a href="#top">Back to top</a>
   </footer>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

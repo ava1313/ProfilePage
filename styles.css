@@ -393,7 +393,8 @@ img {
 }
 
 .portraitCard,
-.signalCard {
+.signalCard,
+.visitorCard {
   overflow: hidden;
   border-radius: var(--radius-xl);
 }
@@ -421,6 +422,92 @@ img {
 
 .portraitCaption {
   padding: 16px 4px 2px;
+}
+
+.visitorCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(125, 207, 255, 0.24);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(125, 207, 255, 0.22), transparent 38%),
+    linear-gradient(135deg, rgba(125, 207, 255, 0.08), rgba(255, 140, 105, 0.08)),
+    rgba(19, 24, 35, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.visitorCard::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  width: 74px;
+  height: 74px;
+  border: 1px solid rgba(125, 207, 255, 0.18);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 12px rgba(125, 207, 255, 0.04),
+    0 0 0 24px rgba(125, 207, 255, 0.025);
+  pointer-events: none;
+}
+
+.visitorCard__copy {
+  display: grid;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.visitorCard__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visitorCard__status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 5px rgba(125, 207, 255, 0.1), 0 0 18px rgba(125, 207, 255, 0.7);
+  animation: visitorPulse 2s ease-in-out infinite;
+}
+
+.visitorCard strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.15rem;
+}
+
+.visitorCard strong span {
+  color: var(--blue);
+  font-size: 1.65rem;
+}
+
+.visitorCard__note {
+  max-width: 110px;
+  position: relative;
+  z-index: 1;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.visitorCard[data-counter-state="ready"] .visitorCard__status i {
+  background: #78e6a5;
+  box-shadow: 0 0 0 5px rgba(120, 230, 165, 0.1), 0 0 18px rgba(120, 230, 165, 0.65);
+}
+
+@keyframes visitorPulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.75; }
+  50% { transform: scale(1.12); opacity: 1; }
 }
 
 .signalCard {
@@ -1006,8 +1093,10 @@ textarea.input {
   .button,
   .navLink,
   .dots i,
-  .certPreview {
+  .certPreview,
+  .visitorCard__status i {
     transition: none;
+    animation: none;
   }
 }
 
@@ -1146,6 +1235,16 @@ textarea.input {
   .contactWrap {
     padding: 10px;
     border-radius: 28px;
+  }
+
+  .visitorCard {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .visitorCard__note {
+    max-width: none;
+    text-align: left;
   }
 
 }
