@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Θεωρία Υπολογισμού — Διαδραστικό Μάθημα</title>
+<style>
+:root{
+  --bg:#f5f6fb; --panel:#fff; --ink:#171a26; --muted:#6b7280; --line:#e5e7f0;
+  --accent:#5b53d6; --accent2:#8b5cf6; --soft:#eeecfd; --accent-ink:#3b34a8;
+  --ok:#16a34a; --ok-soft:#e7f7ed; --bad:#dc2626; --bad-soft:#fdeaea;
+  --warn:#d97706; --warn-soft:#fff4e0; --info:#0e7490; --info-soft:#e0f4f8;
+  --tape:#fffdf5; --r:14px; --sh:0 1px 2px rgba(16,20,45,.05),0 10px 30px rgba(16,20,45,.07);
+}
+body.dark{
+  --bg:#101219; --panel:#181b25; --ink:#e9ebf3; --muted:#98a0b3; --line:#282d3c;
+  --accent:#8b83ff; --accent2:#a78bfa; --soft:#252351; --accent-ink:#bdb7ff;
+  --ok:#4ade80; --ok-soft:#152e1d; --bad:#f87171; --bad-soft:#391b1b;
+  --warn:#fbbf24; --warn-soft:#372810; --info:#67e8f9; --info-soft:#0f2d36;
+  --tape:#1e2230; --sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  -webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:60;background:var(--panel);border-bottom:1px solid var(--line)}
+.hd{max-width:1020px;margin:0 auto;padding:11px 18px;display:flex;align-items:center;gap:12px}
+.logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+.htitle{margin-right:auto;min-width:0}
+.htitle b{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.htitle small{font-size:11.5px;color:var(--muted)}
+.ib{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;
+  padding:7px 11px;font-size:12.5px;cursor:pointer;font-weight:600;font-family:inherit;transition:.15s;white-space:nowrap}
+.ib:hover{border-color:var(--accent);color:var(--accent)}
+.topbar{height:3px;background:var(--line)}
+.topbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s}
+
+/* ---------- layout ---------- */
+.shell{max-width:1020px;margin:0 auto;padding:20px 18px 90px;display:grid;
+  grid-template-columns:236px 1fr;gap:22px;align-items:start}
+@media(max-width:860px){.shell{grid-template-columns:1fr;gap:14px}}
+
+/* ---------- sidebar ---------- */
+.side{position:sticky;top:66px;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--sh);padding:12px;max-height:calc(100vh - 90px);overflow:auto}
+@media(max-width:860px){.side{position:static;max-height:none}}
+.side h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:4px 6px 8px}
+.navi{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--ink);
+  padding:8px 10px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+  display:flex;gap:9px;align-items:center;transition:.12s;line-height:1.35}
+.navi:hover{background:var(--bg)}
+.navi.on{background:var(--soft);color:var(--accent-ink)}
+.navi .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;
+  display:grid;place-items:center;font-size:10px;font-weight:800;color:var(--muted)}
+.navi.on .dot{border-color:var(--accent);color:var(--accent)}
+.navi.done .dot{background:var(--ok);border-color:var(--ok);color:#fff}
+.navi span{min-width:0}
+
+/* ---------- lesson card ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:26px 28px;animation:in .28s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(max-width:640px){.card{padding:20px 17px}}
+.crumb{font-size:11.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.card h2{font-size:24px;margin:0 0 6px;font-weight:750;letter-spacing:-.5px;line-height:1.25}
+.card h3{font-size:16.5px;margin:24px 0 8px;font-weight:700;letter-spacing:-.2px}
+.card p{margin:0 0 13px;font-size:15.5px}
+.card ul,.card ol{margin:0 0 13px;padding-inline-start:22px;font-size:15.5px}
+.card li{margin-bottom:6px}
+.lead{font-size:16px;color:var(--muted)}
+b,strong{font-weight:680}
+code{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+kbd{background:var(--bg);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+  padding:1px 5px;font-size:11px;font-family:ui-monospace,Menlo,monospace}
+
+/* callouts */
+.box{border-radius:11px;padding:13px 16px;margin:0 0 15px;font-size:14.8px;border:1px solid}
+.box p:last-child{margin:0}
+.box .t{font-weight:750;font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.box.idea{background:var(--soft);border-color:transparent;color:var(--accent-ink)}
+.box.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.box.def{background:var(--info-soft);border-color:transparent;color:var(--info)}
+.box.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+body.dark .box.idea,body.dark .box.warn,body.dark .box.def,body.dark .box.ok{color:var(--ink)}
+body.dark .box .t{opacity:.9}
+.box.idea .t{color:var(--accent)} .box.warn .t{color:var(--warn)}
+.box.def .t{color:var(--info)} .box.ok .t{color:var(--ok)}
+
+/* ---------- widget shell ---------- */
+.w{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 16px;background:var(--panel)}
+.w .wh{background:var(--bg);padding:9px 15px;font-size:12.5px;font-weight:700;color:var(--muted);
+  display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.w .wh .tag{background:var(--accent);color:#fff;border-radius:5px;padding:1px 7px;font-size:10px;letter-spacing:.4px}
+.w .wb{padding:15px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.row.mb{margin-bottom:12px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;
+  padding:8px 14px;font-size:13.5px;font-weight:650;cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover:not(:disabled){filter:brightness(1.1);color:#fff}
+.btn.sm{padding:6px 11px;font-size:12.5px}
+input[type=text]{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;
+  padding:8px 12px;font-size:14px;font-family:ui-monospace,Menlo,monospace;width:170px}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+select{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;
+  padding:8px 11px;font-size:13.5px;font-family:inherit}
+.lbl{font-size:12.5px;color:var(--muted);font-weight:650}
+.res{font-size:14px;margin-top:11px;padding:11px 14px;border-radius:10px;line-height:1.55}
+.res.good{background:var(--ok-soft);color:var(--ok)}
+.res.bad{background:var(--bad-soft);color:var(--bad)}
+.res.neut{background:var(--bg);color:var(--muted)}
+body.dark .res.good,body.dark .res.bad{color:var(--ink)}
+
+/* ---------- automaton svg ---------- */
+.autowrap{background:var(--tape);border:1px solid var(--line);border-radius:10px;overflow:auto}
+svg.auto{display:block;margin:0 auto;max-width:100%}
+.st circle{fill:var(--panel);stroke:var(--ink);stroke-width:2;transition:.2s}
+.st.live circle{fill:var(--accent);stroke:var(--accent)}
+.st.live text{fill:#fff}
+.st.acc circle.outer{fill:none}
+.st text{font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;transition:.2s}
+.ed{stroke:var(--muted);stroke-width:1.7;fill:none;marker-end:url(#ah);transition:.2s}
+.ed.live{stroke:var(--accent);stroke-width:3}
+.edl{font-size:12px;font-weight:700;fill:var(--muted);text-anchor:middle}
+.edl.live{fill:var(--accent)}
+
+/* ---------- tape ---------- */
+.tape{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:14px 0 6px}
+.cell{width:38px;height:44px;border:2px solid var(--line);border-radius:8px;background:var(--tape);
+  display:grid;place-items:center;font-family:ui-monospace,Menlo,monospace;font-size:17px;font-weight:700;
+  position:relative;transition:.18s;color:var(--ink)}
+.cell.read{border-color:var(--muted);opacity:.45}
+.cell.head{border-color:var(--accent);background:var(--soft);color:var(--accent-ink);
+  transform:translateY(-4px);box-shadow:0 5px 14px rgba(91,83,214,.25)}
+body.dark .cell.head{color:var(--ink)}
+.cell.head::after{content:"▲";position:absolute;bottom:-17px;font-size:11px;color:var(--accent)}
+.statusline{text-align:center;font-size:13.5px;color:var(--muted);min-height:22px;margin-top:16px}
+.statusline b{color:var(--ink)}
+.pill{display:inline-block;padding:3px 11px;border-radius:99px;font-size:12.5px;font-weight:700}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.run{background:var(--soft);color:var(--accent-ink)}
+
+/* ---------- quiz ---------- */
+.qz{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 16px;background:var(--panel)}
+.qz .qq{font-size:15.5px;font-weight:680;margin-bottom:12px}
+.qopt{display:flex;gap:11px;align-items:flex-start;width:100%;border:1.5px solid var(--line);
+  background:var(--panel);color:var(--ink);border-radius:10px;padding:11px 13px;cursor:pointer;
+  font-family:inherit;font-size:14.5px;text-align:start;margin-bottom:8px;transition:.15s;line-height:1.5}
+.qopt:hover:not(:disabled){border-color:var(--accent);background:var(--soft)}
+.qopt:disabled{cursor:default}
+.qopt .k{flex:none;width:23px;height:23px;border-radius:6px;background:var(--bg);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:1px}
+.qopt.right{border-color:var(--ok);background:var(--ok-soft)}
+.qopt.right .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.qopt.wrong .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.qopt.dim{opacity:.5}
+.fb{font-size:14px;padding:11px 14px;border-radius:10px;margin-top:4px}
+.fb.good{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)}
+
+/* ---------- misc ---------- */
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+  padding:6px 13px;font-size:13px;font-weight:650;cursor:pointer;font-family:inherit;transition:.15s}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.g{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.chip.b{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{border:1px solid var(--line);padding:7px 11px;text-align:center}
+table.t th{background:var(--bg);font-size:12.5px;color:var(--muted);font-weight:700}
+table.t td.hi{background:var(--soft);font-weight:700;color:var(--accent-ink)}
+.foot{display:flex;gap:10px;align-items:center;margin-top:24px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.sp{margin-inline-start:auto}
+.hint{font-size:12px;color:var(--muted)}
+.big{font-size:19px;font-weight:700;letter-spacing:-.3px}
+.center{text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.mini{font-size:12.5px;color:var(--muted)}
+.bar{height:9px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="logo">ΘΥ</div>
+    <div class="htitle">
+      <b>Θεωρία Υπολογισμού — Διαδραστικό Μάθημα</b>
+      <small id="subttl">INF148 · μάθε παίζοντας, όχι διαβάζοντας</small>
+    </div>
+    <button class="ib" id="themeB" title="Θέμα">🌙</button>
+  </div>
+  <div class="topbar"><i id="topbar" style="width:0"></i></div>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <h4>Διαδρομή</h4>
+    <div id="nav"></div>
+    <h4 style="margin-top:14px">Πρόοδος</h4>
+    <div style="padding:0 6px 6px">
+      <div class="bar"><i id="pbar" style="width:0"></i></div>
+      <div class="mini" id="pinfo" style="margin-top:6px"></div>
+      <button class="ib" id="saveB" style="width:100%;margin-top:9px">⬇ Αποθήκευση</button>
+      <button class="ib" id="loadB" style="width:100%;margin-top:6px">⬆ Φόρτωση</button>
+      <input type="file" id="loadF" accept=".json" style="display:none">
+    </div>
+  </aside>
+
+  <main id="main"></main>
+</div>
+<script>
+/* =========================================================
+   ΜΗΧΑΝΗ ΑΥΤΟΜΑΤΩΝ  (rendering + simulation)
+   ========================================================= */
+const R = 24;
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let _uid = 0; const uid = () => 'u' + (++_uid);
+
+/* ---------- geometry helpers ---------- */
+function edgeKey(e){ return e.f + '→' + e.t; }
+function groupEdges(A){
+  const g = {};
+  A.edges.forEach(e => { const k = edgeKey(e); (g[k] = g[k] || {f:e.f, t:e.t, syms:[]}).syms.push(e.s); });
+  return Object.values(g);
+}
+function nodeOf(A,id){ return A.states.find(s => s.id === id); }
+
+function edgePath(A, g, bidir){
+  const a = nodeOf(A,g.f), b = nodeOf(A,g.t);
+  if(g.f === g.t){                                    // self loop
+    const x = a.x, y = a.y - R;
+    return { d:`M ${x-13} ${y+4} C ${x-30} ${y-38}, ${x+30} ${y-38}, ${x+13} ${y+4}`,
+             lx:x, ly:y-30 };
+  }
+  const dx = b.x-a.x, dy = b.y-a.y, L = Math.hypot(dx,dy) || 1;
+  const ux = dx/L, uy = dy/L, px = -uy, py = ux;      // unit + perpendicular
+  const off = bidir ? 17 : 0;
+  const sx = a.x + ux*R + px*off*0.55, sy = a.y + uy*R + py*off*0.55;
+  const ex = b.x - ux*(R+7) + px*off*0.55, ey = b.y - uy*(R+7) + py*off*0.55;
+  const mx = (a.x+b.x)/2 + px*off, my = (a.y+b.y)/2 + py*off;
+  const d = off ? `M ${sx} ${sy} Q ${mx} ${my} ${ex} ${ey}` : `M ${sx} ${sy} L ${ex} ${ey}`;
+  return { d, lx: mx + px*13, ly: my + py*13 - 2 };
+}
+
+/* ---------- render ---------- */
+function drawAutomaton(A, host, live, liveEdges){
+  live = live || [];  liveEdges = liveEdges || [];
+  const gs = groupEdges(A);
+  const pairs = new Set(gs.map(g => g.f+'|'+g.t));
+  let svg = `<svg class="auto" viewBox="0 0 ${A.w} ${A.h}" width="${A.w}" height="${A.h}">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker>
+    </defs>`;
+  gs.forEach(g => {
+    const bidir = g.f !== g.t && pairs.has(g.t+'|'+g.f);
+    const p = edgePath(A, g, bidir);
+    const on = liveEdges.some(le => le.f===g.f && le.t===g.t);
+    svg += `<path class="ed${on?' live':''}" d="${p.d}" style="color:${on?'var(--accent)':'var(--muted)'}"/>`;
+    svg += `<text class="edl${on?' live':''}" x="${p.lx}" y="${p.ly}">${esc(g.syms.join(','))}</text>`;
+  });
+  A.states.forEach(s => {
+    const on = live.includes(s.id);
+    if(s.start){
+      svg += `<path class="ed" d="M ${s.x-R-26} ${s.y} L ${s.x-R-3} ${s.y}" style="color:var(--muted)"/>`;
+      svg += `<text class="edl" x="${s.x-R-34}" y="${s.y+4}">start</text>`;
+    }
+    svg += `<g class="st${on?' live':''}${s.acc?' acc':''}">`;
+    if(s.acc) svg += `<circle class="outer" cx="${s.x}" cy="${s.y}" r="${R+5}"/>`;
+    svg += `<circle cx="${s.x}" cy="${s.y}" r="${R}"/><text x="${s.x}" y="${s.y}">${esc(s.label||s.id)}</text></g>`;
+  });
+  svg += `</svg>`;
+  host.innerHTML = `<div class="autowrap">${svg}</div>`;
+}
+
+/* ---------- simulation ---------- */
+function eclose(A, set){
+  const out = new Set(set); const stack = [...set];
+  while(stack.length){
+    const q = stack.pop();
+    A.edges.filter(e => e.f===q && e.s==='ε').forEach(e => {
+      if(!out.has(e.t)){ out.add(e.t); stack.push(e.t); }
+    });
+  }
+  return [...out];
+}
+function startSet(A){
+  const st = A.states.find(s => s.start).id;
+  return A.type==='nfa' ? eclose(A,[st]) : [st];
+}
+function stepSet(A, cur, sym){
+  let nxt = [], used = [];
+  cur.forEach(q => A.edges.filter(e => e.f===q && e.s===sym).forEach(e => {
+    if(!nxt.includes(e.t)) nxt.push(e.t);
+    used.push({f:e.f, t:e.t});
+  }));
+  if(A.type==='nfa'){
+    const before = [...nxt];
+    nxt = eclose(A, nxt);
+    nxt.forEach(q => { if(!before.includes(q))
+      A.edges.filter(e => e.s==='ε' && nxt.includes(e.f) && e.t===q).forEach(e => used.push({f:e.f,t:e.t})); });
+  }
+  return { nxt, used };
+}
+function accepts(A, w){
+  let cur = startSet(A);
+  for(const c of w){ cur = stepSet(A, cur, c).nxt; if(!cur.length) return false; }
+  return cur.some(q => nodeOf(A,q).acc);
+}
+
+/* =========================================================
+   WIDGET: αυτόματο με ταινία, play / step
+   ========================================================= */
+function wAutomaton(el, cfg){
+  const A = cfg.A;
+  const id = uid();
+  el.innerHTML = `
+   <div class="w">
+     <div class="wh"><span class="tag">ΠΡΟΣΟΜΟΙΩΤΗΣ</span>${esc(cfg.title||'Δοκίμασε το αυτόματο')}</div>
+     <div class="wb">
+       <div class="row mb">
+         <span class="lbl">Λέξη:</span>
+         <input type="text" id="${id}i" value="${esc(cfg.w||'')}" spellcheck="false">
+         ${(cfg.presets||[]).map(p=>`<button class="chip" data-p="${esc(p)}">${p===''?'ε':esc(p)}</button>`).join('')}
+       </div>
+       <div id="${id}g"></div>
+       <div class="tape" id="${id}t"></div>
+       <div class="statusline" id="${id}s"></div>
+       <div class="row" style="justify-content:center;margin-top:12px">
+         <button class="btn sm" id="${id}r">⟲ Αρχή</button>
+         <button class="btn sm" id="${id}b">‹ Πίσω</button>
+         <button class="btn pri sm" id="${id}n">Βήμα ›</button>
+         <button class="btn sm" id="${id}p">▶ Αυτόματα</button>
+       </div>
+       ${cfg.note ? `<div class="mini" style="margin-top:11px;text-align:center">${cfg.note}</div>` : ''}
+     </div>
+   </div>`;
+
+  const inp = $('#'+id+'i'), gh = $('#'+id+'g'), th = $('#'+id+'t'), sh = $('#'+id+'s');
+  let word = inp.value, pos = 0, cur = startSet(A), lastEdges = [], dead = false, timer = null;
+
+  function reset(){
+    word = inp.value.trim(); pos = 0; cur = startSet(A); lastEdges = []; dead = false;
+    stop(); render();
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; $('#'+id+'p').textContent='▶ Αυτόματα'; } }
+  function step(){
+    if(dead || pos >= word.length) return false;
+    const c = word[pos];
+    if(!A.alpha.includes(c)){ dead = true; lastEdges = []; render('badsym'); return false; }
+    const r = stepSet(A, cur, c);
+    cur = r.nxt; lastEdges = r.used; pos++;
+    if(!cur.length) dead = true;
+    render(); return true;
+  }
+  function back(){
+    if(pos === 0) return;
+    const target = pos-1; pos = 0; cur = startSet(A); dead = false; lastEdges = [];
+    for(let i=0;i<target;i++){ const r = stepSet(A,cur,word[i]); cur = r.nxt; lastEdges = r.used; pos++; }
+    render();
+  }
+  function render(err){
+    drawAutomaton(A, gh, cur, lastEdges);
+    th.innerHTML = word.length
+      ? [...word].map((c,i)=>`<div class="cell ${i<pos?'read':''} ${i===pos?'head':''}">${esc(c)}</div>`).join('')
+        + `<div class="cell ${pos>=word.length?'head':''}" style="opacity:.5">⊔</div>`
+      : `<div class="cell head" style="opacity:.5">⊔</div>`;
+    const done = pos >= word.length;
+    const acc = done && !dead && cur.some(q => nodeOf(A,q).acc);
+    let s = '';
+    if(err === 'badsym'){
+      s = `<span class="pill bad">Το σύμβολο «${esc(word[pos])}» δεν ανήκει στο αλφάβητο Σ = {${A.alpha.join(', ')}}</span>`;
+    } else if(dead){
+      s = `<span class="pill bad">Κόλλησε — δεν υπάρχει μετάβαση. Η λέξη ΔΕΝ γίνεται δεκτή.</span>`;
+    } else if(done){
+      s = acc ? `<span class="pill ok">✓ ΑΠΟΔΟΧΗ — κατέληξε σε κατάσταση αποδοχής</span>`
+              : `<span class="pill bad">✗ ΑΠΟΡΡΙΨΗ — η τελική κατάσταση δεν είναι αποδοχής</span>`;
+    } else {
+      s = `<span class="pill run">Διάβασε ${pos} από ${word.length}</span>`;
+    }
+    const names = cur.map(q => nodeOf(A,q).label || q).join(', ');
+    s += `<br><b>${A.type==='nfa' ? 'Πιθανές καταστάσεις' : 'Κατάσταση'}:</b> ${cur.length?esc(names):'—'}`;
+    sh.innerHTML = s;
+  }
+
+  $('#'+id+'n').onclick = () => { stop(); step(); };
+  $('#'+id+'b').onclick = () => { stop(); back(); };
+  $('#'+id+'r').onclick = reset;
+  $('#'+id+'p').onclick = e => {
+    if(timer){ stop(); return; }
+    if(pos >= word.length || dead) reset();
+    e.target.textContent = '⏸ Παύση';
+    timer = setInterval(() => { if(!step()) stop(); }, 700);
+  };
+  inp.oninput = reset;
+  el.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { inp.value = b.dataset.p; reset(); });
+  reset();
+}
+/* =========================================================
+   WIDGET: inline quiz
+   ========================================================= */
+function wQuiz(el, cfg){
+  const id = uid();
+  el.innerHTML = `<div class="qz"><div class="qq">${cfg.q}</div><div id="${id}o"></div><div id="${id}f"></div></div>`;
+  const oh = $('#'+id+'o');
+  oh.innerHTML = cfg.o.map((o,i)=>`<button class="qopt" data-i="${i}"><span class="k">${'ΑΒΓΔΕ'[i]}</span><span>${o}</span></button>`).join('');
+  oh.querySelectorAll('.qopt').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, ok = i === cfg.a;
+    oh.querySelectorAll('.qopt').forEach((x,j)=>{
+      x.disabled = true;
+      if(j===cfg.a) x.classList.add('right');
+      else if(j===i) x.classList.add('wrong');
+      else x.classList.add('dim');
+    });
+    $('#'+id+'f').innerHTML = `<div class="fb ${ok?'good':'bad'}">${ok?'✓ ':'✗ '}${cfg.e}</div>`;
+    markDone(el);
+  });
+}
+
+/* =========================================================
+   WIDGET: Kleene star splitter
+   ========================================================= */
+function wSplit(el, cfg){
+  const id = uid(), G = cfg.G;
+  el.innerHTML = `
+   <div class="w"><div class="wh"><span class="tag">ΠΑΙΞΕ</span>Ανήκει η λέξη στο Γ*;</div><div class="wb">
+     <p style="margin:0 0 11px;font-size:14.5px">Γ = {${G.map(g=>`<code>${g}</code>`).join(', ')}} &nbsp;→&nbsp; Γ* = όλες οι λέξεις που σπάνε σε κομμάτια της Γ.</p>
+     <div class="row mb"><span class="lbl">Λέξη:</span><input type="text" id="${id}i" value="${cfg.w||''}" spellcheck="false">
+       ${(cfg.presets||[]).map(p=>`<button class="chip" data-p="${p}">${p===''?'ε':p}</button>`).join('')}</div>
+     <div id="${id}r"></div>
+   </div></div>`;
+  const inp = $('#'+id+'i'), rh = $('#'+id+'r');
+  function split(w){                       // DP: returns array of pieces or null
+    const n = w.length, back = new Array(n+1).fill(null); const ok = new Array(n+1).fill(false);
+    ok[0] = true;
+    for(let i=1;i<=n;i++) for(const g of G){
+      if(g.length<=i && ok[i-g.length] && w.slice(i-g.length,i)===g){ ok[i]=true; back[i]=g; break; }
+    }
+    if(!ok[n]) return null;
+    const out=[]; let i=n; while(i>0){ out.unshift(back[i]); i-=back[i].length; } return out;
+  }
+  function run(){
+    const w = inp.value.trim();
+    if(w===''){ rh.innerHTML = `<div class="res good">✓ Η κενή λέξη <b>ε</b> ανήκει ΠΑΝΤΑ στο Γ* — είναι η παράθεση μηδέν κομματιών. Ακόμη και ∅* = {ε}.</div>`; return; }
+    const s = split(w);
+    rh.innerHTML = s
+      ? `<div class="res good">✓ <b>${w} ∈ Γ*</b><br>Σπάει ως: ${s.map(p=>`<code>${p}</code>`).join(' | ')} — ${s.length} κομμάτια, όλα μέσα στη Γ.</div>`
+      : `<div class="res bad">✗ <b>${w} ∉ Γ*</b><br>Δοκίμασε κάθε δυνατό χώρισμα: σε καθένα μένει τουλάχιστον ένα κομμάτι που δεν ανήκει στη Γ.</div>`;
+  }
+  inp.oninput = run;
+  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ inp.value=b.dataset.p; run(); });
+  run();
+}
+
+/* =========================================================
+   WIDGET: language membership sorter (regex-backed)
+   ========================================================= */
+function wWords(el, cfg){
+  const id = uid();
+  el.innerHTML = `
+   <div class="w"><div class="wh"><span class="tag">ΠΑΙΞΕ</span>${cfg.title}</div><div class="wb">
+     <p style="margin:0 0 12px;font-size:14.5px">${cfg.desc}</p>
+     <p class="mini" style="margin:0 0 10px">Κάνε κλικ σε κάθε λέξη: ανήκει ή δεν ανήκει;</p>
+     <div class="chips" id="${id}c"></div><div id="${id}r"></div>
+   </div></div>`;
+  const re = new RegExp(cfg.re), ch = $('#'+id+'c'), rh = $('#'+id+'r');
+  let left = cfg.words.length;
+  ch.innerHTML = cfg.words.map((w,i)=>`<button class="chip" data-i="${i}">${w===''?'ε':w}</button>`).join('');
+  ch.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+    if(b.disabled) return;
+    const w = cfg.words[+b.dataset.i], inL = re.test(w);
+    b.disabled = true; b.classList.add(inL?'g':'b');
+    b.textContent = (w===''?'ε':w) + (inL ? '  ✓ ανήκει' : '  ✗ όχι');
+    if(--left===0) rh.innerHTML = `<div class="res neut">${cfg.after||''}</div>`, markDone(el);
+  });
+}
+
+/* =========================================================
+   WIDGET: subset construction (NFA → DFA)
+   ========================================================= */
+function wSubset(el, cfg){
+  const id = uid();
+  const rows = cfg.rows;           // [{from:'{1}', a:'{1,2}', b:'{1}', acc:false}]
+  let step = 0;
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΧΤΙΣΕ ΤΟ</span>Από NFA σε ισοδύναμο DFA</div>
+    <div class="wb"><div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(){
+    let h = `<table class="t"><tr><th>Σύνολο καταστάσεων</th><th>με ${cfg.alpha[0]}</th><th>με ${cfg.alpha[1]}</th><th>τελική;</th></tr>`;
+    rows.forEach((r,i)=>{
+      if(i<step) h += `<tr><td class="hi">${r.from}</td><td>${r.a}</td><td>${r.b}</td><td>${r.acc?'✓ ΝΑΙ':'—'}</td></tr>`;
+      else if(i===step) h += `<tr><td class="hi">${r.from}</td><td colspan="3" style="text-align:start">
+        <span class="lbl">Διαβάζοντας <b>${cfg.alpha[0]}</b> από το ${r.from}, σε ποιο σύνολο πάμε;</span><br>
+        <div class="chips" style="margin-top:7px">${r.opts.map((o,j)=>`<button class="chip" data-j="${j}">${o}</button>`).join('')}</div></td></tr>`;
+      else h += `<tr style="opacity:.35"><td>?</td><td>?</td><td>?</td><td>?</td></tr>`;
+    });
+    h += `</table>`;
+    if(step>=rows.length) h += `<div class="res good" style="margin-top:12px">${cfg.done}</div>`;
+    bh.innerHTML = h;
+    bh.querySelectorAll('[data-j]').forEach(b => b.onclick = () => {
+      const r = rows[step], ok = +b.dataset.j === r.ans;
+      if(ok){ step++; draw(); if(step>=rows.length) markDone(el); }
+      else { b.classList.add('b'); b.disabled = true;
+        bh.insertAdjacentHTML('beforeend', `<div class="res bad" style="margin-top:10px">${r.why}</div>`); }
+    });
+  }
+  draw();
+}
+
+/* =========================================================
+   WIDGET: pumping-lemma game
+   ========================================================= */
+function wPump(el, cfg){
+  const id = uid(); let phase = 0, chosen = null, splitI = null;
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΠΑΙΧΝΙΔΙ</span>Λήμμα Άντλησης — εσύ εναντίον του «αντιπάλου»</div>
+    <div class="wb"><div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(){
+    let h = `<div class="box def" style="margin-bottom:14px"><span class="t">Η γλώσσα</span>${cfg.L}</div>`;
+    h += `<p style="font-size:14.5px"><b>Γύρος 1 — ο αντίπαλος:</b> «Ας πούμε ότι η γλώσσα ΕΙΝΑΙ κανονική. Τότε υπάρχει αριθμός άντλησης <b>p = ${cfg.p}</b>.»</p>`;
+    if(phase===0){
+      h += `<p style="font-size:14.5px"><b>Γύρος 2 — εσύ:</b> διάλεξε λέξη w της γλώσσας με |w| ≥ ${cfg.p}. Διάλεξε σοφά!</p>
+        <div class="chips">${cfg.words.map((w,i)=>`<button class="chip" data-w="${i}">${w.s}</button>`).join('')}</div>`;
+    } else {
+      const W = cfg.words[chosen];
+      h += `<p style="font-size:14.5px"><b>Γύρος 2 — εσύ:</b> διάλεξες <code>${W.s}</code></p>`;
+      if(W.bad){
+        h += `<div class="res bad">${W.why}<br><br><button class="btn sm" id="${id}again">Ξαναδιάλεξε</button></div>`;
+      } else if(phase===1){
+        h += `<p style="font-size:14.5px"><b>Γύρος 3 — ο αντίπαλος</b> σπάει τη λέξη σε x·y·z (με y ≠ ε και |xy| ≤ ${cfg.p}). Διάλεξε ποιο σπάσιμο θα εξετάσεις:</p>
+          <div class="chips">${W.splits.map((s,i)=>`<button class="chip" data-s="${i}">x=${s.x||'ε'}, y=${s.y}, z=${s.z||'ε'}</button>`).join('')}</div>
+          <p class="mini" style="margin-top:9px">Παρατήρησε: όποιο κι αν διαλέξεις, το <b>y</b> βγαίνει πάντα ${W.hint}</p>`;
+      } else {
+        const S = W.splits[splitI];
+        h += `<p style="font-size:14.5px"><b>Γύρος 3:</b> x = <code>${S.x||'ε'}</code>, y = <code>${S.y}</code>, z = <code>${S.z||'ε'}</code></p>
+          <p style="font-size:14.5px"><b>Γύρος 4 — εσύ:</b> διάλεξε πόσες φορές θα επαναληφθεί το y. Θέλεις να βγάλεις λέξη ΕΚΤΟΣ της γλώσσας.</p>
+          <div class="chips">${[0,1,2,3].map(i=>`<button class="chip" data-i="${i}">i = ${i}</button>`).join('')}</div>`;
+        if(phase===3){
+          const w = S.x + S.y.repeat(splitI2) + S.z;
+          const inL = cfg.test(w);
+          h += inL
+            ? `<div class="res bad">Η λέξη <code>${w||'ε'}</code> <b>ανήκει</b> ακόμα στη γλώσσα — δεν βγήκε άτοπο. ${splitI2===1?'Λογικό: με i = 1 παίρνεις πίσω την αρχική λέξη! Δοκίμασε i = 0 ή i = 2.':'Δοκίμασε άλλο i.'}</div>`
+            : `<div class="res good"><b>ΑΤΟΠΟ! 🎉</b><br>Με i = ${splitI2} παίρνεις <code>${w||'ε'}</code>, που <b>ΔΕΝ ανήκει</b> στη γλώσσα.<br><br>${cfg.win}</div>`;
+        }
+      }
+    }
+    bh.innerHTML = h;
+    bh.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{ chosen=+b.dataset.w; phase=1; draw(); });
+    bh.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ splitI=+b.dataset.s; phase=2; draw(); });
+    bh.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{ splitI2=+b.dataset.i; phase=3; draw();
+      if(!cfg.test(cfg.words[chosen].splits[splitI].x + cfg.words[chosen].splits[splitI].y.repeat(splitI2) + cfg.words[chosen].splits[splitI].z)) markDone(el); });
+    const ag = $('#'+id+'again'); if(ag) ag.onclick=()=>{ phase=0; chosen=null; draw(); };
+  }
+  let splitI2 = 0;
+  draw();
+}
+
+/* =========================================================
+   WIDGET: CFG derivation builder
+   ========================================================= */
+function wDeriv(el, cfg){
+  const id = uid();
+  let form = [cfg.start], hist = [cfg.start];
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΧΤΙΣΕ ΤΟ</span>Παράγαγε τη λέξη με τους κανόνες</div>
+    <div class="wb">
+      <div class="box def" style="margin-bottom:13px"><span class="t">Γραμματική</span>
+        ${cfg.rules.map(r=>`<code>${r.v} → ${r.to.length?r.to.join(''):'ε'}</code>`).join('&nbsp; ')}</div>
+      <p style="font-size:14.5px;margin-bottom:6px"><b>Στόχος:</b> <code>${cfg.target||'(οτιδήποτε)'}</code></p>
+      <div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(msg){
+    const vars = cfg.rules.map(r=>r.v);
+    let h = `<div style="font-family:ui-monospace,Menlo,monospace;font-size:15px;margin:12px 0;line-height:2.2">`;
+    h += form.map((s,i)=> vars.includes(s)
+        ? `<button class="chip on" data-k="${i}" style="padding:3px 10px">${s}</button>`
+        : `<span style="padding:0 2px">${s}</span>`).join('');
+    h += `</div>`;
+    h += `<div class="mini">Παραγωγή: ${hist.map(x=>x===''?'ε':x).join(' ⇒ ')}</div>`;
+    h += `<div id="${id}m"></div>`;
+    const cur = form.join('');
+    if(!form.some(s=>vars.includes(s))){
+      h += cur===cfg.target
+        ? `<div class="res good">✓ Τα κατάφερες! Παρήγαγες τη <code>${cur||'ε'}</code>. Αυτή η ακολουθία βημάτων λέγεται <b>παραγωγή</b>.</div>`
+        : `<div class="res bad">Κατέληξες στη <code>${cur||'ε'}</code>, όχι στη <code>${cfg.target}</code>. Δεν πειράζει — και αυτή ανήκει στη γλώσσα!
+             <br><button class="btn sm" id="${id}rst" style="margin-top:9px">⟲ Ξανά</button></div>`;
+      if(cur===cfg.target) markDone(el);
+    }
+    bh.innerHTML = h;
+    if(msg) $('#'+id+'m').innerHTML = msg;
+    bh.querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
+      const k = +b.dataset.k, v = form[k];
+      const opts = cfg.rules.filter(r=>r.v===v);
+      $('#'+id+'m').innerHTML = `<div class="res neut"><b>Ποιον κανόνα για το ${v};</b><div class="chips" style="margin-top:8px">`
+        + opts.map((r,j)=>`<button class="chip" data-a="${cfg.rules.indexOf(r)}" data-k2="${k}">${r.v} → ${r.to.length?r.to.join(''):'ε'}</button>`).join('')
+        + `</div></div>`;
+      $('#'+id+'m').querySelectorAll('[data-a]').forEach(x => x.onclick = () => {
+        const r = cfg.rules[+x.dataset.a], kk = +x.dataset.k2;
+        form = [...form.slice(0,kk), ...r.to, ...form.slice(kk+1)];
+        hist.push(form.join(''));
+        draw();
+      });
+    });
+    const rs = $('#'+id+'rst'); if(rs) rs.onclick = () => { form=[cfg.start]; hist=[cfg.start]; draw(); };
+  }
+  draw();
+}
+
+/* =========================================================
+   WIDGET: Turing machine tape simulator
+   ========================================================= */
+function wTM(el, cfg){
+  const id = uid(), D = cfg.delta;
+  el.innerHTML = `
+   <div class="w"><div class="wh"><span class="tag">ΠΡΟΣΟΜΟΙΩΤΗΣ</span>${cfg.title}</div><div class="wb">
+     <div class="row mb"><span class="lbl">Είσοδος:</span><input type="text" id="${id}i" value="${cfg.w}" spellcheck="false">
+       ${(cfg.presets||[]).map(p=>`<button class="chip" data-p="${p}">${p===''?'ε':p}</button>`).join('')}</div>
+     <div class="tape" id="${id}t"></div>
+     <div class="statusline" id="${id}s"></div>
+     <div class="row" style="justify-content:center;margin-top:14px">
+       <button class="btn sm" id="${id}r">⟲ Αρχή</button>
+       <button class="btn pri sm" id="${id}n">Βήμα ›</button>
+       <button class="btn sm" id="${id}p">▶ Αυτόματα</button>
+       <button class="btn sm" id="${id}f">⏭ Μέχρι τέλους</button>
+     </div>
+     ${cfg.note?`<div class="mini" style="margin-top:12px">${cfg.note}</div>`:''}
+   </div></div>`;
+  const inp = $('#'+id+'i'), th = $('#'+id+'t'), sh = $('#'+id+'s');
+  let tape=[], head=1, st='q1', steps=0, timer=null;
+  function reset(){
+    tape = ['⊔', ...inp.value.trim().split(''), '⊔','⊔'];
+    head = 1; st = 'q1'; steps = 0; stop(); render();
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; $('#'+id+'p').textContent='▶ Αυτόματα'; } }
+  function step(){
+    if(st==='qacc'||st==='qrej') return false;
+    while(head >= tape.length) tape.push('⊔');
+    const sym = tape[head], t = (D[st]||{})[sym];
+    if(!t){ st='qrej'; render(); return false; }
+    tape[head] = t[1]; st = t[0];
+    head += (t[2]==='R'?1:-1);
+    if(head < 0){ tape.unshift('⊔'); head = 0; }
+    steps++; render(); return st!=='qacc' && st!=='qrej';
+  }
+  function render(){
+    while(head >= tape.length) tape.push('⊔');
+    th.innerHTML = tape.map((c,i)=>`<div class="cell ${i===head?'head':''}">${c}</div>`).join('');
+    let s;
+    if(st==='qacc') s = `<span class="pill ok">✓ ΑΠΟΔΟΧΗ — η μηχανή σταμάτησε στην q_accept</span>`;
+    else if(st==='qrej') s = `<span class="pill bad">✗ ΑΠΟΡΡΙΨΗ — η μηχανή σταμάτησε στην q_reject</span>`;
+    else s = `<span class="pill run">Τρέχει…</span>`;
+    s += `<br><b>Κατάσταση:</b> ${st} &nbsp;·&nbsp; <b>Βήματα:</b> ${steps}`;
+    if(cfg.legend && st!=='qacc' && st!=='qrej') s += `<br><span class="mini">${cfg.legend[st]||''}</span>`;
+    sh.innerHTML = s;
+  }
+  $('#'+id+'n').onclick=()=>{stop();step();};
+  $('#'+id+'r').onclick=reset;
+  $('#'+id+'f').onclick=()=>{stop(); let g=0; while(step() && g++<3000){} };
+  $('#'+id+'p').onclick=e=>{ if(timer){stop();return;}
+    if(st==='qacc'||st==='qrej') reset();
+    e.target.textContent='⏸ Παύση'; timer=setInterval(()=>{ if(!step()) stop(); },380); };
+  inp.oninput=reset;
+  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.p;reset();});
+  reset();
+}
+
+/* =========================================================
+   WIDGET: κατάταξη γλώσσας σε κλάση
+   ========================================================= */
+function wClassify(el, cfg){
+  const id = uid(); let i = 0, score = 0;
+  const CL = ['Κανονική','Χωρίς συμφραζόμενα (όχι κανονική)','Αποφασίσιμη (όχι CFL)','Αναγνωρίσιμη ή χειρότερη'];
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΤΑΞΙΝΟΜΗΣΕ</span>Σε ποια κλάση ανήκει η γλώσσα;</div>
+    <div class="wb"><div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(fb){
+    if(i>=cfg.items.length){
+      bh.innerHTML = `<div class="res ${score===cfg.items.length?'good':'neut'}">Τελείωσες: <b>${score}/${cfg.items.length}</b> σωστά.
+        <br>Θυμήσου την ιεραρχία: <b>Κανονικές ⊊ Χωρίς συμφραζόμενα ⊊ Αποφασίσιμες ⊊ Αναγνωρίσιμες</b>.</div>`;
+      markDone(el); return;
+    }
+    const it = cfg.items[i];
+    bh.innerHTML = `<div class="mini" style="margin-bottom:8px">${i+1} από ${cfg.items.length}</div>
+      <div class="big" style="margin-bottom:14px">${it.L}</div>
+      <div class="chips">${CL.map((c,j)=>`<button class="chip" data-j="${j}">${c}</button>`).join('')}</div>
+      ${fb||''}`;
+    bh.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{
+      const ok = +b.dataset.j===it.a; if(ok) score++;
+      const f = `<div class="res ${ok?'good':'bad'}">${ok?'✓ Σωστά. ':'✗ Είναι <b>'+CL[it.a]+'</b>. '}${it.e}
+        <br><button class="btn sm" id="${id}nx" style="margin-top:9px">Επόμενη ›</button></div>`;
+      draw(f); $('#'+id+'nx').onclick=()=>{ i++; draw(); };
+    });
+  }
+  draw();
+}
+
+/* =========================================================
+   WIDGET: κατασκευή αναγωγής
+   ========================================================= */
+function wReduce(el, cfg){
+  const id = uid(); let i = 0;
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΧΤΙΣΕ ΤΟ</span>Φτιάξε τη σωστή αναγωγή</div>
+    <div class="wb"><div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(fb){
+    if(i>=cfg.items.length){ bh.innerHTML = `<div class="res good">${cfg.done}</div>`; markDone(el); return; }
+    const it = cfg.items[i];
+    bh.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:15px;
+        font-size:13px;font-weight:700">
+        <span class="pill run">⟨M, w⟩</span><span style="color:var(--muted)">→</span>
+        <span class="pill" style="background:var(--warn-soft);color:var(--warn)">F: κατασκευάζει…</span>
+        <span style="color:var(--muted)">→</span>
+        <span class="pill" style="background:var(--info-soft);color:var(--info)">R: αποφασίζει το ${it.B}</span>
+      </div>
+      <p style="font-size:14.5px"><b>Θέλουμε να δείξουμε ότι το ${it.B} είναι μη επιλύσιμο</b>, ανάγοντας από την L_TM.
+        Ποια μηχανή πρέπει να κατασκευάσει η F;</p>
+      <div class="chips" style="flex-direction:column;align-items:stretch">
+        ${it.o.map((o,j)=>`<button class="chip" data-j="${j}" style="text-align:start;border-radius:10px">${o}</button>`).join('')}
+      </div>${fb||''}`;
+    bh.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{
+      const ok = +b.dataset.j===it.a;
+      const f = `<div class="res ${ok?'good':'bad'}" style="margin-top:12px">${ok?'✓ Ακριβώς. ':'✗ Όχι. '}${it.e}
+        <br><button class="btn sm" id="${id}nx" style="margin-top:9px">Επόμενο ›</button></div>`;
+      draw(f); $('#'+id+'nx').onclick=()=>{ i++; draw(); };
+    });
+  }
+  draw();
+}
+
+/* =========================================================
+   WIDGET: 3SAT → CLIQUE
+   ========================================================= */
+function wClique(el, cfg){
+  const id = uid();
+  const CL = cfg.clauses;                      // [['x1','x2','!x3'], ...]
+  const vars = cfg.vars;                       // ['x1','x2','x3']
+  let val = {}; vars.forEach(v=>val[v]=false);
+  const nodes = [];
+  const cx=[150,420,285], cy=[70,70,250];      // clause centres
+  CL.forEach((c,ci)=>c.forEach((lit,li)=>{
+    const ang = -Math.PI/2 + li*(2*Math.PI/3);
+    nodes.push({lit, ci, x:cx[ci]+Math.cos(ang)*52, y:cy[ci]+Math.sin(ang)*52});
+  }));
+  const truth = lit => lit[0]==='!' ? !val[lit.slice(1)] : val[lit];
+  const compat = (a,b) => a.ci!==b.ci && !(a.lit.replace('!','')===b.lit.replace('!','') && (a.lit[0]==='!')!==(b.lit[0]==='!'));
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΠΑΙΞΕ</span>Από τύπο 3CNF σε γράφο — βρες την κλίκα</div>
+    <div class="wb">
+      <p style="font-size:14.5px;margin-bottom:10px"><b>φ =</b> ${CL.map(c=>'('+c.map(l=>l.replace('!','¬')).join(' ∨ ')+')').join(' ∧ ')}</p>
+      <div class="row mb"><span class="lbl">Ανάθεση τιμών:</span>
+        ${vars.map(v=>`<button class="chip" data-v="${v}">${v} = ΨΕΥΔΕΣ</button>`).join('')}</div>
+      <div id="${id}g"></div><div id="${id}r"></div>
+    </div></div>`;
+  const gh = $('#'+id+'g'), rh = $('#'+id+'r');
+  function draw(){
+    const T = nodes.map(n => truth(n.lit));
+    let picked = [];                            // one true literal per clause forming clique
+    for(let ci=0;ci<CL.length;ci++){
+      const cand = nodes.map((n,i)=>({n,i})).filter(o=>o.n.ci===ci && T[o.i]);
+      if(cand.length) picked.push(cand[0].i);
+    }
+    const isClique = picked.length===CL.length &&
+      picked.every((a,i)=>picked.every((b,j)=>i===j||compat(nodes[a],nodes[b])));
+    let svg = `<svg class="auto" viewBox="0 0 570 340" width="570" height="340">`;
+    let hot = '';
+    nodes.forEach((a,i)=>nodes.forEach((b,j)=>{ if(i<j && compat(a,b)){
+      const on = isClique && picked.includes(i) && picked.includes(j);
+      const ln = `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+        stroke="${on?'var(--ok)':'var(--line)'}" stroke-width="${on?4:1.2}"/>`;
+      if(on) hot += ln; else svg += ln; }}));
+    svg += hot;                                   // οι ακμές της κλίκας πάνω απ' όλα
+    CL.forEach((c,ci)=>{ svg += `<text x="${cx[ci]}" y="${cy[ci]+4}" style="font-size:11px;font-weight:700;fill:var(--muted);text-anchor:middle">ρήτρα ${ci+1}</text>`; });
+    nodes.forEach((n,i)=>{
+      const on = T[i], inC = isClique && picked.includes(i);
+      svg += `<circle cx="${n.x}" cy="${n.y}" r="20"
+        fill="${inC?'var(--ok)':on?'var(--soft)':'var(--panel)'}"
+        stroke="${inC?'var(--ok)':on?'var(--accent)':'var(--line)'}" stroke-width="2"/>`;
+      svg += `<text x="${n.x}" y="${n.y}" style="font-size:11.5px;font-weight:700;text-anchor:middle;dominant-baseline:central;
+        fill:${inC?'#fff':'var(--ink)'}">${n.lit.replace('!','¬')}</text>`;
+    });
+    svg += `</svg>`;
+    gh.innerHTML = `<div class="autowrap">${svg}</div>`;
+    const sat = CL.every((c,ci)=>c.some((l,li)=>truth(l)));
+    rh.innerHTML = sat
+      ? `<div class="res good">✓ Ο τύπος <b>ικανοποιείται</b> — και ο γράφος έχει <b>${CL.length}-κλίκα</b> (πράσινοι κόμβοι).
+          <br>Αυτό είναι όλη η αναγωγή: <b>φ ικανοποιήσιμος ⇔ ο G έχει k-κλίκα</b>, με k = πλήθος ρητρών.</div>`
+      : `<div class="res bad">✗ Ο τύπος <b>δεν ικανοποιείται</b> με αυτές τις τιμές — υπάρχει ρήτρα χωρίς κανένα αληθές literal, άρα δεν βρίσκεις ${CL.length} κόμβους έναν από κάθε ρήτρα.</div>`;
+    el.querySelectorAll('[data-v]').forEach(b=>{
+      b.textContent = `${b.dataset.v} = ${val[b.dataset.v]?'ΑΛΗΘΕΣ':'ΨΕΥΔΕΣ'}`;
+      b.classList.toggle('on', val[b.dataset.v]);
+    });
+    if(sat) markDone(el);
+  }
+  el.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{ val[b.dataset.v]=!val[b.dataset.v]; draw(); });
+  draw();
+}
+
+/* =========================================================
+   WIDGET: ρυθμοί αύξησης
+   ========================================================= */
+function wGrowth(el){
+  const id = uid();
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΔΕΣ ΤΟ</span>Γιατί το «πολυωνυμικό» είναι τόσο σημαντικό</div>
+    <div class="wb">
+      <div class="row mb"><span class="lbl">Μέγεθος εισόδου n:</span>
+        <input type="range" id="${id}s" min="1" max="60" value="12" style="flex:1;min-width:150px">
+        <b id="${id}v" class="mono" style="width:34px">12</b></div>
+      <div id="${id}o"></div></div></div>`;
+  const sl = $('#'+id+'s'), vv = $('#'+id+'v'), oh = $('#'+id+'o');
+  const fmt = x => x<1e4 ? x.toLocaleString('el') :
+    x<1e15 ? Math.round(x).toLocaleString('el') : x.toExponential(2).replace('e+','×10^');
+  function human(steps){
+    const s = steps/1e9;                    // 1 δισ. βήματα/δευτ.
+    if(s<1) return 'ακαριαία';
+    if(s<60) return Math.round(s)+' δευτ.';
+    if(s<3600) return Math.round(s/60)+' λεπτά';
+    if(s<86400) return Math.round(s/3600)+' ώρες';
+    if(s<3.15e7) return Math.round(s/86400)+' μέρες';
+    if(s<3.15e10) return Math.round(s/3.15e7)+' χρόνια';
+    return fmt(s/3.15e7)+' χρόνια';
+  }
+  function draw(){
+    const n = +sl.value; vv.textContent = n;
+    const rows = [['n','γραμμικό',n],['n²','τετραγωνικό',n*n],['n³','κυβικό',n**3],['2ⁿ','εκθετικό',Math.pow(2,n)]];
+    const max = Math.max(...rows.map(r=>Math.log10(Math.max(r[2],1))));
+    oh.innerHTML = rows.map(r=>{
+      const pct = Math.max(2, Math.log10(Math.max(r[2],1))/Math.max(max,1)*100);
+      const exp = r[0]==='2ⁿ';
+      return `<div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <b class="mono">${r[0]}</b><span class="mini">${r[1]} · ${fmt(r[2])} βήματα · ${human(r[2])}</span></div>
+        <div class="bar"><i style="width:${pct}%;background:${exp?'var(--bad)':'var(--ok)'}"></i></div></div>`;
+    }).join('') + `<div class="res neut" style="margin-top:6px">Οι τρεις πράσινες είναι <b>πολυωνυμικές</b> — μεγαλώνουν «λογικά».
+      Η κόκκινη είναι <b>εκθετική</b>: στο n = 60 χρειάζεσαι περισσότερο χρόνο από την ηλικία του σύμπαντος.
+      Αυτή είναι όλη η διαφορά ανάμεσα στο <b>P</b> και στο «δεν ξέρουμε γρήγορο αλγόριθμο».</div>`;
+  }
+  sl.oninput = draw; draw();
+}
+
+/* =========================================================
+   WIDGET: σωστό / λάθος γρήγορα
+   ========================================================= */
+function wTF(el, cfg){
+  const id = uid(); let i = 0, sc = 0;
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΓΡΗΓΟΡΑ</span>Σωστό ή Λάθος;</div>
+    <div class="wb"><div id="${id}b"></div></div></div>`;
+  const bh = $('#'+id+'b');
+  function draw(fb){
+    if(i>=cfg.items.length){
+      bh.innerHTML = `<div class="res ${sc===cfg.items.length?'good':'neut'}">Σκορ: <b>${sc}/${cfg.items.length}</b></div>`;
+      markDone(el); return;
+    }
+    bh.innerHTML = `<div class="mini" style="margin-bottom:8px">${i+1} από ${cfg.items.length}</div>
+      <div class="big" style="margin-bottom:14px">${cfg.items[i].s}</div>
+      <div class="chips"><button class="chip" data-v="1">✓ Σωστό</button><button class="chip" data-v="0">✗ Λάθος</button></div>${fb||''}`;
+    bh.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{
+      const ok = (b.dataset.v==='1') === cfg.items[i].t; if(ok) sc++;
+      const f = `<div class="res ${ok?'good':'bad'}" style="margin-top:12px">${ok?'✓ ':'✗ '}${cfg.items[i].e}
+        <br><button class="btn sm" id="${id}nx" style="margin-top:9px">Επόμενο ›</button></div>`;
+      draw(f); $('#'+id+'nx').onclick=()=>{ i++; draw(); };
+    });
+  }
+  draw();
+}
+
+/* =========================================================
+   WIDGET: αυτόματο στοίβας (PDA) με ζωντανή στοίβα
+   ========================================================= */
+function wPDA(el, cfg){
+  const P = cfg.P, id = uid();
+  const A = { type:'dfa', alpha:P.alpha, w:P.w, h:P.h, states:P.states,
+    edges: P.edges.map(e => ({f:e.f, t:e.t, s:`${e.r||'ε'},${e.pop||'ε'}→${e.push||'ε'}`})) };
+  el.innerHTML = `
+   <div class="w"><div class="wh"><span class="tag">ΠΡΟΣΟΜΟΙΩΤΗΣ</span>${esc(cfg.title)}</div><div class="wb">
+     <div class="row mb"><span class="lbl">Λέξη:</span>
+       <input type="text" id="${id}i" value="${esc(cfg.w||'')}" spellcheck="false">
+       ${(cfg.presets||[]).map(p=>`<button class="chip" data-p="${esc(p)}">${p===''?'ε':esc(p)}</button>`).join('')}</div>
+     <div id="${id}g"></div>
+     <div style="display:flex;gap:20px;align-items:flex-end;justify-content:center;margin-top:14px;flex-wrap:wrap">
+       <div><div class="mini center" style="margin-bottom:5px">ΤΑΙΝΙΑ ΕΙΣΟΔΟΥ</div><div class="tape" id="${id}t" style="margin:0"></div></div>
+       <div><div class="mini center" style="margin-bottom:5px">ΣΤΟΙΒΑ</div><div id="${id}k"></div></div>
+     </div>
+     <div class="statusline" id="${id}s"></div>
+     <div class="row" style="justify-content:center;margin-top:12px">
+       <button class="btn sm" id="${id}r">⟲ Αρχή</button>
+       <button class="btn pri sm" id="${id}n">Βήμα ›</button>
+       <button class="btn sm" id="${id}p">▶ Αυτόματα</button>
+     </div>
+     ${cfg.note?`<div class="mini" style="margin-top:11px;text-align:center">${cfg.note}</div>`:''}
+   </div></div>`;
+  const inp=$('#'+id+'i'), gh=$('#'+id+'g'), th=$('#'+id+'t'), kh=$('#'+id+'k'), sh=$('#'+id+'s');
+  let word='', pos=0, st='', stack=[], liveE=[], stuck=false, timer=null;
+
+  function reset(){ word=inp.value.trim(); pos=0; stack=[]; stuck=false; liveE=[];
+    st=P.states.find(s=>s.start).id; stop(); render(); }
+  function stop(){ if(timer){clearInterval(timer);timer=null;$('#'+id+'p').textContent='▶ Αυτόματα';} }
+  function pick(){
+    const top = stack.length ? stack[stack.length-1] : null;
+    const ok = e => (!e.pop || e.pop===top) &&
+                    (!e.r ? true : (pos<word.length && word[pos]===e.r));
+    const cand = P.edges.filter(e => e.f===st && ok(e));
+    const byRead = cand.find(e => e.r);
+    if(byRead) return byRead;                       // προτίμησε πάντα να διαβάσεις σύμβολο
+    const left = pos < word.length;                 // μένει είσοδος;
+    // ε-μετάβαση προς κατάσταση αποδοχής επιτρέπεται μόνο αφού τελειώσει η λέξη
+    return cand.find(e => !e.r && !(left && nodeOf(A,e.t).acc)) || null;
+  }
+  function step(){
+    if(stuck) return false;
+    const e = pick();
+    if(!e){ stuck = true; render(); return false; }
+    if(e.pop) stack.pop();
+    if(e.push) stack.push(e.push);
+    if(e.r) pos++;
+    st = e.t; liveE = [{f:e.f,t:e.t}];
+    render(); return true;
+  }
+  function render(){
+    drawAutomaton(A, gh, [st], liveE);
+    th.innerHTML = word.length
+      ? [...word].map((c,i)=>`<div class="cell ${i<pos?'read':''} ${i===pos?'head':''}">${esc(c)}</div>`).join('')
+        + `<div class="cell ${pos>=word.length?'head':''}" style="opacity:.5">⊔</div>`
+      : `<div class="cell head" style="opacity:.5">⊔</div>`;
+    kh.innerHTML = `<div style="display:flex;flex-direction:column-reverse;gap:3px;align-items:center">`
+      + (stack.length ? stack.map(s=>`<div class="cell" style="width:34px;height:32px;font-size:15px">${esc(s)}</div>`).join('')
+                      : `<div class="mini" style="padding:9px 14px;border:1px dashed var(--line);border-radius:8px">άδεια</div>`)
+      + `</div>`;
+    const done = pos>=word.length, acc = done && nodeOf(A,st).acc;
+    let s;
+    if(acc) s = `<span class="pill ok">✓ ΑΠΟΔΟΧΗ</span>`;
+    else if(stuck) s = done
+      ? `<span class="pill bad">✗ ΑΠΟΡΡΙΨΗ — τελείωσε η λέξη αλλά δεν είμαστε σε κατάσταση αποδοχής</span>`
+      : `<span class="pill bad">✗ ΚΟΛΛΗΣΕ στο «${esc(word[pos])}» — καμία μετάβαση δεν ταιριάζει με αυτό το σύμβολο και αυτή την κορυφή στοίβας. Η λέξη ΑΠΟΡΡΙΠΤΕΤΑΙ.</span>`;
+    else s = `<span class="pill run">Διάβασε ${pos} από ${word.length} · στοίβα: ${stack.length}</span>`;
+    s += `<br><b>Κατάσταση:</b> ${esc(nodeOf(A,st).label||st)} &nbsp;·&nbsp; <b>Κορυφή στοίβας:</b> ${stack.length?esc(stack[stack.length-1]):'—'}`;
+    sh.innerHTML = s;
+    if(acc) markDone(el);
+  }
+  $('#'+id+'n').onclick=()=>{stop();step();};
+  $('#'+id+'r').onclick=reset;
+  $('#'+id+'p').onclick=e=>{ if(timer){stop();return;}
+    if(stuck||pos>=word.length) reset();
+    e.target.textContent='⏸ Παύση'; timer=setInterval(()=>{ if(!step()) stop(); },650); };
+  inp.oninput=reset;
+  el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.p;reset();});
+  reset();
+}
+
+/* =========================================================
+   WIDGET: βήμα-βήμα απόδειξη / κατασκευή
+   ========================================================= */
+function wSteps(el, cfg){
+  const id = uid(); let i = 0;
+  el.innerHTML = `<div class="w"><div class="wh"><span class="tag">ΒΗΜΑ-ΒΗΜΑ</span>${esc(cfg.title)}</div>
+    <div class="wb"><div id="${id}b"></div>
+    <div class="row" style="margin-top:13px"><button class="btn pri sm" id="${id}n">Επόμενο βήμα ›</button>
+      <button class="btn sm" id="${id}r">⟲ Από την αρχή</button>
+      <span class="sp mini" id="${id}c"></span></div></div></div>`;
+  const bh=$('#'+id+'b');
+  function draw(){
+    bh.innerHTML = cfg.steps.slice(0,i+1).map((s,j)=>
+      `<div style="${j<i?'opacity:.6;':''}margin-bottom:13px">
+         <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px">ΒΗΜΑ ${j+1} — ${esc(s.t)}</div>
+         <div style="font-size:14.8px;margin-top:4px">${s.c}</div></div>`).join('');
+    $('#'+id+'c').textContent = `${i+1} από ${cfg.steps.length}`;
+    $('#'+id+'n').disabled = i >= cfg.steps.length-1;
+    if(i >= cfg.steps.length-1){
+      bh.insertAdjacentHTML('beforeend', `<div class="res good">${cfg.done}</div>`);
+      markDone(el);
+    }
+  }
+  $('#'+id+'n').onclick=()=>{ if(i<cfg.steps.length-1){ i++; draw(); } };
+  $('#'+id+'r').onclick=()=>{ i=0; draw(); };
+  draw();
+}
+/* =========================================================
+   ΑΥΤΟΜΑΤΑ (ορισμοί)
+   ========================================================= */
+const AUT = {
+  ends1:{ type:'dfa', alpha:['0','1'], w:380, h:185,
+    states:[{id:'q1',x:120,y:112,start:1,label:'q₁'},{id:'q2',x:265,y:112,acc:1,label:'q₂'}],
+    edges:[{f:'q1',t:'q1',s:'0'},{f:'q1',t:'q2',s:'1'},{f:'q2',t:'q2',s:'1'},{f:'q2',t:'q1',s:'0'}]},
+
+  odd1:{ type:'dfa', alpha:['0','1'], w:400, h:185,
+    states:[{id:'a',x:125,y:112,start:1,label:'άρτ'},{id:'p',x:280,y:112,acc:1,label:'περ'}],
+    edges:[{f:'a',t:'a',s:'0'},{f:'a',t:'p',s:'1'},{f:'p',t:'a',s:'1'},{f:'p',t:'p',s:'0'}]},
+
+  c001:{ type:'dfa', alpha:['0','1'], w:580, h:195,
+    states:[{id:'q1',x:90,y:118,start:1,label:'q₁'},{id:'q2',x:225,y:118,label:'q₂'},
+            {id:'q3',x:360,y:118,label:'q₃'},{id:'q4',x:495,y:118,acc:1,label:'q₄'}],
+    edges:[{f:'q1',t:'q1',s:'1'},{f:'q1',t:'q2',s:'0'},{f:'q2',t:'q3',s:'0'},{f:'q2',t:'q1',s:'1'},
+           {f:'q3',t:'q3',s:'0'},{f:'q3',t:'q4',s:'1'},{f:'q4',t:'q4',s:'0'},{f:'q4',t:'q4',s:'1'}]},
+
+  endsAB:{ type:'dfa', alpha:['a','b'], w:450, h:265,
+    states:[{id:'q0',x:130,y:75,start:1,label:'q₀'},{id:'q1',x:320,y:75,label:'q₁'},
+            {id:'q2',x:225,y:205,acc:1,label:'q₂'}],
+    edges:[{f:'q0',t:'q0',s:'b'},{f:'q0',t:'q1',s:'a'},{f:'q1',t:'q1',s:'a'},
+           {f:'q1',t:'q2',s:'b'},{f:'q2',t:'q1',s:'a'},{f:'q2',t:'q0',s:'b'}]},
+
+  /* ίδιο με ends1 αλλά με ανεστραμμένες τελικές — για το συμπλήρωμα */
+  ends1c:{ type:'dfa', alpha:['0','1'], w:380, h:185,
+    states:[{id:'q1',x:120,y:112,start:1,acc:1,label:'q₁'},{id:'q2',x:265,y:112,label:'q₂'}],
+    edges:[{f:'q1',t:'q1',s:'0'},{f:'q1',t:'q2',s:'1'},{f:'q2',t:'q2',s:'1'},{f:'q2',t:'q1',s:'0'}]},
+
+  nfa11:{ type:'nfa', alpha:['0','1'], w:580, h:195,
+    states:[{id:'q1',x:90,y:118,start:1,label:'q₁'},{id:'q2',x:225,y:118,label:'q₂'},
+            {id:'q3',x:360,y:118,label:'q₃'},{id:'q4',x:495,y:118,acc:1,label:'q₄'}],
+    edges:[{f:'q1',t:'q1',s:'0'},{f:'q1',t:'q1',s:'1'},{f:'q1',t:'q2',s:'1'},
+           {f:'q2',t:'q3',s:'0'},{f:'q2',t:'q3',s:'ε'},{f:'q3',t:'q4',s:'1'},
+           {f:'q4',t:'q4',s:'0'},{f:'q4',t:'q4',s:'1'}]},
+
+  nfaAB:{ type:'nfa', alpha:['a','b'], w:500, h:195,
+    states:[{id:'s1',x:110,y:118,start:1,label:'1'},{id:'s2',x:265,y:118,label:'2'},
+            {id:'s3',x:420,y:118,acc:1,label:'3'}],
+    edges:[{f:'s1',t:'s1',s:'a'},{f:'s1',t:'s1',s:'b'},{f:'s1',t:'s2',s:'a'},{f:'s2',t:'s3',s:'b'}]},
+
+  dfaAB:{ type:'dfa', alpha:['a','b'], w:520, h:255,
+    states:[{id:'A',x:120,y:80,start:1,label:'{1}'},{id:'B',x:330,y:80,label:'{1,2}'},
+            {id:'C',x:330,y:195,acc:1,label:'{1,3}'}],
+    edges:[{f:'A',t:'B',s:'a'},{f:'A',t:'A',s:'b'},{f:'B',t:'B',s:'a'},
+           {f:'B',t:'C',s:'b'},{f:'C',t:'B',s:'a'},{f:'C',t:'A',s:'b'}]},
+
+  /* NFA για την ένωση: «αρχίζει με a» ή «τελειώνει με b» */
+  nfaUnion:{ type:'nfa', alpha:['a','b'], w:520, h:290,
+    states:[{id:'S',x:95,y:145,start:1,label:'νέα'},
+            {id:'p1',x:250,y:65,label:'p₁'},{id:'p2',x:420,y:65,acc:1,label:'p₂'},
+            {id:'r1',x:250,y:225,label:'r₁'},{id:'r2',x:420,y:225,acc:1,label:'r₂'}],
+    edges:[{f:'S',t:'p1',s:'ε'},{f:'S',t:'r1',s:'ε'},
+           {f:'p1',t:'p2',s:'a'},{f:'p2',t:'p2',s:'a'},{f:'p2',t:'p2',s:'b'},
+           {f:'r1',t:'r1',s:'a'},{f:'r1',t:'r1',s:'b'},{f:'r1',t:'r2',s:'b'}]}
+};
+
+/* =========================================================
+   ΜΗΧΑΝΗ TURING για {0ⁿ1ⁿ}
+   ========================================================= */
+const TM01 = {
+  q1:{ '0':['q2','x','R'], 'x':['q1','x','R'], '1':['qrej','1','R'], '⊔':['qacc','⊔','R'] },
+  q2:{ '0':['q2','0','R'], 'x':['q2','x','R'], '1':['q3','x','L'], '⊔':['qrej','⊔','R'] },
+  q3:{ '0':['q3','0','L'], '1':['q3','1','L'], 'x':['q3','x','L'], '⊔':['q1','⊔','R'] }
+};
+const TMLEG = {
+  q1:'q₁ = ψάχνω το επόμενο ασημείωτο 0 (και το σημειώνω με x)',
+  q2:'q₂ = τρέχω δεξιά για να βρω το επόμενο ασημείωτο 1',
+  q3:'q₃ = γυρίζω πίσω στην αρχή της ταινίας'
+};
+
+/* =========================================================
+   ΑΥΤΟΜΑΤΑ ΣΤΟΙΒΑΣ (PDA)
+   ========================================================= */
+const PDA = {
+  anbn:{ alpha:['0','1'], w:660, h:215,
+    states:[{id:'q1',x:85,y:130,start:1,label:'q₁'},{id:'q2',x:255,y:130,label:'q₂'},
+            {id:'q3',x:435,y:130,label:'q₃'},{id:'q4',x:595,y:130,acc:1,label:'q₄'}],
+    edges:[{f:'q1',t:'q2',push:'$'},
+           {f:'q2',t:'q2',r:'0',push:'0'},
+           {f:'q2',t:'q3',r:'1',pop:'0'},
+           {f:'q3',t:'q3',r:'1',pop:'0'},
+           {f:'q3',t:'q4',pop:'$'},
+           {f:'q2',t:'q4',pop:'$'}]},
+
+  pal:{ alpha:['a','b','c'], w:660, h:215,
+    states:[{id:'q1',x:85,y:130,start:1,label:'q₁'},{id:'q2',x:255,y:130,label:'q₂'},
+            {id:'q3',x:435,y:130,label:'q₃'},{id:'q4',x:595,y:130,acc:1,label:'q₄'}],
+    edges:[{f:'q1',t:'q2',push:'$'},
+           {f:'q2',t:'q2',r:'a',push:'a'},
+           {f:'q2',t:'q2',r:'b',push:'b'},
+           {f:'q2',t:'q3',r:'c'},
+           {f:'q3',t:'q3',r:'a',pop:'a'},
+           {f:'q3',t:'q3',r:'b',pop:'b'},
+           {f:'q3',t:'q4',pop:'$'}]}
+};
+
+/* =========================================================
+   ΜΗΧΑΝΕΣ TURING ΠΟΥ ΥΠΟΛΟΓΙΖΟΥΝ ΣΥΝΑΡΤΗΣΗ
+   ========================================================= */
+/* δεξιά ολίσθηση: w ↦ ⊔w  (μετακινεί όλη την είσοδο μία θέση δεξιά) */
+const TMSHIFT = {
+  q1:{ 'a':['q1','a','R'], 'b':['q1','b','R'], '⊔':['qSh','⊔','L'] },
+  qSh:{ 'a':['qPA','⊔','R'], 'b':['qPB','⊔','R'], '⊔':['qacc','⊔','R'] },
+  qPA:{ 'a':['qBk','a','L'], 'b':['qBk','a','L'], '⊔':['qBk','a','L'] },
+  qPB:{ 'a':['qBk','b','L'], 'b':['qBk','b','L'], '⊔':['qBk','b','L'] },
+  qBk:{ 'a':['qSh','a','L'], 'b':['qSh','b','L'], '⊔':['qSh','⊔','L'] }
+};
+const SHIFTLEG = {
+  q1:'q₁ = τρέχω δεξιά για να βρω το τέλος της λέξης',
+  qSh:'qSh = σηκώνω το σύμβολο (το σβήνω και το «κρατάω στο μυαλό μου», δηλαδή στην κατάσταση)',
+  qPA:'qPA = κρατάω ένα a και το γράφω μία θέση δεξιότερα',
+  qPB:'qPB = κρατάω ένα b και το γράφω μία θέση δεξιότερα',
+  qBk:'qBk = γυρίζω πίσω για το επόμενο σύμβολο'
+};
+
+/* αντιγραφή: w ↦ w#w */
+const TMCOPY = {
+  q1:{ 'a':['q1','a','R'], 'b':['q1','b','R'], '⊔':['qHo','#','L'] },
+  qHo:{ 'a':['qHo','a','L'], 'b':['qHo','b','L'], 'A':['qHo','A','L'],
+        'B':['qHo','B','L'], '#':['qHo','#','L'], '⊔':['qSc','⊔','R'] },
+  qSc:{ 'a':['qCA','A','R'], 'b':['qCB','B','R'], 'A':['qSc','A','R'],
+        'B':['qSc','B','R'], '#':['qUn','#','L'] },
+  qCA:{ 'a':['qCA','a','R'], 'b':['qCA','b','R'], 'A':['qCA','A','R'],
+        'B':['qCA','B','R'], '#':['qCA','#','R'], '⊔':['qHo','a','L'] },
+  qCB:{ 'a':['qCB','a','R'], 'b':['qCB','b','R'], 'A':['qCB','A','R'],
+        'B':['qCB','B','R'], '#':['qCB','#','R'], '⊔':['qHo','b','L'] },
+  qUn:{ 'A':['qUn','a','L'], 'B':['qUn','b','L'], 'a':['qUn','a','L'],
+        'b':['qUn','b','L'], '⊔':['qacc','⊔','R'] }
+};
+const COPYLEG = {
+  q1:'q₁ = βρίσκω το τέλος της w και γράφω το διαχωριστικό #',
+  qHo:'qHo = γυρίζω στην αρχή της ταινίας',
+  qSc:'qSc = ψάχνω το επόμενο ΑΣΗΜΕΙΩΤΟ γράμμα (τα κεφαλαία A,B είναι ήδη αντιγραμμένα)',
+  qCA:'qCA = μεταφέρω ένα a στο τέλος',
+  qCB:'qCB = μεταφέρω ένα b στο τέλος',
+  qUn:'qUn = ξεμαρκάρω: A→a, B→b'
+};
+/* =========================================================
+   ΤΑ ΜΑΘΗΜΑΤΑ
+   ========================================================= */
+const L = [];
+
+/* ---------------- 1 ---------------- */
+L.push({t:'Λέξεις και Γλώσσες', s:'Το αλφαβητάρι όλου του μαθήματος', b:[
+ {p:`Όλο το μάθημα μιλάει για <b>ένα και μόνο πράγμα</b>: δίνεις σε μια μηχανή μια συμβολοσειρά και εκείνη λέει <b>ΝΑΙ</b> ή <b>ΟΧΙ</b>. Τίποτα άλλο. Ό,τι διαβάσεις παρακάτω είναι απλώς όλο και πιο δυνατές μηχανές που απαντούν ΝΑΙ/ΟΧΙ.`},
+ {box:'def',t:'Τρεις λέξεις που πρέπει να ξεχωρίζεις',c:`
+   <b>Αλφάβητο Σ</b> — ένα πεπερασμένο σύνολο συμβόλων. Π.χ. Σ = {0, 1}.<br>
+   <b>Λέξη</b> — μια πεπερασμένη σειρά συμβόλων. Π.χ. <code>0110</code>. Η κενή λέξη γράφεται <b>ε</b> και έχει μήκος 0.<br>
+   <b>Γλώσσα</b> — ένα <i>σύνολο</i> λέξεων. Π.χ. «όλες οι λέξεις που τελειώνουν σε 1».`},
+ {p:`Σκέψου το έτσι: το <b>αλφάβητο</b> είναι τα γράμματα, η <b>λέξη</b> είναι μία λέξη, και η <b>γλώσσα</b> είναι ένα ολόκληρο λεξικό. Το <code>Σ*</code> είναι το λεξικό που περιέχει <i>κάθε</i> δυνατή λέξη — και κάθε γλώσσα είναι ένα κομμάτι του.`},
+ {box:'warn',t:'Η πρώτη παγίδα — και πέφτουν όλοι',c:`Η <b>ε</b> είναι <i>λέξη</i> (μήκους 0). Το <b>∅</b> είναι <i>γλώσσα</i> (χωρίς καμία λέξη). Δεν είναι το ίδιο πράγμα, ούτε καν το ίδιο είδος πράγματος.<br><br>
+   Ανάλογο: η <b>ε</b> είναι ένα άδειο φύλλο χαρτί. Το <b>∅</b> είναι ένας φάκελος χωρίς κανένα φύλλο μέσα. Η <b>{ε}</b> είναι ένας φάκελος με ένα άδειο φύλλο μέσα — έχει 1 στοιχείο, όχι 0.`},
+ {q:{q:'Πόσα στοιχεία έχει η γλώσσα {ε};',
+   o:['0 — είναι κενή','1 — περιέχει την κενή λέξη','Άπειρα','Δεν είναι γλώσσα'],a:1,
+   e:'Ο φάκελος έχει μέσα ένα φύλλο (την ε), απλώς το φύλλο είναι άδειο. Η ∅ είναι ο φάκελος χωρίς φύλλα.'}},
+ {h:'Οι τρεις πράξεις — και μία που ξεγελάει'},
+ {p:`Από γλώσσες φτιάχνουμε καινούριες γλώσσες με τρεις πράξεις:<br>
+   <b>Ένωση</b> A ∪ B: λέξεις που ανήκουν στη μία <i>ή</i> στην άλλη.<br>
+   <b>Παράθεση</b> A ∘ B: κόβεις τη λέξη σε δύο κομμάτια — το πρώτο από την A, το δεύτερο από τη B.<br>
+   <b>Kleene Star</b> A*: κόβεις τη λέξη σε <i>όσα</i> κομμάτια θέλεις, όλα από την A.`},
+ {box:'idea',t:'Το Kleene star περιέχει ΠΑΝΤΑ την ε',c:`Γιατί «όσα κομμάτια θέλεις» περιλαμβάνει και το <b>μηδέν κομμάτια</b>. Παράθεση μηδέν λέξεων = κενή λέξη.<br><br>
+   Γι' αυτό ισχύει η περίεργη ισότητα <code>∅* = {ε}</code>: ακόμη κι αν δεν έχεις τίποτα να κολλήσεις, το «τίποτα κολλημένο» είναι η ε. Πέφτει σε εξετάσεις.`},
+ {p:`Δοκίμασέ το μόνος σου. Πάρε Γ = {11, 0} και γράψε λέξεις — το εργαλείο βρίσκει αν σπάνε σε κομμάτια της Γ:`},
+ {w:'wSplit',c:{G:['11','0'],w:'1100011',presets:['1100011','101','','1110','0011']}},
+ {p:`Πρόσεξε το <code>101</code>: δοκίμασες <code>1|01</code>, <code>10|1</code>, <code>1|0|1</code>… σε κάθε χώρισμα μένει ένα μεμονωμένο <code>1</code> που δεν ανήκει στη Γ. Αυτό είναι ακριβώς ο τρόπος που το αποδεικνύεις και στο χαρτί.`},
+ {h:'Η μεγάλη εικόνα'},
+ {p:`Οι γλώσσες κατατάσσονται σε τέσσερις φωλιασμένους κύκλους. Αυτή είναι <b>όλη η δομή του μαθήματος</b> — αν τη θυμάσαι, ξέρεις πού βρίσκεσαι κάθε στιγμή:`},
+ {box:'ok',t:'Η ιεραρχία',c:`<b>Κανονικές</b> ⊊ <b>Χωρίς συμφραζόμενα</b> ⊊ <b>Turing-αποφασίσιμες</b> ⊊ <b>Turing-αναγνωρίσιμες</b><br><br>
+   Κάθε ⊊ σημαίνει «γνήσια μικρότερο»: υπάρχει γλώσσα σε κάθε επίπεδο που δεν χωράει στο προηγούμενο. Κάθε κεφάλαιο του μαθήματος χτίζει ένα από αυτά τα επίπεδα.`},
+ {tf:{items:[
+   {s:'∅* = {ε}',t:true,e:'Ναι. Παράθεση μηδέν λέξεων δίνει την ε, ακόμη κι αν η αρχική γλώσσα είναι κενή.'},
+   {s:'Η παράθεση γλωσσών είναι αντιμεταθετική: Γ₁·Γ₂ = Γ₂·Γ₁',t:false,e:'Λάθος. {a}·{b} = {ab} ≠ {ba}. Είναι όμως ΠΡΟΣΕΤΑΙΡΙΣΤΙΚΗ — μην τα μπερδεύεις.'},
+   {s:'Κάθε άπειρη γλώσσα είναι μη κανονική',t:false,e:'Λάθος. Η 0* είναι άπειρη και αναγνωρίζεται από αυτόματο μίας κατάστασης. Σημασία έχει η ΜΝΗΜΗ που χρειάζεται, όχι το μέγεθος.'},
+   {s:'1*∅ = ∅',t:true,e:'Ναι. Για να φτιάξεις λέξη χρειάζεσαι ένα κομμάτι από κάθε γλώσσα — αλλά η ∅ δεν έχει να σου δώσει τίποτα.'}]}}
+]});
+
+/* ---------------- 2 ---------------- */
+L.push({t:'Πεπερασμένα Αυτόματα (DFA)', s:'Η πιο απλή μηχανή που λέει ΝΑΙ/ΟΧΙ', b:[
+ {p:`Το πεπερασμένο αυτόματο είναι ένας υπολογιστής με <b>γελοία λίγη μνήμη</b>: δεν θυμάται τίποτα εκτός από «σε ποιο κουτάκι είμαι τώρα». Διαβάζει τη λέξη γράμμα-γράμμα από αριστερά προς τα δεξιά, αλλάζει κουτάκι σε κάθε γράμμα, και στο τέλος κοιτάει πού κατέληξε.`},
+ {p:`Ξεκίνα με το πιο απλό. Γράψε μια λέξη και πάτα <b>▶ Αυτόματα</b> — δες την κεφαλή να τρέχει και την κατάσταση να ανάβει:`},
+ {w:'wAutomaton',c:{A:AUT.ends1,w:'1001',presets:['1001','0010','1','','11'],
+   title:'Ποιες λέξεις δέχεται αυτό;',
+   note:'Δοκίμασε αρκετές λέξεις και προσπάθησε να μαντέψεις τον κανόνα πριν διαβάσεις παρακάτω.'}},
+ {box:'idea',t:'Το βρήκες;',c:`Το αυτόματο δέχεται ακριβώς τις λέξεις που <b>τελειώνουν σε 1</b>. Η q₂ (διπλός κύκλος = κατάσταση αποδοχής) σημαίνει «το τελευταίο που διάβασα ήταν 1».`},
+ {h:'Ο ορισμός — τώρα που τον έχεις δει να κινείται'},
+ {box:'def',t:'DFA = πεντάδα (Q, Σ, δ, q₀, F)',c:`
+   <b>Q</b> — τα κουτάκια (καταστάσεις)<br>
+   <b>Σ</b> — το αλφάβητο<br>
+   <b>δ : Q × Σ → Q</b> — ο κανόνας «από αυτό το κουτάκι, μ' αυτό το γράμμα, πάω εκεί»<br>
+   <b>q₀</b> — από πού ξεκινάς (ένα και μόνο)<br>
+   <b>F ⊆ Q</b> — τα κουτάκια αποδοχής (μπορεί να είναι κανένα, ένα ή πολλά)`},
+ {p:`Το <b>ντετερμινιστικό</b> κρύβεται στο <code>δ : Q × Σ → Q</code>: για κάθε κουτάκι και κάθε γράμμα υπάρχει <b>ακριβώς ένα</b> επόμενο κουτάκι. Ούτε δύο, ούτε κανένα. Άρα κάθε λέξη έχει έναν και μοναδικό δρόμο.`},
+ {box:'warn',t:'Η παγίδα που κόβει τους μισούς',c:`Δεν μετράει αν <i>πέρασες</i> από κατάσταση αποδοχής. Μετράει <b>μόνο πού είσαι όταν τελειώσει η λέξη</b>.<br><br>
+   Δες το παρακάτω αυτόματο με τη λέξη <code>11</code>: περνάει από την κατάσταση αποδοχής στο πρώτο 1, και μετά φεύγει. Απορρίπτεται.`},
+ {w:'wAutomaton',c:{A:AUT.odd1,w:'11',presets:['11','1','101','0010','1101'],
+   title:'Περιττό πλήθος από 1 — πρόσεξε τη λέξη 11',
+   note:'Το 0 δεν αλλάζει τίποτα. Κάθε 1 σε πετάει στην άλλη πλευρά. Αυτό λέγεται «να θυμάσαι την ισοτιμία».'}},
+ {q:{q:'Στο παραπάνω αυτόματο, γίνεται δεκτή η λέξη 01001101;',
+   o:['Ναι — τελειώνει σε 1','Όχι — έχει τέσσερα 1, δηλαδή άρτιο πλήθος','Ναι — περνάει από την κατάσταση αποδοχής','Δεν ορίζεται'],a:1,
+   e:'Μέτρα τα 1: είναι τέσσερα. Άρτιο ⇒ καταλήγει στην «άρτ» που δεν είναι αποδοχής. Το ότι τελειώνει σε 1 αφορά ΑΛΛΟ αυτόματο — μην τα μπερδεύεις.'}},
+ {h:'Πώς σχεδιάζεις εσύ ένα αυτόματο'},
+ {p:`Η ερώτηση-κλειδί είναι πάντα: <b>«τι πρέπει να θυμάμαι μέχρι τώρα;»</b> Η απάντηση σου δίνει τις καταστάσεις.<br><br>
+   Για «η λέξη περιέχει κάπου το <code>001</code>»: πρέπει να θυμάσαι <i>πόσο μακριά έχω φτάσει στο μοτίβο</i> — τίποτα, είδα 0, είδα 00, το βρήκα. Τέσσερις καταστάσεις:`},
+ {w:'wAutomaton',c:{A:AUT.c001,w:'10011',presets:['10011','0001','111','000111','01010'],
+   title:'Περιέχει την υπολέξη 001',
+   note:'Πρόσεξε την q₄: μόλις μπεις, δεν ξαναβγαίνεις. Λέγεται «απορροφητική» κατάσταση — το βρήκα, τελείωσε.'}},
+ {p:`Και τώρα εσύ. Το παρακάτω αυτόματο έχει τρεις καταστάσεις. Δοκίμασε λέξεις μέχρι να βρεις τον κανόνα:`},
+ {w:'wAutomaton',c:{A:AUT.endsAB,w:'abab',presets:['abab','ab','aab','ba','abb','aba'],
+   title:'Βρες τι αναγνωρίζει (αλφάβητο {a,b})'}},
+ {q:{q:'Ποιον κανόνα υλοποιεί το προηγούμενο αυτόματο;',
+   o:['Λέξεις που αρχίζουν με a','Λέξεις που τελειώνουν σε ab','Λέξεις με ίσο πλήθος a και b','Λέξεις με άρτιο μήκος'],a:1,
+   e:'Η q₂ σημαίνει «τα δύο τελευταία γράμματα ήταν ab». Πρόσεξε πώς από την q₂ με a γυρνάς στην q₁ και όχι στην q₀ — γιατί το a μπορεί να είναι η αρχή ενός νέου ab.'}},
+ {box:'idea',t:'Κράτα αυτό',c:`Ένα DFA είναι το μοντέλο ενός <b>αλγορίθμου για πρόβλημα απόφασης</b>: λέξη → ΝΑΙ/ΟΧΙ. Και μια γλώσσα λέγεται <b>κανονική</b> ακριβώς όταν υπάρχει τέτοιο αυτόματο γι' αυτήν.`}
+]});
+
+/* ---------------- 3 ---------------- */
+L.push({t:'Μη Ντετερμινιστικά Αυτόματα (NFA)', s:'Η μηχανή που μαντεύει — και δεν κερδίζει δύναμη', b:[
+ {p:`Ένα NFA είναι το ίδιο πράγμα, με τρεις χαλαρώσεις:<br>
+   1. Από ένα κουτάκι με το ίδιο γράμμα μπορείς να πας σε <b>πολλά</b> κουτάκια ταυτόχρονα.<br>
+   2. Μπορεί να μην υπάρχει <b>καμία</b> μετάβαση — τότε αυτός ο δρόμος πεθαίνει.<br>
+   3. Υπάρχουν <b>ε-μεταβάσεις</b>: αλλάζεις κουτάκι <i>χωρίς να διαβάσεις γράμμα</i>, τζάμπα.`},
+ {box:'def',t:'Πότε δέχεται;',c:`Το NFA δέχεται τη λέξη αν <b>ΥΠΑΡΧΕΙ ΕΣΤΩ ΕΝΑΣ</b> δρόμος που καταλήγει σε κατάσταση αποδοχής.<br><br>
+   Δεν χρειάζεται να πετύχουν όλοι. Οι υπόλοιποι μπορεί να πεθάνουν ή να καταλήξουν αλλού — αδιάφορο.`},
+ {p:`Στον προσομοιωτή θα δεις κάτι διαφορετικό: αντί για <i>μία</i> κατάσταση, το αυτόματο βρίσκεται σε ένα <b>σύνολο</b> πιθανών καταστάσεων ταυτόχρονα. Σαν να τρέχεις όλους τους δρόμους παράλληλα:`},
+ {w:'wAutomaton',c:{A:AUT.nfa11,w:'010110',presets:['010110','11','101','0100','0'],
+   title:'Δέχεται τις λέξεις που περιέχουν 101 ή 11',
+   note:'Πρόσεξε το βέλος q₂ → q₃ με ετικέτα «0,ε»: μπορείς να περάσεις είτε διαβάζοντας 0, είτε ΤΖΑΜΠΑ. Έτσι το ίδιο κομμάτι καλύπτει και το 101 και το 11.'}},
+ {p:`Δοκίμασε τη λέξη <code>0</code>: το σύνολο καταστάσεων μένει {q₁} και δεν φτάνει ποτέ στην q₄. Δοκίμασε το <code>11</code>: κάποια στιγμή το σύνολο περιέχει την q₄ — αρκεί αυτό.`},
+ {box:'warn',t:'Το NFA ΔΕΝ είναι πιο δυνατό',c:`Είναι πιο <b>βολικό</b>, όχι πιο δυνατό. Κάθε NFA μετατρέπεται σε ισοδύναμο DFA. Και τα δύο αναγνωρίζουν ακριβώς τις <b>κανονικές γλώσσες</b>.<br><br>
+   (Κράτα το: στις <i>μηχανές Turing</i> ο μη ντετερμινισμός επίσης δεν αλλάζει το τι υπολογίζεται — αλλάζει όμως το <i>πόσο γρήγορα</i>. Εκεί κρύβεται το P vs NP.)`},
+ {h:'Ο αλγόριθμος ντετερμινιστικοποίησης'},
+ {p:`Η ιδέα σε μία γραμμή: <b>μια κατάσταση του νέου DFA = ένα σύνολο καταστάσεων του NFA</b> — ακριβώς αυτό που έβλεπες να αναβοσβήνει στον προσομοιωτή.`},
+ {p:`Να το NFA που θα μετατρέψουμε. Δέχεται τις λέξεις που τελειώνουν σε <code>ab</code>:`},
+ {w:'wAutomaton',c:{A:AUT.nfaAB,w:'abab',presets:['abab','ab','ba','aab','b'],title:'Το NFA πριν τη μετατροπή'}},
+ {p:`Τώρα χτίσ' το εσύ. Ξεκινάμε από το <b>{1}</b> (μονοσύνολο της αρχικής) και σε κάθε βήμα ρωτάμε: «από αυτό το σύνολο, διαβάζοντας a, σε ποιο σύνολο πάω;» — παίρνουμε την <b>ένωση</b> όλων των μεταβάσεων.`},
+ {w:'wSubset',c:{alpha:['a','b'],
+   rows:[
+    {from:'{1}',a:'{1,2}',b:'{1}',acc:false,opts:['{1}','{1,2}','{2}'],ans:1,
+     why:'Από την 1 με a το NFA πάει ΚΑΙ στην 1 (βρόχος) ΚΑΙ στην 2. Παίρνουμε την ένωση: {1,2}.'},
+    {from:'{1,2}',a:'{1,2}',b:'{1,3}',acc:false,opts:['{1,2}','{1,3}','{2,3}'],ans:0,
+     why:'Από την 1 με a → {1,2}. Από την 2 με a → τίποτα (∅). Ένωση: {1,2}.'},
+    {from:'{1,3}',a:'{1,2}',b:'{1}',acc:true,opts:['{1,3}','{1,2}','{3}'],ans:1,
+     why:'Από την 1 με a → {1,2}. Από την 3 με a → τίποτα. Ένωση: {1,2}.'}],
+   done:`Τελείωσες! Τρεις καταστάσεις — και το <b>{1,3}</b> είναι τελική γιατί περιέχει την τελική κατάσταση 3 του NFA. Αυτός είναι όλος ο κανόνας: <b>ένα σύνολο είναι τελικό αν περιέχει έστω μία τελική του NFA</b>.`}},
+ {p:`Και να το αποτέλεσμα — ένα κανονικό DFA, με σύνολα ως ονόματα καταστάσεων. Δοκίμασε τις ίδιες λέξεις με πριν, θα συμφωνούν πάντα:`},
+ {w:'wAutomaton',c:{A:AUT.dfaAB,w:'abab',presets:['abab','ab','ba','aab','b'],title:'Το ισοδύναμο DFA'}},
+ {tf:{items:[
+   {s:'Ένα NFA δέχεται τη λέξη αν ΟΛΟΙ οι δρόμοι καταλήγουν σε τελική κατάσταση',t:false,
+    e:'Λάθος — αρκεί ΕΝΑΣ. Είναι υπαρξιακή συνθήκη, το πιο συχνό λάθος του κεφαλαίου.'},
+   {s:'Ένα NFA με n καταστάσεις μπορεί να χρειαστεί DFA με έως 2ⁿ καταστάσεις',t:true,
+    e:'Σωστό. Οι καταστάσεις του DFA είναι υποσύνολα του Q, και τα υποσύνολα είναι 2ⁿ. Στην πράξη κρατάμε μόνο τα προσβάσιμα.'},
+   {s:'Σε ένα DFA επιτρέπεται να λείπει μετάβαση για κάποιο (q, σ)',t:false,
+    e:'Λάθος. Η δ πρέπει να ορίζεται παντού — γι’ αυτό συχνά χρειάζεσαι «κατάσταση παγίδα». Σε NFA επιτρέπεται.'}]}}
+]});
+
+/* ---------------- 4 ---------------- */
+L.push({t:'Κανονικές Εκφράσεις', s:'Ο τρίτος τρόπος να πεις την ίδια γλώσσα', b:[
+ {p:`Μέχρι τώρα περιγράψαμε γλώσσες με <b>αυτόματα</b> (διαγράμματα) και με <b>λόγια</b>. Η κανονική έκφραση είναι ο τρίτος τρόπος — μια σύντομη φόρμουλα. Και το θεώρημα λέει ότι οι τρεις τρόποι είναι <b>ακριβώς ισοδύναμοι</b>.`},
+ {box:'def',t:'Οι δομικοί λίθοι',c:`<code>a</code> = η λέξη a &nbsp;·&nbsp; <code>ε</code> = η κενή λέξη &nbsp;·&nbsp; <code>∅</code> = τίποτα<br>
+   <code>R₁ ∪ R₂</code> = ή το ένα ή το άλλο<br>
+   <code>R₁R₂</code> = πρώτα το ένα, μετά το άλλο<br>
+   <code>R*</code> = όσες φορές θέλεις (και μηδέν)`},
+ {box:'warn',t:'Προτεραιότητα πράξεων — σαν το ×  πριν το +',c:`<b>1. Kleene star &nbsp;→&nbsp; 2. Παράθεση &nbsp;→&nbsp; 3. Ένωση</b><br><br>
+   Άρα το <code>ba*</code> σημαίνει <code>b(a*)</code>, όχι <code>(ba)*</code>. Και το <code>a ∪ ba</code> σημαίνει <code>a ∪ (ba)</code>.`},
+ {p:`Ας τις δούμε στην πράξη. Κάνε κλικ σε κάθε λέξη και μάντεψε αν ανήκει:`},
+ {w:'wWords',c:{title:'0*10*', desc:'Μηδέν ή περισσότερα 0, μετά ένα 1, μετά πάλι μηδέν ή περισσότερα 0.',
+   re:'^0*10*$', words:['1','010','0010','11','0','101',''],
+   after:'Ο κανόνας: <b>ακριβώς ένα 1</b> στη λέξη. Πρόσεξε ότι η ε δεν ανήκει — το 1 είναι υποχρεωτικό.'}},
+ {w:'wWords',c:{title:'(ΣΣ)* όπου Σ = {0,1}', desc:'Κάθε «γύρος» του star καταναλώνει ακριβώς δύο σύμβολα, οποιαδήποτε.',
+   re:'^([01][01])*$', words:['','01','0011','101','1','1010','00000'],
+   after:'Ο κανόνας: <b>άρτιο μήκος</b>. Η ε ανήκει (μήκος 0, άρτιο). Ομοίως η (ΣΣΣ)* δίνει τα μήκη πολλαπλάσια του 3.'}},
+ {w:'wWords',c:{title:'1*(01⁺)*', desc:'Πρώτα όσα 1 θέλεις, μετά γύροι της μορφής «ένα 0 και τουλάχιστον ένα 1».',
+   re:'^1*(01+)*$', words:['','111','011','0','0111011','10','0101'],
+   after:'Ο κανόνας: <b>κάθε 0 ακολουθείται από τουλάχιστον ένα 1</b>. Άρα καμία λέξη δεν τελειώνει σε 0 και δεν υπάρχουν δύο συνεχόμενα 0.'}},
+ {h:'Δύο ισοδυναμίες που ΔΕΝ ισχύουν'},
+ {box:'warn',t:'Οι δύο μεγάλες παγίδες',c:`
+   <b>(σ₁ ∪ σ₂)* ≉ σ₁* ∪ σ₂*</b><br>
+   Αντιπαράδειγμα: <code>abba</code> ∈ (a ∪ b)* αλλά <code>abba</code> ∉ a* ∪ b*. Το δεξί μέλος δίνει μόνο «όλα a» ή «όλα b».<br><br>
+   <b>(σ₁σ₂)* ≉ σ₁*σ₂*</b><br>
+   Αντιπαράδειγμα: <code>abab</code> ∈ (ab)* αλλά <code>abab</code> ∉ a*b*. Το δεξί μέλος θέλει όλα τα a πρώτα.`},
+ {q:{q:'Ισχύει b*a* ∩ a*b* = a* ∪ b*;',
+   o:['Ναι','Όχι, γιατί η ε λείπει από το δεξί μέλος','Όχι, γιατί η τομή είναι κενή','Ισχύει μόνο χωρίς την ε'],a:0,
+   e:'Ναι, ισχύει. Μια λέξη που είναι και «b πριν a» και «a πριν b» δεν μπορεί να έχει και τα δύο γράμματα — άρα είναι όλη a ή όλη b (ή η ε, που ανήκει και στα δύο μέλη).'}},
+ {q:{q:'Ισχύει a*b* ∩ b*c* = ∅;',
+   o:['Ναι, δεν έχουν κοινές λέξεις','Όχι — η ε και κάθε λέξη μόνο από b ανήκουν και στα δύο','Όχι, μόνο λόγω της ε','Δεν ορίζεται'],a:1,
+   e:'Κλασική παγίδα: ξεχνάμε ότι το star επιτρέπει ΜΗΔΕΝ επαναλήψεις. Το bb ανήκει στο a*b* (με μηδέν a) και στο b*c* (με μηδέν c). Η τομή είναι ολόκληρο το b*.'}},
+ {h:'Από DFA σε κανονική έκφραση — η άλλη κατεύθυνση'},
+ {p:`Αυτό ζητιέται σχεδόν πάντα (το 3ο φροντιστήριο είναι ολόκληρο πάνω σε αυτό). Η τεχνική λέγεται <b>απαλοιφή καταστάσεων</b>: μετατρέπεις το DFA σε «γενικευμένο NFA», όπου στα βέλη γράφονται <b>κανονικές εκφράσεις</b> αντί για σκέτα σύμβολα, και μετά σβήνεις τις καταστάσεις μία-μία.`},
+ {box:'idea',t:'Ο ΕΝΑΣ κανόνας που πρέπει να θυμάσαι',c:`Όταν σβήνεις μια κατάσταση <b>q</b>, για κάθε ζεύγος «μπαίνω από το i, βγαίνω προς το j» βάζεις απευθείας βέλος i → j με ετικέτα:<br><br>
+   <div class="center big mono">(i→q) · (q→q)* · (q→j)</div><br>
+   Δηλαδή: <i>μπαίνω</i>, μετά <i>γυρνάω στον βρόχο όσες φορές θέλω</i>, μετά <i>βγαίνω</i>. Αν υπήρχε ήδη βέλος i → j, το ενώνεις με ∪.`},
+ {p:`Ας το κάνουμε σε πραγματικό αυτόματο — αυτό που ήδη ξέρεις, το «τελειώνει σε 1»:`},
+ {w:'wAutomaton',c:{A:AUT.ends1,w:'101',presets:['101','10','1','0'],title:'Το DFA που θα μετατρέψουμε'}},
+ {w:'wSteps',c:{title:'Απαλοιφή καταστάσεων, βήμα-βήμα',
+  steps:[
+   {t:'Προετοιμασία',c:`Προσθέτουμε <b>νέα αρχική S</b> με ε-βέλος προς την q₁, και <b>νέα τελική A</b> με ε-βέλος από την q₂. Έτσι η αρχική δεν έχει εισερχόμενα και η τελική δεν έχει εξερχόμενα.<br><br>
+     Τα βέλη τώρα: <code>S→q₁: ε</code> · <code>q₁→q₁: 0</code> · <code>q₁→q₂: 1</code> · <code>q₂→q₁: 0</code> · <code>q₂→q₂: 1</code> · <code>q₂→A: ε</code>`},
+   {t:'Σβήνουμε την q₁',c:`Ποιοι περνούν από την q₁; Δύο διαδρομές:<br><br>
+     <b>S → q₁ → q₂</b> &nbsp;=&nbsp; <code>ε · 0* · 1</code> = <code>0*1</code><br>
+     <b>q₂ → q₁ → q₂</b> &nbsp;=&nbsp; <code>0 · 0* · 1</code> = <code>00*1</code><br><br>
+     Το δεύτερο <b>ενώνεται</b> με το βέλος q₂→q₂ που ήδη υπήρχε (το <code>1</code>):<br>
+     <code>q₂→q₂ : 1 ∪ 00*1</code>`},
+   {t:'Σβήνουμε την q₂',c:`Έμειναν μόνο S, q₂, A. Η μοναδική διαδρομή είναι <b>S → q₂ → A</b>:<br><br>
+     <div class="center big mono">(0*1) · (1 ∪ 00*1)* · ε</div>`},
+   {t:'Αποτέλεσμα',c:`<div class="center big mono">0*1(1 ∪ 00*1)*</div><br>
+     Διάβασέ το: «μηδέν ή περισσότερα 0, μετά ένα 1, και μετά όσα μπλοκ θέλεις που το καθένα τελειώνει σε 1». Δηλαδή: <b>η λέξη τελειώνει σε 1</b>. ✓<br><br>
+     Ισοδύναμα, και πιο κομψά: <code>(0 ∪ 1)*1</code> — δηλαδή <code>Σ*1</code>.`}],
+  done:`Η απάντηση που βρήκες με τον αλγόριθμο μοιάζει πιο άσχημη από την προφανή <code>Σ*1</code>, και αυτό είναι απολύτως φυσιολογικό: <b>η ίδια γλώσσα έχει πολλές ισοδύναμες κανονικές εκφράσεις</b>. Στις εξετάσεις παίρνεις μονάδες και για τις δύο, αρκεί να είναι σωστές.`}},
+ {q:{q:'Σβήνουμε μια κατάσταση q. Υπάρχει βέλος i→q με ετικέτα a, βρόχος q→q με ετικέτα b, και βέλος q→j με ετικέτα c. Τι ετικέτα παίρνει το νέο βέλος i→j;',
+   o:['abc','a ∪ b ∪ c','ab*c','a*bc*'],a:2,
+   e:'Ο κανόνας είναι (i→q)(q→q)*(q→j) = ab*c. Ο βρόχος παίρνει το αστεράκι, γιατί μπορείς να τον διανύσεις όσες φορές θέλεις — ή καμία.'}},
+ {box:'idea',t:'Και οι δύο κατευθύνσεις μαζί',c:`<b>κ.ε. → αυτόματο:</b> σπάς την έκφραση στα κομμάτια της και κολλάς τα αντίστοιχα μικρά NFA με ε-μεταβάσεις.<br>
+   <b>αυτόματο → κ.ε.:</b> γενικευμένο NFA + απαλοιφή καταστάσεων, όπως μόλις έκανες.<br><br>
+   Οι δύο κατευθύνσεις μαζί αποδεικνύουν το θεώρημα: <b>κανονική γλώσσα ⟺ υπάρχει κανονική έκφραση</b>.`}
+]});
+/* ---------------- 5 ---------------- */
+L.push({t:'Κλειστότητα & Κατασκευές', s:'Πώς φτιάχνεις καινούρια αυτόματα από παλιά', b:[
+ {p:`«Κλειστότητα» σημαίνει: <b>παίρνεις κανονικές γλώσσες, κάνεις μια πράξη, και το αποτέλεσμα είναι πάλι κανονικό.</b> Ακούγεται βαρετό — είναι όμως το πιο χρήσιμο εργαλείο για ασκήσεις, γιατί σου γλιτώνει το χτίσιμο αυτομάτων από το μηδέν.`},
+ {box:'ok',t:'Οι κανονικές γλώσσες είναι κλειστές ως προς',c:`ένωση · τομή · <b>συμπλήρωμα</b> · διαφορά · παράθεση · Kleene star<br><br>
+   (Κράτα το: οι <i>χωρίς συμφραζόμενα</i> γλώσσες, που θα δεις μετά, <b>ΔΕΝ</b> είναι κλειστές ως προς τομή και συμπλήρωμα. Είναι διαφορά που ρωτιέται.)`},
+ {h:'Συμπλήρωμα — η ευκολότερη και η πιο ύπουλη'},
+ {p:`Θέλεις τις λέξεις που το αυτόματο <b>ΔΕΝ</b> δέχεται; Πάρε το DFA και <b>αντάλλαξε τελικές με μη τελικές</b>. Τέλος.`},
+ {w:'wAutomaton',c:{A:AUT.ends1,w:'1001',presets:['1001','1000','','0'],title:'Πριν: τελειώνει σε 1'}},
+ {w:'wAutomaton',c:{A:AUT.ends1c,w:'1001',presets:['1001','1000','','0'],
+   title:'Μετά: ίδια βέλη, ανεστραμμένες τελικές — τώρα δέχεται όσες ΔΕΝ τελειώνουν σε 1',
+   note:'Δοκίμασε την ίδια λέξη και στα δύο. Ό,τι δεχόταν το πρώτο, το απορρίπτει το δεύτερο και αντίστροφα. Πρόσεξε: η ε γίνεται τώρα δεκτή, γιατί η αρχική κατάσταση έγινε τελική.'}},
+ {box:'warn',t:'Γιατί ΔΕΝ δουλεύει σε NFA',c:`Σε DFA κάθε λέξη έχει έναν μοναδικό δρόμο, άρα «τελική ή μη τελική» είναι καθαρή διχοτομία.<br><br>
+   Σε NFA μια λέξη μπορεί να έχει <b>ταυτόχρονα</b> έναν δρόμο που καταλήγει σε τελική και έναν που δεν καταλήγει. Αν αντιστρέψεις, η λέξη θα γίνεται δεκτή <b>και από τα δύο</b> αυτόματα — δεν πήρες συμπλήρωμα.<br><br>
+   <b>Λύση:</b> πρώτα ντετερμινιστικοποίηση, μετά αντιστροφή.`},
+ {q:{q:'Έχεις NFA για τη γλώσσα L. Θέλεις αυτόματο για το συμπλήρωμα. Τι κάνεις;',
+   o:['Αντιστρέφω τελικές/μη τελικές στο NFA','Πρώτα μετατρέπω σε DFA, μετά αντιστρέφω','Αντιστρέφω τα βέλη','Δεν γίνεται'],a:1,
+   e:'Η αντιστροφή τελικών δουλεύει ΜΟΝΟ σε ντετερμινιστικό αυτόματο. Το βήμα της ντετερμινιστικοποίησης είναι υποχρεωτικό — και είναι κλασική παγίδα εξετάσεων.'}},
+ {h:'Τομή και ένωση — το αυτόματο γινόμενο'},
+ {p:`Θέλεις να τρέξεις <b>δύο αυτόματα ταυτόχρονα</b> πάνω στην ίδια λέξη. Άρα η κατάστασή σου είναι ένα <b>ζεύγος</b>: «το πρώτο είναι στην q, το δεύτερο στην r».`},
+ {box:'def',t:'Η κατασκευή γινομένου',c:`Καταστάσεις: <b>Q₁ × Q₂</b> (όλα τα ζεύγη)<br>
+   Αρχική: <b>(s₁, s₂)</b><br>
+   Μετάβαση: <b>δ((q,r), σ) = (δ₁(q,σ), δ₂(r,σ))</b> — κινούνται και τα δύο μαζί<br><br>
+   Και μόνο οι τελικές αλλάζουν ανάλογα με το τι θέλεις:<br>
+   <b>ΤΟΜΗ:</b> F = F₁ × F₂ — πρέπει να δέχονται <b>και τα δύο</b><br>
+   <b>ΕΝΩΣΗ:</b> F = (Q₁ × F₂) ∪ (F₁ × Q₂) — αρκεί να δέχεται <b>ένα</b>`},
+ {q:{q:'Στο αυτόματο γινόμενο, ποιο σύνολο τελικών δίνει την ΤΟΜΗ;',
+   o:['F₁ × F₂','(Q₁ × F₂) ∪ (F₁ × Q₂)','Q₁ × Q₂','F₁ ∪ F₂'],a:0,
+   e:'Για την τομή απαιτείς ΚΑΙ τα δύο να είναι σε τελική κατάσταση, άρα το ζεύγος πρέπει να έχει και τις δύο συνιστώσες στο F. Η δεύτερη επιλογή είναι για την ΕΝΩΣΗ (αρκεί μία).'}},
+ {h:'Παράθεση και star — εδώ θέλεις NFA'},
+ {p:`Για την <b>ένωση</b> με NFA: βάζεις μια <b>νέα αρχική</b> κατάσταση με ε-βέλη προς τις δύο παλιές αρχικές. Το αυτόματο «μαντεύει» σε ποιο από τα δύο θα δουλέψει:`},
+ {w:'wAutomaton',c:{A:AUT.nfaUnion,w:'ab',presets:['ab','aa','ba','bb','b','a'],
+   title:'Ένωση: «αρχίζει με a» ∪ «τελειώνει με b»',
+   note:'Στο πρώτο κιόλας βήμα, με τις ε-μεταβάσεις, το σύνολο καταστάσεων γίνεται {νέα, p₁, r₁} — μπαίνεις ταυτόχρονα και στα δύο υπο-αυτόματα.'}},
+ {p:`Για την <b>παράθεση</b>: βάζεις τα δύο αυτόματα στη σειρά, με ε-βέλη από τις τελικές του πρώτου προς την αρχική του δεύτερου.<br>
+   Για το <b>Kleene star</b>: ε-βέλη από τις τελικές πίσω στην αρχική (για τις επαναλήψεις) <b>και</b> μια νέα αρχική κατάσταση που είναι τελική (για την ε).`},
+ {box:'warn',t:'Γιατί χρειάζεται ΝΕΑ αρχική στο star',c:`Αν απλώς κάνεις τελική την παλιά αρχική για να δέχεσαι την ε, μπορεί να αρχίσεις να δέχεσαι και λέξεις που <b>δεν ανήκουν</b> στο Γ*.<br><br>
+   Παράδειγμα από τις διαφάνειες: Γ = (bb)*ba. Με το «εύκολο» κόλπο, το αυτόματο θα δεχόταν την <code>bb</code>, που δεν ανήκει ούτε στη Γ ούτε στη Γ*.`},
+ {h:'Το κόλπο που λύνει ασκήσεις'},
+ {box:'idea',t:'Τομή με κανονική γλώσσα',c:`Θέλεις να δείξεις ότι μια δύσκολη γλώσσα <b>C δεν είναι κανονική</b>; Τέμνησέ την με μια απλή κανονική R ώστε να πέσεις σε γνωστή μη κανονική γλώσσα.<br><br>
+   <b>Παράδειγμα:</b> C = {λέξεις με ίσο πλήθος 0 και 1}. Τότε<br>
+   <code>C ∩ 0*1* = {0ⁿ1ⁿ}</code><br>
+   Αν η C ήταν κανονική, η τομή θα ήταν κανονική (κλειστότητα). Αλλά η {0ⁿ1ⁿ} δεν είναι. <b>Άτοπο.</b>`},
+ {tf:{items:[
+   {s:'Αν οι L₁, L₂ δεν είναι κανονικές, τότε ούτε η L₁ ∪ L₂ μπορεί να είναι',t:false,
+    e:'Λάθος. Πάρε μια μη κανονική L και το (επίσης μη κανονικό) συμπλήρωμά της: η ένωσή τους είναι το Σ*, που είναι κανονικό. Η κλειστότητα δεν δουλεύει ανάποδα.'},
+   {s:'Η διαφορά L₁ \\\\ L₂ δύο κανονικών γλωσσών είναι πάντα κανονική',t:true,
+    e:'Σωστό, γιατί L₁ \\\\ L₂ = L₁ ∩ ¬L₂ και η κλάση είναι κλειστή σε τομή και συμπλήρωμα.'},
+   {s:'Κάθε πεπερασμένη γλώσσα είναι κανονική',t:true,
+    e:'Σωστό. Κάθε λέξη είναι μια κ.ε. από μόνη της, και η πεπερασμένη ένωση κανονικών είναι κανονική.'}]}}
+]});
+
+/* ---------------- 6 ---------------- */
+L.push({t:'Λήμμα Άντλησης', s:'Το εργαλείο που αποδεικνύει ότι κάτι ΔΕΝ γίνεται', b:[
+ {p:`Μέχρι τώρα φτιάχναμε αυτόματα. Τώρα το αντίστροφο: πώς αποδεικνύεις ότι για κάποια γλώσσα <b>δεν υπάρχει</b> αυτόματο;`},
+ {box:'idea',t:'Η διαίσθηση σε τρεις γραμμές',c:`Ένα DFA έχει <b>p καταστάσεις</b> — πεπερασμένες.<br>
+   Αν του δώσεις λέξη μήκους ≥ p, ο δρόμος περνά από p+1 καταστάσεις.<br>
+   Άρα <b>κάποια κατάσταση επαναλαμβάνεται</b> (αρχή του περιστεριώνα) ⇒ ο δρόμος περνά από <b>βρόχο</b>.<br><br>
+   Και εδώ είναι το κλειδί: το αυτόματο <b>δεν θυμάται πόσες φορές γύρισε τον βρόχο</b>. Άρα αν δέχεται τη λέξη μία φορά, τη δέχεται με 0, 2, 3, 100 γύρους.`},
+ {box:'def',t:'Το Λήμμα',c:`Αν η <b>L είναι κανονική</b>, τότε υπάρχει αριθμός <b>p > 0</b> τέτοιος ώστε κάθε λέξη w ∈ L με |w| ≥ p να σπάει σε <b>w = xyz</b> με:<br>
+   <b>1.</b> y ≠ ε &nbsp;(ο βρόχος διαβάζει κάτι)<br>
+   <b>2.</b> |xy| ≤ p &nbsp;(ο βρόχος είναι μέσα στα πρώτα p σύμβολα)<br>
+   <b>3.</b> xy<sup>i</sup>z ∈ L για <b>κάθε</b> i ≥ 0`},
+ {box:'warn',t:'Μονόδρομο!',c:`Το λήμμα λέει «κανονική ⇒ αντλείται». <b>ΔΕΝ</b> λέει το ανάποδο.<br><br>
+   Άρα χρησιμεύει <b>μόνο</b> για να αποδείξεις ότι κάτι <b>ΔΕΝ</b> είναι κανονικό. Δεν μπορείς ποτέ να αποδείξεις κανονικότητα με αυτό.`},
+ {h:'Παίξ\' το σαν παιχνίδι'},
+ {p:`Η απόδειξη είναι κυριολεκτικά ένα <b>παιχνίδι δύο παικτών</b>. Ο αντίπαλος διαλέγει το p και το σπάσιμο· <b>εσύ</b> διαλέγεις τη λέξη και το i. Αν μπορείς πάντα να κερδίσεις, η γλώσσα δεν είναι κανονική.`},
+ {w:'wPump',c:{
+   L:'<b>C = {λέξεις στο {0,1} με ίσο πλήθος από 0 και 1}</b><br>π.χ. 01, 0011, 0101, 1100 ανήκουν· τα 0, 011, 001 όχι.',
+   p:4,
+   words:[
+     {s:'(01)⁴ = 01010101', bad:true,
+      why:'<b>Κακή επιλογή!</b> Αυτή η λέξη <b>αντλείται</b>: με x = ε, y = 01, z = (01)³, κάθε επανάληψη προσθέτει ένα 0 και ένα 1 μαζί — το πλήθος μένει ίσο. Δεν θα βγάλεις ποτέ άτοπο.<br><br>Μάθημα: σε μια <i>μη</i> κανονική γλώσσα μπορεί κάλλιστα να υπάρχουν λέξεις που αντλούνται. Πρέπει να διαλέξεις σοφά.'},
+     {s:'0¹1¹ = 01', bad:true,
+      why:'<b>Άκυρη επιλογή:</b> |w| = 2 < p = 4. Το λήμμα εγγυάται άντληση μόνο για λέξεις μήκους <b>τουλάχιστον p</b>. Διάλεξε μεγαλύτερη — και γράψ\' την ως συνάρτηση του p.'},
+     {s:'0⁴1⁴ = 00001111', bad:false,
+      hint:'<b>μόνο μηδενικά</b>, γιατί η συνθήκη |xy| ≤ 4 το κλειδώνει μέσα στα τέσσερα πρώτα σύμβολα.',
+      splits:[{x:'',y:'0',z:'0001111'},{x:'0',y:'00',z:'01111'},{x:'',y:'0000',z:'1111'},{x:'00',y:'0',z:'01111'}]}
+   ],
+   test:w => { const z=[...w].filter(c=>c==='0').length, o=[...w].filter(c=>c==='1').length; return z===o; },
+   win:`Και επειδή αυτό δουλεύει για <b>κάθε</b> σπάσιμο (το y είναι πάντα μόνο μηδενικά), η υπόθεση «η C είναι κανονική» καταρρέει.<br><br><b>Άρα η C ΔΕΝ είναι κανονική.</b> Αυτή ακριβώς είναι η δομή που γράφεις στο χαρτί.`}},
+ {box:'ok',t:'Η συνταγή για το χαρτί',c:`<b>1.</b> «Έστω ότι η L είναι κανονική.»<br>
+   <b>2.</b> «Τότε υπάρχει αριθμός άντλησης p.» (δεν τον διαλέγεις εσύ!)<br>
+   <b>3.</b> «Παίρνω τη λέξη w = …» (γραμμένη ως συνάρτηση του p — <b>εδώ</b> είναι η εξυπνάδα)<br>
+   <b>4.</b> «Για κάθε σπάσιμο w = xyz με y ≠ ε και |xy| ≤ p, το y αποτελείται μόνο από …»<br>
+   <b>5.</b> «Άρα με i = 0 (ή i = 2) παίρνω λέξη εκτός L. ΑΤΟΠΟ.»<br>
+   <b>6.</b> «Άρα η L δεν είναι κανονική.»`},
+ {box:'warn',t:'Ποτέ i = 1',c:`Με i = 1 παίρνεις πίσω την αρχική λέξη w, που φυσικά <b>ανήκει</b> στην L. Δεν βγάζεις τίποτα. Χρησιμοποίησε <b>i = 0</b> (αφαιρείς το y) ή <b>i = 2</b> (το διπλασιάζεις).`},
+ {q:{q:'Στην απόδειξη, ποιος διαλέγει τι;',
+   o:['Εγώ διαλέγω το p και τη λέξη','Το λήμμα δίνει το p· εγώ διαλέγω τη λέξη· πρέπει να καλύψω ΚΑΘΕ σπάσιμο· εγώ διαλέγω το i','Εγώ διαλέγω τα πάντα','Ο αντίπαλος διαλέγει τα πάντα'],a:1,
+   e:'Η εναλλαγή είναι: ∃p ∀w ∃(xyz) ∀i. Το p σου δίνεται, τη λέξη τη διαλέγεις εσύ (σοφά!), το σπάσιμο πρέπει να το καλύψεις γενικά, και το i το διαλέγεις εσύ.'}},
+ {p:`Τρεις γλώσσες που πρέπει να ξέρεις απ\' έξω ότι <b>δεν</b> είναι κανονικές:`},
+ {box:'def',t:'Οι τρεις κλασικές',c:`<b>C₀ = {0ⁿ1ⁿ}</b> — πρέπει να μετρήσεις πόσα 0 είδες<br>
+   <b>C = {ίσο πλήθος 0 και 1}</b> — το ίδιο, σε οποιαδήποτε σειρά<br>
+   <b>D = {u·u}</b> — πρέπει να θυμάσαι ολόκληρη την πρώτη μισή λέξη`},
+ {q:{q:'Είναι κανονική η γλώσσα {aⁿbⁿ | n < 3};',
+   o:['Όχι — έχει τη μορφή aⁿbⁿ','Ναι — είναι η πεπερασμένη {ε, ab, aabb}','Όχι — απαιτεί μέτρηση','Δεν μπορούμε να ξέρουμε'],a:1,
+   e:'Ωραία παγίδα. Με n < 3 έχεις μόνο n = 0, 1, 2 — τρεις λέξεις συνολικά. Πεπερασμένη γλώσσα ⇒ κανονική. Η ΜΟΡΦΗ aⁿbⁿ δεν σημαίνει τίποτα από μόνη της· μετράει αν το n είναι απεριόριστο.'}}
+]});
+
+/* ---------------- 7 ---------------- */
+L.push({t:'Ασυμφραστικές Γλώσσες', s:'Δίνουμε στη μηχανή μια στοίβα', b:[
+ {p:`Το πεπερασμένο αυτόματο κόλλησε στην <code>0ⁿ1ⁿ</code> γιατί δεν μπορεί να μετρήσει. Ας του δώσουμε λοιπόν <b>μια στοίβα</b> — απεριόριστη μνήμη, αλλά με έναν κανόνα: βλέπεις μόνο την κορυφή.`},
+ {box:'idea',t:'Η στοίβα σαν σωρός πιάτα',c:`Βάζεις πιάτα από πάνω, παίρνεις πιάτα από πάνω. Ό,τι έβαλες <b>πρώτο</b>, θα το πάρεις <b>τελευταίο</b>.<br><br>
+   Έτσι η <code>0ⁿ1ⁿ</code> λύνεται εύκολα: για κάθε 0 βάζεις ένα πιάτο, για κάθε 1 βγάζεις ένα. Αν στο τέλος η στοίβα είναι άδεια — ΝΑΙ.`},
+ {p:`Δες το να συμβαίνει. Στον προσομοιωτή, δίπλα στην ταινία υπάρχει τώρα και η <b>στοίβα</b>. Οι ετικέτες στα βέλη διαβάζονται <code>διαβάζω, βγάζω → βάζω</code>, με <b>ε</b> όπου δεν γίνεται τίποτα:`},
+ {w:'wPDA',c:{P:PDA.anbn,w:'000111',presets:['000111','0011','01','','001','0101','011'],
+   title:'Αυτόματο στοίβας για {0ⁿ1ⁿ}',
+   note:'Πρόσεξε το <b>$</b> στο πρώτο βήμα: είναι ο «πάτος» της στοίβας — έτσι καταλαβαίνουμε πότε άδειασε. Δοκίμασε το <code>001</code> (περισσεύει 0) και το <code>011</code> (κολλάει: ζητά 0 από τη στοίβα και δεν υπάρχει).'}},
+ {box:'idea',t:'Τι μόλις είδες',c:`Στην q₂ η στοίβα <b>μεγαλώνει</b> (ένα σύμβολο ανά 0). Στην q₃ <b>μικραίνει</b> (ένα ανά 1). Αν φτάσουμε στο <code>$</code> ακριβώς όταν τελειώνει η λέξη, τα πλήθη ήταν ίσα.<br><br>
+   Αυτό ακριβώς δεν μπορούσε να κάνει το πεπερασμένο αυτόματο: η στοίβα είναι <b>απεριόριστος μετρητής</b>.`},
+ {p:`Και τώρα το πιο διαφωτιστικό παράδειγμα — γιατί η στοίβα πιάνει <b>παλίνδρομα</b> αλλά όχι επανάληψη:`},
+ {w:'wPDA',c:{P:PDA.pal,w:'abcba',presets:['abcba','aabcbaa','abcab','c','abcb'],
+   title:'Αυτόματο στοίβας για {w c wᴿ} — παλίνδρομα με μαρκαδόρο',
+   note:'Δοκίμασε <code>abcba</code> (δέχεται) και μετά <code>abcab</code> (κολλάει). Η στοίβα επιστρέφει τα σύμβολα ΑΝΑΠΟΔΑ — γι\’ αυτό ταιριάζει με το wᴿ και όχι με το w.'}},
+ {box:'warn',t:'Το όριο της στοίβας, σε μία γραμμή',c:`Η στοίβα είναι <b>LIFO</b>: ό,τι βάλεις πρώτο βγαίνει τελευταίο. Άρα σου δίνει δωρεάν την <b>αντιστροφή</b>.<br><br>
+   Γι\’ αυτό η <b>{w c wᴿ}</b> είναι CFL, ενώ η <b>{w c w}</b> ΔΕΝ είναι: για τη δεύτερη θα έπρεπε να ξαναδιαβάσεις το w με την ίδια σειρά, και η στοίβα δεν το επιτρέπει.`},
+ {q:{q:'Στο PDA για την {0ⁿ1ⁿ}, γιατί βάζουμε πρώτα το σύμβολο $ στη στοίβα;',
+   o:['Για να μετράμε τα 0','Για να ξέρουμε πότε η στοίβα άδειασε — δεν μπορούμε να «κοιτάξουμε» αν είναι κενή','Είναι διακοσμητικό','Για να ξεχωρίζουμε τα 0 από τα 1'],a:1,
+   e:'Το PDA βλέπει μόνο την κορυφή. Δεν υπάρχει εντολή «είναι άδεια;». Βάζοντας έναν δείκτη πάτου $, το «βλέπω $ στην κορυφή» σημαίνει «έβγαλα όλα όσα είχα βάλει».'}},
+ {h:'Γραμματικές χωρίς συμφραζόμενα'},
+ {p:`Μια <b>γραμματική</b> είναι το ίδιο πράγμα από την άλλη μεριά: αντί να ελέγχεις αν μια λέξη ανήκει, τη <b>φτιάχνεις</b> από κανόνες.`},
+ {box:'def',t:'CFG = τετράδα (V, Σ, R, S)',c:`<b>V</b> = μεταβλητές (κεφαλαία) · <b>Σ</b> = τερματικά σύμβολα (τα πραγματικά γράμματα)<br>
+   <b>R</b> = κανόνες της μορφής <code>Μεταβλητή → οτιδήποτε</code> · <b>S</b> = η αρχική μεταβλητή<br><br>
+   Ξεκινάς από το S και αντικαθιστάς μεταβλητές μέχρι να μείνουν μόνο τερματικά. Αυτή η ακολουθία λέγεται <b>παραγωγή</b>.`},
+ {p:`Χτίσ\' το μόνος σου. Κάνε κλικ στη μεταβλητή <b>S</b> και διάλεξε κανόνα — φτιάξε τη λέξη <code>000111</code>:`},
+ {w:'wDeriv',c:{start:'S',target:'000111',
+   rules:[{v:'S',to:['0','S','1']},{v:'S',to:[]}]}},
+ {p:`Είδες τι έγινε; Ο κανόνας <code>S → 0S1</code> προσθέτει <b>ταυτόχρονα</b> ένα 0 αριστερά και ένα 1 δεξιά. Γι\' αυτό τα πλήθη μένουν πάντα ίσα — κάτι που το πεπερασμένο αυτόματο δεν μπορεί να πετύχει.`},
+ {p:`Άλλη μία, πιο ενδιαφέρουσα: αυτή παράγει <b>σωστά ισορροπημένες παρενθέσεις</b>, με το a να παίζει τον ρόλο του «(» και το b του «)». Φτιάξε την <code>abab</code>:`},
+ {w:'wDeriv',c:{start:'S',target:'abab',
+   rules:[{v:'S',to:['a','S','b']},{v:'S',to:['S','S']},{v:'S',to:[]}]}},
+ {q:{q:'Ποια λέξη ΔΕΝ παράγεται από την S → aSb | SS | ε;',
+   o:['abab','aaabbb','aababb','ba'],a:3,
+   e:'Η ba «κλείνει παρένθεση» πριν την ανοίξει. Πρόσεξε ότι έχει ίσο πλήθος a και b — άρα η γλώσσα ΔΕΝ είναι απλώς «ίσα πλήθη», είναι «σωστά ισορροπημένα».'}},
+ {h:'Το λήμμα άντλησης για CFL — τώρα με ΔΥΟ τρύπες'},
+ {p:`Στα δέντρα παραγωγής, όταν μια μεταβλητή επαναλαμβάνεται σε ένα μονοπάτι, το υποδέντρο μπορεί να αντιγραφεί — και τότε φουσκώνουν <b>ταυτόχρονα</b> δύο κομμάτια, ένα αριστερά και ένα δεξιά.`},
+ {box:'def',t:'Λήμμα άντλησης για CFL',c:`Κάθε αρκετά μεγάλη λέξη σπάει σε <b>s = uvxyz</b> με:<br>
+   <b>1.</b> uv<sup>i</sup>xy<sup>i</sup>z ∈ A για κάθε i ≥ 0 &nbsp;(τα v και y αντλούνται <b>μαζί</b>)<br>
+   <b>2.</b> |vy| > 0 &nbsp;<b>3.</b> |vxy| ≤ p`},
+ {box:'warn',t:'Τα όρια της στοίβας',c:`<b>{aⁿbⁿcⁿ}</b> — ΔΕΝ είναι CFL. Η στοίβα ξοδεύεται στη σύγκριση a-b και μετά είναι άδεια· δεν έχει πια πληροφορία για τα c.<br><br>
+   <b>{u·u}</b> — ΔΕΝ είναι CFL. Η στοίβα <i>αντιστρέφει</i>, οπότε ελέγχει άνετα <b>παλίνδρομα</b> (u·uᴿ) αλλά όχι <b>επανάληψη</b> (u·u).`},
+ {q:{q:'Η {u·u | u ∈ Σ*} είναι χωρίς συμφραζόμενα;',
+   o:['Ναι, με S → aSa | bSb | ε','Όχι — η στοίβα αντιστρέφει, άρα πιάνει παλίνδρομα αλλά όχι επανάληψη','Ναι, είναι πιο εύκολη από την 0ⁿ1ⁿ','Είναι κανονική'],a:1,
+   e:'Προσοχή: η γραμματική S → aSa | bSb | ε παράγει τα ΠΑΛΙΝΔΡΟΜΑ, όχι την u·u. Είναι διαφορετικές γλώσσες, και η δεύτερη δεν είναι CFL.'}},
+ {box:'ok',t:'Τι πρέπει να θυμάσαι για κλειστότητα',c:`Οι CFL είναι κλειστές ως προς <b>ένωση, παράθεση, Kleene star</b>.<br>
+   <b>ΔΕΝ</b> είναι κλειστές ως προς <b>τομή</b> και <b>συμπλήρωμα</b>.<br><br>
+   Αντιπαράδειγμα: {aⁿbⁿcᵐ} ∩ {aⁿbᵐcᵐ} = {aⁿbⁿcⁿ}, που δεν είναι CFL. Δύο CFL έδωσαν κάτι που δεν είναι.`},
+ {box:'idea',t:'Μια ακόμα διαφορά',c:`Στα πεπερασμένα αυτόματα, NFA και DFA είναι <b>ισοδύναμα</b>.<br>
+   Στα αυτόματα στοίβας, τα <b>μη ντετερμινιστικά είναι γνησίως πιο δυνατά</b> από τα ντετερμινιστικά. Ρωτιέται.`}
+]});
+/* ---------------- 8 ---------------- */
+L.push({t:'Μηχανές Turing', s:'Τώρα η μηχανή μπορεί και να γράφει', b:[
+ {p:`Η μηχανή Turing είναι το τελευταίο και ισχυρότερο μοντέλο. Δύο αλλαγές σε σχέση με το αυτόματο, και είναι τεράστιες:<br>
+   <b>1.</b> Μπορεί να <b>γράψει</b> πάνω στην ταινία, όχι μόνο να διαβάσει.<br>
+   <b>2.</b> Η κεφαλή κινείται και <b>αριστερά</b>, όχι μόνο δεξιά. Άρα μπορεί να ξαναδιαβάσει.`},
+ {box:'def',t:'TM = 7-άδα (Q, Σ, Γ, δ, q₀, q_accept, q_reject)',c:`
+   <b>Σ</b> = αλφάβητο εισόδου — <b>δεν</b> περιέχει το κενό ⊔<br>
+   <b>Γ</b> = αλφάβητο ταινίας — περιέχει το ⊔ και όλο το Σ, συν βοηθητικά σύμβολα<br>
+   <b>δ : Q × Γ → Q × Γ × {Α, Δ}</b> — «σε αυτή την κατάσταση, βλέποντας αυτό: πήγαινε εκεί, γράψε αυτό, κουνήσου εκεί»<br>
+   <b>q_accept ≠ q_reject</b> — υποχρεωτικά διαφορετικές`},
+ {h:'Δες τη να δουλεύει'},
+ {p:`Να μια πραγματική μηχανή που αποφασίζει την <code>0ⁿ1ⁿ</code> — τη γλώσσα που κανένα πεπερασμένο αυτόματο δεν πιάνει. Η στρατηγική της: <b>σβήνει ζευγάρια</b>. Μαρκάρει ένα 0 με x, βρίσκει το αντίστοιχο 1 και το μαρκάρει κι αυτό, γυρίζει πίσω, επαναλαμβάνει.`},
+ {w:'wTM',c:{title:'Μηχανή Turing για {0ⁿ1ⁿ}', delta:TM01, legend:TMLEG, w:'0011',
+   presets:['0011','000111','001','01','','0101','10'],
+   note:'Πάτα ▶ και παρακολούθησε τα x να εμφανίζονται. Δοκίμασε το <code>0101</code>: απορρίπτεται αμέσως, γιατί βρίσκει 0 δεξιά από 1. Δοκίμασε το <code>001</code>: ξεμένει από 1.'}},
+ {box:'idea',t:'Τι μόλις είδες',c:`Η ταινία <b>άλλαξε</b> — η αρχική είσοδος καταστράφηκε, γεμάτη x. Αυτό είναι αδύνατο σε πεπερασμένο αυτόματο, όπου η ταινία είναι μόνο για ανάγνωση.<br><br>
+   Και η δυνατότητα να γράφεις σημάδια είναι ακριβώς η <b>απεριόριστη μνήμη</b> που σου έλειπε.`},
+ {h:'Η ΠΙΟ σημαντική διάκριση του μαθήματος'},
+ {box:'warn',t:'Αναγνωρίζει ≠ Αποφασίζει',c:`<b>ΑΝΑΓΝΩΡΙΖΕΙ</b> την L: δέχεται ακριβώς τις λέξεις της L. Για τις υπόλοιπες μπορεί να απορρίπτει… <b>ή να τρέχει για πάντα</b>.<br><br>
+   <b>ΑΠΟΦΑΣΙΖΕΙ</b> την L: το ίδιο, ΑΛΛΑ <b>τερματίζει πάντα</b> — δέχεται ή απορρίπτει ρητά, ποτέ ατέρμονος βρόχος.<br><br>
+   Στα πεπερασμένα αυτόματα οι δύο έννοιες ταυτίζονται (διαβάζουν τη λέξη και σταματούν). Στις μηχανές Turing <b>χωρίζουν</b>, και αυτή η διαφορά είναι όλο το επόμενο κεφάλαιο.`},
+ {p:`Πώς φτιάχνεις μηχανή που <i>αναγνωρίζει χωρίς να αποφασίζει</i>; Παίρνεις τον αποφασιστή και αντικαθιστάς κάθε «απόρριψη» με έναν <b>ατέρμονο βρόχο</b>. Δέχεται τα ίδια ακριβώς, αλλά τώρα κολλάει στα υπόλοιπα.`},
+ {q:{q:'Η M απορρίπτει τη λέξη w. Τι ξέρουμε σίγουρα;',
+   o:['Ότι η M τερματίζει σε κάθε είσοδο','Ότι η M τερματίζει σε ΑΥΤΗ την είσοδο, φτάνοντας στην q_reject','Ότι η w ανήκει στην L(M)','Ότι η M δεν αναγνωρίζει καμία γλώσσα'],a:1,
+   e:'Η απόρριψη σημαίνει ρητό τερματισμό — αλλά μόνο γι’ αυτή τη λέξη. Σε άλλες μπορεί να τρέχει για πάντα. Πρόσεξε τη διαφορά: «δεν δέχεται» καλύπτει και τον ατέρμονο βρόχο, «απορρίπτει» όχι.'}},
+ {tf:{items:[
+   {s:'Μια ΤΜ μπορεί να γράψει το κενό σύμβολο ⊔ στην ταινία της',t:true,
+    e:'Σωστό. Το ⊔ ανήκει στο αλφάβητο ταινίας Γ. Απλώς δεν ανήκει στο αλφάβητο εισόδου Σ.'},
+   {s:'Το αλφάβητο ταινίας Γ μπορεί να ταυτίζεται με το αλφάβητο εισόδου Σ',t:false,
+    e:'Λάθος. Το Γ περιέχει υποχρεωτικά το ⊔, ενώ το Σ υποχρεωτικά όχι. Άρα το Γ έχει πάντα τουλάχιστον ένα σύμβολο παραπάνω.'},
+   {s:'Μια ΤΜ μπορεί να έχει μόνο μία κατάσταση',t:false,
+    e:'Λάθος. Ο ορισμός απαιτεί q_accept ≠ q_reject, άρα τουλάχιστον δύο.'},
+   {s:'Στο τέλος του υπολογισμού, στην ταινία είναι πάντα γραμμένη η αρχική είσοδος w',t:false,
+    e:'Λάθος — μόλις είδες τη μηχανή να τη γεμίζει x. Ισχύει όμως για ΠΕΠΕΡΑΣΜΕΝΑ ΑΥΤΟΜΑΤΑ, όπου η ταινία είναι μόνο για ανάγνωση.'},
+   {s:'Μια ντετερμινιστική ΤΜ κάνει μοναδικό υπολογισμό για κάθε είσοδο, και ο υπολογισμός πάντα τερματίζει',t:false,
+    e:'Το πρώτο σκέλος σωστό, το δεύτερο ΛΑΘΟΣ. Ο υπολογισμός μπορεί να είναι ατέρμονος. Τερματισμό πάντα έχουν μόνο οι ΑΠΟΦΑΣΙΣΤΕΣ.'}]}},
+ {h:'Ο τρίτος ρόλος: μηχανές που ΥΠΟΛΟΓΙΖΟΥΝ'},
+ {p:`Μέχρι τώρα η μηχανή απαντούσε ΝΑΙ/ΟΧΙ. Αλλά μια μηχανή Turing μπορεί και να <b>υπολογίσει μια συνάρτηση</b>: τερματίζει έχοντας γραμμένη στην ταινία την <b>έξοδο</b> <code>f(w)</code>, χωρίς να αποδέχεται ή να απορρίπτει τίποτα.`},
+ {box:'warn',t:'Η ερώτηση που πέφτει στα θέματα',c:`«Αυτή η μηχανή είναι <b>αποφασιστής</b>, <b>αναγνωριστής</b>, ή <b>υπολογίζει συνάρτηση</b>;»<br><br>
+   Και στα θέματα του 2010 και του 2011 η απάντηση για τις μηχανές που ακολουθούν είναι: <b>υπολογίζει συνάρτηση</b>. Δεν αποφασίζει καμία γλώσσα — παράγει έξοδο.`},
+ {p:`<b>1. Η μηχανή δεξιάς ολίσθησης</b> — μετακινεί ολόκληρη την είσοδο μία θέση δεξιά. Τρέχει δεξιά μέχρι το τέλος, και μετά «σηκώνει» κάθε σύμβολο και το ξαναγράφει μία θέση παραπέρα, δουλεύοντας ανάποδα:`},
+ {w:'wTM',c:{title:'Μηχανή δεξιάς ολίσθησης: w ↦ ⊔w', delta:TMSHIFT, legend:SHIFTLEG, w:'ab',
+   presets:['ab','abb','a','','baab'],
+   note:'Το κόλπο: το σύμβολο «αποθηκεύεται στην κατάσταση» (qPA κρατά ένα a, qPB ένα b). Γι\’ αυτό χρειάζεσαι ΜΙΑ κατάσταση ανά σύμβολο του αλφαβήτου — και γι\’ αυτό δεν γίνεται με άπειρο αλφάβητο.'}},
+ {q:{q:'Πόσα βήματα περίπου κάνει η μηχανή δεξιάς ολίσθησης σε είσοδο μήκους n;',
+   o:['O(1) — σταθερά','O(n) — γραμμικά','O(n²) — τετραγωνικά','O(2ⁿ) — εκθετικά'],a:2,
+   e:'Για κάθε ένα από τα n σύμβολα κάνει μια μικρή σταθερή δουλειά, ΑΛΛΑ πρώτα διατρέχει όλη τη λέξη για να βρει το τέλος και μετά γυρίζει πίσω σύμβολο-σύμβολο. Συνολικά τάξης n² στη γενική περιγραφή του βιβλίου (με μία ταινία). Πρόσεξε: η ερώτηση «πόσα βήματα;» ζητιέται ρητά στα θέματα του 2011.'}},
+ {p:`<b>2. Η μηχανή αντιγραφής</b> — υπολογίζει τη συνάρτηση <code>w ↦ w#w</code>. Είναι πιο σύνθετη και δείχνει την τεχνική του <b>μαρκαρίσματος</b>: κεφαλαία A, B σημαίνουν «αυτό το γράμμα το αντέγραψα ήδη».`},
+ {w:'wTM',c:{title:'Μηχανή αντιγραφής: w ↦ w#w', delta:TMCOPY, legend:COPYLEG, w:'ab',
+   presets:['ab','aba','b','','bba'],
+   note:'Πάτα ⏭ και δες το τελικό αποτέλεσμα στην ταινία. Μετά ξαναπάτα ▶ αργά για να δεις το μοτίβο: μαρκάρω ένα γράμμα → το πηγαίνω στο τέλος → γυρίζω στην αρχή → επόμενο. Στο τέλος ξεμαρκάρω τα πάντα.'}},
+ {box:'idea',t:'Οι τρεις ρόλοι μιας μηχανής Turing',c:`<b>Αποφασιστής</b> — τερματίζει πάντα, λέει ΝΑΙ ή ΟΧΙ. <i>Αποφασίζει</i> μια γλώσσα.<br>
+   <b>Αναγνωριστής</b> — λέει ΝΑΙ για τις λέξεις της γλώσσας, αλλά μπορεί να κολλήσει στις υπόλοιπες. <i>Αναγνωρίζει</i> μια γλώσσα.<br>
+   <b>Μεταγωγέας</b> — τερματίζει αφήνοντας μια έξοδο στην ταινία. <i>Υπολογίζει</i> μια συνάρτηση.<br><br>
+   Ο τρίτος ρόλος είναι που χρειάζεσαι στις <b>αναγωγές</b>: η συνάρτηση αναγωγής f πρέπει να είναι Turing-υπολογίσιμη, δηλαδή να υπάρχει τέτοια μηχανή γι\’ αυτήν.`},
+ {box:'ok',t:'Δύο θεωρήματα για παραλλαγές',c:`<b>Πολλές ταινίες:</b> ΤΜ χρόνου O(t(n)) με πολλές ταινίες → ισοδύναμη μίας ταινίας χρόνου <b>O(t²(n))</b>. Τετραγωνικό κόστος, δηλαδή <i>πολυωνυμικό</i>.<br><br>
+   <b>Μη ντετερμινισμός:</b> μη ντετερμινιστική ΤΜ χρόνου O(t(n)) → ντετερμινιστική χρόνου <b>2^O(t(n))</b>. <i>Εκθετικό</i> κόστος.<br><br>
+   Κράτα αυτή την ασυμμετρία — είναι όλο το P vs NP.`},
+ {box:'def',t:'Θέση Church-Turing',c:`«Ό,τι θεωρούμε διαισθητικά <b>αλγόριθμο</b> = μηχανή Turing που τερματίζει.»<br><br>
+   Δεν είναι θεώρημα, είναι παραδοχή. Χάρη σε αυτήν μπορούμε να λέμε «δεν υπάρχει αλγόριθμος» και να το αποδεικνύουμε μιλώντας για μηχανές Turing.`}
+]});
+
+/* ---------------- 9 ---------------- */
+L.push({t:'Αποφασισιμότητα', s:'Τα πρώτα προβλήματα που ΔΕΝ λύνονται', b:[
+ {p:`Τώρα κάνουμε κάτι παράξενο: δίνουμε <b>μηχανές ως είσοδο σε άλλες μηχανές</b>. Κάθε αυτόματο ή μηχανή είναι τελικά μια συμβολοσειρά — τη γράφουμε <code>⟨M⟩</code>. Και έτσι μπορούμε να ρωτήσουμε ερωτήσεις για προγράμματα, με προγράμματα.`},
+ {box:'ok',t:'Τα εύκολα: αυτά ΛΥΝΟΝΤΑΙ',c:`<b>L_DFA = {⟨A, w⟩ | το DFA A δέχεται τη w}</b> — ΑΠΟΦΑΣΙΣΙΜΗ.<br>
+   Γιατί; Προσομοιώνεις το A πάνω στη w. Το DFA διαβάζει ακριβώς |w| σύμβολα και σταματά. <b>Πάντα</b> τερματίζεις.<br><br>
+   Ομοίως αποφασίσιμα: το ίδιο για αυτόματα στοίβας, «είναι κενή η L(A);» για DFA, «L(A) = L(B);» για DFA, και η συνεκτικότητα γράφου.`},
+ {box:'warn',t:'Το δύσκολο: αυτό ΔΕΝ λύνεται',c:`<b>L_TM = {⟨M, w⟩ | η μηχανή Turing M δέχεται τη w}</b><br><br>
+   <b>ΕΙΝΑΙ</b> Turing-αναγνωρίσιμη: η «καθολική μηχανή» προσομοιώνει την M πάνω στη w.<br>
+   <b>ΔΕΝ ΕΙΝΑΙ</b> Turing-αποφασίσιμη.<br><br>
+   Η διαφορά είναι ακριβώς η εξής: αν η M κολλήσει σε ατέρμονο βρόχο, ο προσομοιωτής κολλάει μαζί της. Και <b>δεν υπάρχει τρόπος να καταλάβεις εκ των προτέρων</b> αν θα κολλήσει.`},
+ {h:'Η απόδειξη — διαγωνιοποίηση'},
+ {p:`Είναι η πιο κομψή απόδειξη του μαθήματος και βγαίνει σε τέσσερις γραμμές. Ακολούθα τη λογική, δεν χρειάζεται να την «αποστηθίσεις»:`},
+ {box:'def',t:'Το επιχείρημα',c:`<b>1.</b> Έστω ότι υπάρχει μηχανή <b>H</b> που αποφασίζει την L_TM.<br>
+   <b>2.</b> Φτιάχνω μηχανή <b>D</b> που παίρνει ⟨M⟩ και κάνει το <b>αντίθετο</b>: <i>απορρίπτει</i> την ⟨M⟩ ακριβώς όταν η M <i>δέχεται</i> την ⟨M⟩.<br>
+   <b>3.</b> Τρέχω τη <b>D πάνω στον εαυτό της</b>: η D απορρίπτει την ⟨D⟩ ⟺ η D δέχεται την ⟨D⟩.<br>
+   <b>4.</b> <b>ΑΤΟΠΟ.</b> Άρα δεν υπάρχει η D, άρα δεν υπάρχει ούτε η H.`},
+ {p:`Είναι η ίδια ιδέα με το «ο κουρέας που ξυρίζει ακριβώς όσους δεν ξυρίζονται μόνοι τους — ποιος ξυρίζει τον κουρέα;»`},
+ {h:'Γιατί ΠΡΕΠΕΙ να υπάρχουν άλυτα προβλήματα'},
+ {box:'idea',t:'Μέτρημα',c:`Κάθε <b>μηχανή Turing είναι μια συμβολοσειρά</b> ⇒ οι μηχανές είναι όσοι και οι φυσικοί αριθμοί (αριθμήσιμα άπειρες).<br><br>
+   Κάθε <b>πρόβλημα είναι μια γλώσσα</b>, δηλαδή ένα υποσύνολο του Σ* ⇒ τα προβλήματα είναι <b>υπεραριθμήσιμα</b> άπειρα.<br><br>
+   Άρα υπάρχουν «πολύ περισσότερα» προβλήματα από μηχανές. Δεν φτάνουν οι μηχανές — αναγκαστικά κάποια προβλήματα μένουν άλυτα.`},
+ {p:`Τώρα κατάταξε γλώσσες στη σωστή κλάση. Σκέψου κάθε φορά: <i>«τι μνήμη χρειάζομαι για να το ελέγξω;»</i>`},
+ {w:'wClassify',c:{items:[
+   {L:'{w | η w τελειώνει σε 01}',a:0,e:'Χρειάζεσαι να θυμάσαι μόνο τα δύο τελευταία σύμβολα — πεπερασμένη μνήμη, άρα DFA.'},
+   {L:'{0ⁿ1ⁿ | n ≥ 0}',a:1,e:'Χρειάζεται μέτρημα ⇒ όχι κανονική. Αλλά μια στοίβα αρκεί (S → 0S1 | ε) ⇒ χωρίς συμφραζόμενα.'},
+   {L:'{aⁿbⁿcⁿ | n ≥ 0}',a:2,e:'Τρεις μετρήσεις — η μία στοίβα δεν φτάνει. Είναι όμως εύκολα αποφασίσιμη με μηχανή Turing (σβήνεις τριάδες).'},
+   {L:'{u·u | u ∈ Σ*}',a:2,e:'Η στοίβα αντιστρέφει, άρα δεν πιάνει την επανάληψη ⇒ όχι CFL. Με ΤΜ όμως συγκρίνεις εύκολα τα δύο μισά.'},
+   {L:'L_TM = {⟨M,w⟩ | η M δέχεται τη w}',a:3,e:'Αναγνωρίσιμη (καθολική μηχανή) αλλά ΟΧΙ αποφασίσιμη — αυτό αποδεικνύει η διαγωνιοποίηση.'},
+   {L:'{w | η w έχει ίσο πλήθος 0 και 1}',a:1,e:'Δεν είναι κανονική (λήμμα άντλησης), αλλά είναι CFL: μετράς τη διαφορά στη στοίβα.'}]}},
+ {box:'def',t:'Το θεώρημα-κλειδί',c:`<b>A αποφασίσιμη ⟺ η A είναι αναγνωρίσιμη ΚΑΙ το συμπλήρωμά της Ā είναι αναγνωρίσιμο.</b><br><br>
+   Γιατί; Τρέχεις τις δύο μηχανές <b>παράλληλα</b>. Κάθε λέξη ανήκει σε ακριβώς μία από τις δύο, άρα κάποια θα δεχθεί σε πεπερασμένο χρόνο. Τερματίζεις πάντα.<br><br>
+   <b>Πόρισμα:</b> το συμπλήρωμα της L_TM δεν είναι ούτε καν αναγνωρίσιμο.`},
+ {q:{q:'«Τα NP-πλήρη προβλήματα είναι Turing-αναγνωρίσιμα αλλά όχι Turing-αποφασίσιμα.» Σωστό;',
+   o:['Σωστό','Λάθος — είναι ΑΠΟΦΑΣΙΣΙΜΑ· απλώς δεν ξέρουμε αν λύνονται γρήγορα','Σωστό, γιατί δεν υπάρχει πολυωνυμικός αλγόριθμος','Δεν έχει νόημα'],a:1,
+   e:'Μεγάλη παγίδα από παλιά θέματα. Η NP-πληρότητα αφορά ΤΑΧΥΤΗΤΑ, όχι ΥΠΑΡΞΗ αλγορίθμου. Το CLIQUE λύνεται με εξαντλητικό έλεγχο — τερματίζει πάντα, απλώς αργεί εκθετικά.'}}
+]});
+
+/* ---------------- 10 ---------------- */
+L.push({t:'Αναγωγές', s:'Πώς μολύνεις ένα πρόβλημα με τη δυσκολία ενός άλλου', b:[
+ {p:`Έχεις <b>ένα</b> αποδεδειγμένα άλυτο πρόβλημα: την L_TM. Η αναγωγή είναι το εργαλείο που μετατρέπει αυτό το ένα σε <b>δεκάδες</b> άλυτα προβλήματα, χωρίς να ξανακάνεις διαγωνιοποίηση.`},
+ {box:'def',t:'Τι σημαίνει «το Α ανάγεται στο Β» (A ≤ B)',c:`<b>Αν ξέρω να λύνω το Β, ξέρω να λύνω και το Α.</b><br><br>
+   Τυπικά: υπάρχει <b>υπολογίσιμη</b> συνάρτηση f με <code>w ∈ A ⟺ f(w) ∈ B</code>. Μετατρέπεις κάθε ερώτηση για το Α σε ερώτηση για το Β.`},
+ {box:'idea',t:'Καθημερινή αναλογία',c:`«Το να βρω τη διεύθυνσή σου <b>ανάγεται</b> στο να βρω το τηλέφωνό σου», γιατί αν έχω το τηλέφωνο μπορώ να πάρω και να ρωτήσω.<br><br>
+   Συμπέρασμα: το να βρω διεύθυνση <b>δεν είναι δυσκολότερο</b> από το να βρω τηλέφωνο.`},
+ {box:'warn',t:'Η κατεύθυνση είναι ΤΟ ΠΑΝ',c:`Όταν A ≤ B ισχύουν <b>δύο</b> πράγματα (είναι αντιθετοαναστροφές, δηλαδή το ίδιο πράγμα):<br><br>
+   <b>Β επιλύσιμο ⇒ Α επιλύσιμο</b> &nbsp;(η ευκολία πάει προς τα ΠΙΣΩ)<br>
+   <b>Α μη επιλύσιμο ⇒ Β μη επιλύσιμο</b> &nbsp;(η δυσκολία πάει προς τα ΕΜΠΡΟΣ)<br><br>
+   Άρα: για να δείξεις ότι το <b>Γ είναι ΜΗ επιλύσιμο</b>, βάζεις το <b>Γ δεξιά</b>: L_TM ≤ Γ.<br>
+   Για να δείξεις ότι το <b>Γ ΕΙΝΑΙ επιλύσιμο</b>, βάζεις το <b>Γ αριστερά</b>: Γ ≤ (κάτι γνωστό επιλύσιμο).`},
+ {h:'Το μοτίβο — είναι πάντα το ίδιο'},
+ {p:`Κάθε απόδειξη μη επιλυσιμότητας έχει την ίδια σκελετική δομή. Χτίζεις μια <b>ενδιάμεση μηχανή</b> που «κρύβει» μέσα της την ερώτηση «δέχεται η M τη w;»:`},
+ {w:'wReduce',c:{items:[
+  {B:'HALT_TM = {⟨M,w⟩ | η M τερματίζει με είσοδο w}',
+   o:['Μια μηχανή M′ που τρέχει την M στο x· αν δεχθεί, δέχεται· αν ΔΕΝ δεχθεί, μπαίνει σε ατέρμονο βρόχο',
+      'Την ίδια την M, χωρίς αλλαγή',
+      'Μια μηχανή που τερματίζει πάντα'],
+   a:0,
+   e:'Μετατρέπεις την «απόρριψη» σε «βρόχο». Έτσι: η M δέχεται τη w ⟺ η M′ τερματίζει με είσοδο w. Η ταυτοτική δεν δουλεύει, γιατί μια μηχανή μπορεί να τερματίζει ΑΠΟΡΡΙΠΤΟΝΤΑΣ.'},
+  {B:'E_TM = {⟨M⟩ | L(M) = ∅}',
+   o:['Την ίδια την M',
+      'Μια μηχανή T που με είσοδο x: αν x ≠ w απορρίπτει· αν x = w τρέχει την M στη w και δέχεται ανν η M δεχθεί',
+      'Μια μηχανή που δέχεται τα πάντα'],
+   a:1,
+   e:'Έτσι η γλώσσα της T είναι {w} αν η M δέχεται τη w, και ∅ αλλιώς. Η ερώτηση «είναι κενή;» γίνεται ακριβώς η ερώτηση «δέχεται η M τη w;».'},
+  {B:'REGULAR_TM = {⟨M⟩ | η L(M) είναι κανονική}',
+   o:['Μια μηχανή T που δέχεται μόνο τη w',
+      'Την ίδια την M',
+      'Μια μηχανή T που με είσοδο x: αν το x έχει μορφή 0ⁿ1ⁿ δέχεται· αλλιώς τρέχει την M στη w και δέχεται ανν η M δεχθεί'],
+   a:2,
+   e:'Το τέχνασμα: αν η M δέχεται τη w, η T δέχεται ΤΑ ΠΑΝΤΑ (L = Σ*, κανονική). Αν όχι, δέχεται μόνο τις 0ⁿ1ⁿ (ΜΗ κανονική). Η ερώτηση «είναι κανονική;» απαντά την «δέχεται η M τη w;».'}],
+  done:`Το είδες: η ενδιάμεση μηχανή είναι πάντα <b>φτιαγμένη ώστε η ιδιότητα που μας ενδιαφέρει να εξαρτάται αποκλειστικά από το αν η M δέχεται τη w</b>. Αυτή είναι όλη η τέχνη.`}},
+ {box:'ok',t:'Θεώρημα Rice — το μεγάλο κανόνι',c:`<b>Το να αποφασιστεί οποιαδήποτε (μη τετριμμένη) ιδιότητα της ΓΛΩΣΣΑΣ που αναγνωρίζει μια ΤΜ είναι μη επιλύσιμο.</b><br><br>
+   Με ένα χτύπημα: είναι κενή; πεπερασμένη; κανονική; χωρίς συμφραζόμενα; αποφασίσιμη; — <b>όλα άλυτα</b>.<br><br>
+   <b>ΠΡΟΣΟΧΗ:</b> αφορά ιδιότητες της <i>γλώσσας</i> L(M), όχι της <i>μηχανής</i>. Το «έχει η M πάνω από 5 καταστάσεις;» είναι απολύτως επιλύσιμο — απλώς μετράς στην κωδικοποίηση.`},
+ {q:{q:'Ποια από αυτές τις ερωτήσεις για μηχανή Turing M είναι ΕΠΙΛΥΣΙΜΗ;',
+   o:['Τερματίζει η M με κενή ταινία;','Είναι κανονική η L(M);','Έχει η M πάνω από 10 καταστάσεις;','Δέχεται η M έστω μία λέξη;'],a:2,
+   e:'Οι άλλες τρεις αφορούν τη ΣΥΜΠΕΡΙΦΟΡΑ / τη γλώσσα της μηχανής και είναι μη επιλύσιμες (Rice). Το πλήθος καταστάσεων είναι απλή ΣΥΝΤΑΚΤΙΚΗ ιδιότητα: διαβάζεις την ⟨M⟩ και μετράς.'}},
+ {box:'warn',t:'Μια λεπτομέρεια που ρωτιέται',c:`Ισχύει <b>L_TM ≤ συμπλήρωμα(E_TM)</b>, <b>ΟΧΙ</b> L_TM ≤ E_TM.<br><br>
+   Η κατασκευή δίνει «η M δέχεται τη w ⟺ η L(T) <b>δεν</b> είναι κενή». Η άρνηση σε πετάει στο συμπλήρωμα. Ο βαθύτερος λόγος: η L_TM είναι αναγνωρίσιμη ενώ η E_TM δεν είναι, και η αναγωγή μεταφέρει αναγνωρισιμότητα προς τα εμπρός.`},
+ {tf:{items:[
+   {s:'Αν A ≤ B και το B είναι επιλύσιμο, τότε και το A είναι επιλύσιμο',t:true,
+    e:'Σωστό — αυτό είναι το βασικό θεώρημα. Μετατρέπεις το w σε f(w) και τρέχεις τον αλγόριθμο του B.'},
+   {s:'Αν A ≤ B τότε το B είναι μη επιλύσιμο',t:false,
+    e:'Λάθος. Η αναγωγή από μόνη της δεν λέει τίποτα για κανένα από τα δύο ξεχωριστά — μιλάει μόνο για τη ΣΧΕΤΙΚΗ δυσκολία. Χρειάζεσαι επιπλέον ότι το A είναι μη επιλύσιμο.'},
+   {s:'A μη επιλύσιμο ⟺ το συμπλήρωμα Ā μη επιλύσιμο',t:true,
+    e:'Σωστό. Οι ΑΠΟΦΑΣΙΣΙΜΕΣ γλώσσες είναι κλειστές ως προς το συμπλήρωμα (αντιστρέφεις αποδοχή/απόρριψη). Προσοχή: για τις ΑΝΑΓΝΩΡΙΣΙΜΕΣ δεν ισχύει.'}]}}
+]});
+
+/* ---------------- 11 ---------------- */
+L.push({t:'Πολυπλοκότητα: P και NP', s:'Από «λύνεται;» σε «λύνεται γρήγορα;»', b:[
+ {p:`Αλλάζουμε ερώτηση. Μέχρι τώρα ρωτούσαμε <b>«λύνεται καθόλου;»</b>. Τώρα ρωτάμε <b>«λύνεται γρήγορα;»</b> — και όλα τα προβλήματα εδώ είναι αποφασίσιμα.`},
+ {box:'warn',t:'Μην τα μπερδέψεις',c:`<b>Υπολογισιμότητα:</b> υπάρχει αλγόριθμος; (Halting Problem: <b>όχι</b>)<br>
+   <b>Πολυπλοκότητα:</b> υπάρχει <i>γρήγορος</i> αλγόριθμος; (CLIQUE: υπάρχει αλγόριθμος, αλλά <b>δεν ξέρουμε</b> αν υπάρχει γρήγορος)<br><br>
+   Από εδώ βγαίνει το κλασικό λάθος «τα NP-πλήρη δεν είναι αποφασίσιμα». Είναι.`},
+ {h:'Γιατί «πολυωνυμικό» και όχι κάτι άλλο'},
+ {p:`Σύρε τον διακόπτη και δες γιατί η γραμμή τραβιέται ακριβώς εκεί:`},
+ {w:'wGrowth',c:{}},
+ {box:'def',t:'Οι ορισμοί',c:`<b>f(n) = O(g(n))</b>: υπάρχουν σταθερά c και n₀ ώστε f(n) ≤ c·g(n) για κάθε n ≥ n₀. Δηλαδή «από κάποιο σημείο και μετά, το πολύ τόσο».<br><br>
+   <b>Χρόνος μιας ΤΜ</b> = ο <b>μέγιστος</b> αριθμός βημάτων σε είσοδο μήκους n (χειρότερη περίπτωση).<br><br>
+   <b>P</b> = οι γλώσσες που <b>αποφασίζονται</b> σε πολυωνυμικό χρόνο από <b>ντετερμινιστική</b> ΤΜ. Δηλαδή P = ∪ₖ TIME(nᵏ).`},
+ {q:{q:'Έστω f(n) = 3n⁴ + 1000n³ + 50000. Τι ισχύει;',
+   o:['f(n) = O(n³)','f(n) = O(n⁴) και f(n) = O(n⁵), αλλά f(n) ≠ O(n³)','f(n) = O(n) γιατί αγνοούμε σταθερές','f(n) = O(n⁴) και τίποτε άλλο'],a:1,
+   e:'Μετράει μόνο ο μεγαλύτερος όρος: n⁴. Και επειδή το O είναι ΑΝΩ φράγμα, ισχύει και για κάθε μεγαλύτερη δύναμη. Δεν ισχύει για n³, γιατί το n⁴ τελικά ξεπερνά κάθε c·n³.'}},
+ {box:'ok',t:'Τι ξέρουμε για το P',c:`Κλειστό ως προς: συμπλήρωμα, ένωση, τομή, παράθεση, Kleene star.<br>
+   Οι <b>κανονικές</b> γλώσσες ⊆ P (τρέχεις το DFA σε χρόνο O(|w|)).<br>
+   Οι <b>χωρίς συμφραζόμενα</b> ⊆ P (υπάρχει πολυωνυμικός αλγόριθμος για το «x ∈ L(G);»).<br>
+   Το πλήθος <b>ταινιών δεν επηρεάζει</b> το P (τετραγωνικό κόστος). Ο <b>μη ντετερμινισμός επηρεάζει</b> (εκθετικό κόστος).`},
+ {h:'NP και NP-πληρότητα'},
+ {box:'def',t:'Οι ορισμοί που πρέπει να ξέρεις ακριβώς',c:`<b>A ≤ₚ B</b> (πολυωνυμική αναγωγή): υπάρχει <b>πολυωνυμικά υπολογίσιμη</b> f με w ∈ A ⟺ f(w) ∈ B.<br><br>
+   <b>Η L είναι NP-πλήρης</b> αν ισχύουν <b>ΚΑΙ ΤΑ ΔΥΟ</b>:<br>
+   &nbsp;&nbsp;<b>(α)</b> L ∈ NP, και<br>
+   &nbsp;&nbsp;<b>(β)</b> κάθε γλώσσα του NP ανάγεται πολυωνυμικά στην L.`},
+ {box:'idea',t:'Cook-Levin',c:`Το <b>SAT είναι NP-πλήρες</b> — το πρώτο, από το οποίο βγαίνουν όλα τα άλλα.<br><br>
+   Η απόδειξη κωδικοποιεί ολόκληρο τον υπολογισμό μιας μη ντετερμινιστικής μηχανής ως έναν πίνακα (<i>tableau</i>) και φτιάχνει τύπο <code>φ = φ_cell ∧ φ_start ∧ φ_accept ∧ φ_move</code> που ικανοποιείται ακριβώς όταν υπάρχει αποδεκτός υπολογισμός.`},
+ {box:'ok',t:'Πώς δείχνεις ότι κάτι ΝΕΟ είναι NP-πλήρες',c:`Αν <b>(α)</b> η A είναι NP-πλήρης, <b>(β)</b> η B ∈ NP και <b>(γ)</b> <b>A ≤ₚ B</b>, τότε η B είναι NP-πλήρης.<br><br>
+   <b>Πρόσεξε τη φορά:</b> το ΓΝΩΣΤΟ NP-πλήρες ανάγεται <b>ΣΤΟ</b> νέο. Αν το κάνεις ανάποδα δεν αποδεικνύεις τίποτα.`},
+ {h:'3SAT → CLIQUE: δες την αναγωγή να συμβαίνει'},
+ {p:`Κάθε literal γίνεται κόμβος. Βάζουμε ακμή ανάμεσα σε literals <b>διαφορετικών ρητρών</b>, εκτός αν είναι αντίθετα (x και ¬x). Θέτουμε <b>k = πλήθος ρητρών</b>.<br><br>
+   Πάτησε τους διακόπτες και βρες μια ανάθεση που ικανοποιεί τον τύπο — θα δεις την κλίκα να εμφανίζεται:`},
+ {w:'wClique',c:{vars:['x1','x2','x3'],
+   clauses:[['x1','x2','!x3'],['!x1','x2','x3'],['x1','!x2','x3']]}},
+ {box:'idea',t:'Γιατί δουλεύει',c:`Μια κλίκα μεγέθους k <b>πρέπει</b> να πάρει έναν κόμβο από κάθε ρήτρα (δεν υπάρχουν ακμές μέσα στην ίδια ρήτρα) και <b>δεν μπορεί</b> να πάρει αντιφατικά literals. Αυτό είναι ακριβώς μια συνεπής ανάθεση που ικανοποιεί κάθε ρήτρα.<br><br>
+   <b>φ ικανοποιήσιμος ⟺ ο G έχει k-κλίκα.</b> Και ο γράφος κατασκευάζεται σε πολυωνυμικό χρόνο. Τέλος απόδειξης.`},
+ {tf:{items:[
+   {s:'Αν αποδειχθεί ότι ένα NP-πλήρες πρόβλημα ανήκει στο P, τότε P = NP',t:true,
+    e:'Σωστό. Κάθε A ∈ NP ανάγεται πολυωνυμικά σε αυτό· αν αυτό είναι στο P, τότε και το A. Άρα NP ⊆ P, και μαζί με το προφανές P ⊆ NP παίρνεις ισότητα.'},
+   {s:'Αν P = NP τότε το «έχει ο γράφος G k-κλίκα;» λύνεται σε πολυωνυμικό χρόνο',t:true,
+    e:'Σωστό. Το CLIQUE ∈ NP, άρα αν NP ⊆ P τότε CLIQUE ∈ P.'},
+   {s:'«Αν P ≠ NP τότε η ΤΜ χρειάζεται εκθετικά βήματα για το CLIQUE, γιατί θα κοιτάει κάθε σύνολο k κορυφών»',t:false,
+    e:'Το ΣΥΜΠΕΡΑΣΜΑ είναι σωστό, αλλά η ΑΙΤΙΟΛΟΓΗΣΗ όχι. Το ότι ο εξαντλητικός αλγόριθμος είναι εκθετικός δεν αποδεικνύει ότι ΚΑΘΕ αλγόριθμος είναι. Οι εξετάσεις ρωτούν ακριβώς αυτή τη διάκριση.'},
+   {s:'Υπάρχει αποφασίσιμη γλώσσα που δεν ανήκει στο P',t:true,
+    e:'Σωστό. Π.χ. η E = {⟨M,w⟩ | η M δέχεται τη w μέσα σε 2^|w| βήματα}, με απόδειξη διαγωνιοποίησης.'}]}},
+ {box:'ok',t:'Τελείωσες!',c:`Αυτή είναι όλη η ύλη σε 11 βήματα: από «τι είναι λέξη» μέχρι το P vs NP.<br><br>
+   Τώρα άνοιξε το <b>test.html</b> και δούλεψε τις 283 ερωτήσεις — ξεκίνα με τα φίλτρα <b>SOS</b> και <b>Παγίδες</b>, εκεί είναι που κερδίζονται οι μονάδες.`}
+]});
+/* =========================================================
+   ΕΦΑΡΜΟΓΗ
+   ========================================================= */
+const ST = { ch:0, done:{} };            // done: 'ch:idx' -> true
+
+function markDone(el){
+  const k = el.dataset.key;
+  if(k && !ST.done[k]){ ST.done[k] = true; paint(); }
+}
+function totalTasks(){
+  let n = 0; L.forEach(c => c.b.forEach(b => { if(b.q||b.tf||b.w) n++; })); return n;
+}
+function chTasks(i){ return L[i].b.filter(b => b.q||b.tf||b.w).length; }
+function chDone(i){ return Object.keys(ST.done).filter(k => k.startsWith(i+':')).length; }
+
+function paint(){
+  const tot = totalTasks(), dn = Object.keys(ST.done).length;
+  $('#pbar').style.width = (dn/tot*100)+'%';
+  $('#pinfo').textContent = dn+' από '+tot+' δραστηριότητες';
+  $('#topbar').style.width = ((ST.ch+1)/L.length*100)+'%';
+  $$('#nav .navi').forEach((b,i)=>{
+    b.classList.toggle('on', i===ST.ch);
+    const c = chDone(i), t = chTasks(i);
+    b.classList.toggle('done', t>0 && c>=t);
+    b.querySelector('.dot').textContent = (t>0 && c>=t) ? '✓' : (i+1);
+  });
+}
+
+function buildNav(){
+  $('#nav').innerHTML = L.map((c,i)=>
+    `<button class="navi" data-i="${i}"><span class="dot">${i+1}</span><span>${c.t}</span></button>`).join('');
+  $$('#nav .navi').forEach(b => b.onclick = () => go(+b.dataset.i));
+}
+
+function render(){
+  const c = L[ST.ch], m = $('#main');
+  let h = `<div class="card"><div class="crumb">Κεφάλαιο ${ST.ch+1} από ${L.length}</div>
+    <h2>${c.t}</h2><p class="lead">${c.s}</p>`;
+  c.b.forEach((b,i)=>{
+    const key = ST.ch+':'+i;
+    if(b.h)      h += `<h3>${b.h}</h3>`;
+    else if(b.p) h += `<p>${b.p}</p>`;
+    else if(b.box) h += `<div class="box ${b.box}"><span class="t">${b.t}</span>${b.c}</div>`;
+    else if(b.w || b.q || b.tf) h += `<div id="slot${i}" data-key="${key}"></div>`;
+  });
+  h += `<div class="foot">
+      <button class="btn" id="prevC"${ST.ch===0?' disabled':''}>← Προηγούμενο</button>
+      <button class="btn pri" id="nextC"${ST.ch===L.length-1?' disabled':''}>Επόμενο κεφάλαιο →</button>
+      <span class="sp hint">${chDone(ST.ch)}/${chTasks(ST.ch)} δραστηριότητες σε αυτό το κεφάλαιο</span>
+    </div></div>`;
+  m.innerHTML = h;
+
+  c.b.forEach((b,i)=>{
+    const el = $('#slot'+i); if(!el) return;
+    try{
+      if(b.q)  wQuiz(el, b.q);
+      else if(b.tf) wTF(el, b.tf);
+      else if(b.w) window[b.w](el, b.c||{});
+    }catch(err){ el.innerHTML = `<div class="res bad">Σφάλμα widget: ${err.message}</div>`; console.error(b.w, err); }
+    if(ST.done[ST.ch+':'+i]) el.style.opacity = 1;
+  });
+
+  const p = $('#prevC'), n = $('#nextC');
+  if(p) p.onclick = () => go(ST.ch-1);
+  if(n) n.onclick = () => go(ST.ch+1);
+  paint();
+}
+function go(i){
+  if(i<0 || i>=L.length) return;
+  ST.ch = i; render(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* theme + save/load */
+$('#themeB').onclick = e => {
+  document.body.classList.toggle('dark');
+  e.target.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+};
+$('#saveB').onclick = () => {
+  const blob = new Blob([JSON.stringify({v:1, ch:ST.ch, done:ST.done})], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'proodos-mathima.json'; a.click();
+  URL.revokeObjectURL(a.href);
+};
+$('#loadB').onclick = () => $('#loadF').click();
+$('#loadF').onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { try{
+      const d = JSON.parse(r.result);
+      if(d && d.done){ ST.done = d.done; ST.ch = d.ch||0; render(); }
+      else alert('Το αρχείο δεν έχει τη σωστή μορφή.');
+    }catch(_){ alert('Δεν μπόρεσα να διαβάσω το αρχείο.'); } };
+  r.readAsText(f); e.target.value = '';
+};
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT') return;
+  if(e.key === 'ArrowRight' && ST.ch < L.length-1) go(ST.ch+1);
+  if(e.key === 'ArrowLeft'  && ST.ch > 0)          go(ST.ch-1);
+});
+
+buildNav();
+render();
+</script>
+</body>
+</html>
