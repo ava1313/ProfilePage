@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Θεωρία Υπολογισμού — Το Παιχνίδι</title>
+<style>
+:root{
+  --bg:#f2f4fb; --card:#fff; --ink:#1b1e2b; --mut:#7b8296; --line:#e4e7f2;
+  --br:#5b53d6; --ok:#22c55e; --okd:#16a34a; --bad:#ef4444; --badd:#dc2626;
+  --gold:#f59e0b; --shadow:0 2px 0 var(--line),0 10px 28px rgba(20,24,60,.07);
+}
+body.dark{ --bg:#11131b; --card:#1a1d27; --ink:#eaecf4; --mut:#949bb0; --line:#2b3040;
+  --br:#8b83ff; --shadow:0 2px 0 var(--line),0 10px 28px rgba(0,0,0,.35); }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ---------- shell ---------- */
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;position:relative}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 16px 8px;
+  display:flex;align-items:center;gap:10px}
+.hearts{font-size:19px;letter-spacing:1px}
+.streak{display:flex;align-items:center;gap:4px;font-weight:800;font-size:15px;color:var(--gold)}
+.xp{margin-inline-start:auto;font-weight:800;font-size:14px;color:var(--br)}
+.iconb{border:0;background:transparent;font-size:20px;cursor:pointer;padding:2px 4px;line-height:1}
+.pbar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;flex:1}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),#4ade80);
+  border-radius:99px;transition:width .35s cubic-bezier(.3,1.4,.5,1)}
+.body{flex:1;padding:8px 16px 130px}
+
+/* ---------- map ---------- */
+.hero{text-align:center;padding:14px 10px 20px}
+.hero h1{font-size:26px;margin:0 0 4px;font-weight:850;letter-spacing:-.6px}
+.hero p{margin:0;color:var(--mut);font-size:14px}
+.wcard{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:20px;
+  padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);cursor:pointer;
+  border:2px solid transparent;transition:transform .12s,border-color .15s;position:relative}
+.wcard:active{transform:scale(.985)}
+.wcard.lock{opacity:.5;cursor:not-allowed}
+.wcard.done{border-color:var(--ok)}
+.wemo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;flex:none}
+.wtxt{flex:1;min-width:0}
+.wtxt b{display:block;font-size:16px;font-weight:800;letter-spacing:-.2px}
+.wtxt small{color:var(--mut);font-size:12.5px;font-weight:600}
+.ring{width:44px;height:44px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:11.5px;font-weight:800}
+
+/* ---------- level card ---------- */
+.stage{animation:pop .3s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.qtitle{font-size:13px;font-weight:800;color:var(--mut);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:10px}
+.qbig{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1.3;margin-bottom:6px}
+.qsub{font-size:15.5px;color:var(--mut);margin-bottom:16px}
+.facticon{font-size:52px;text-align:center;margin:6px 0 12px}
+.factbox{background:var(--card);border-radius:20px;padding:22px 20px;box-shadow:var(--shadow);
+  text-align:center;margin-bottom:14px}
+.factbox .big{font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.35}
+.factbox .sm{font-size:15px;color:var(--mut);margin-top:9px}
+.tip{background:var(--card);border-radius:16px;padding:13px 16px;box-shadow:var(--shadow);
+  font-size:14.5px;margin-bottom:14px}
+.tip b{color:var(--br)}
+
+/* ---------- options ---------- */
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:block;width:100%;text-align:start;background:var(--card);color:var(--ink);
+  border:2px solid var(--line);border-bottom-width:4px;border-radius:16px;padding:15px 17px;
+  font-size:16.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:.12s;line-height:1.35}
+.opt:active:not(:disabled){transform:translateY(2px);border-bottom-width:2px}
+.opt:disabled{cursor:default}
+.opt.sel{border-color:var(--br);background:color-mix(in srgb,var(--br) 10%,var(--card))}
+.opt.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--card));color:var(--okd)}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--card));color:var(--badd)}
+.opt.fade{opacity:.45}
+body.dark .opt.good{color:#86efac} body.dark .opt.bad{color:#fca5a5}
+.opts.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts.two .opt{text-align:center;font-size:18px;padding:18px 10px}
+
+/* chips for tap-levels */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{background:var(--card);border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;
+  padding:12px 16px;font-size:17px;font-weight:800;cursor:pointer;font-family:ui-monospace,Menlo,monospace;
+  color:var(--ink);transition:.12s}
+.chip:active:not(:disabled){transform:translateY(2px);border-bottom-width:2px}
+.chip.sel{border-color:var(--br);background:color-mix(in srgb,var(--br) 12%,var(--card))}
+.chip.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--card))}
+.chip.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 16%,var(--card))}
+.chip.miss{border-color:var(--ok);border-style:dashed}
+
+/* ---------- automaton / tape ---------- */
+.viz{background:var(--card);border-radius:18px;padding:12px 8px;box-shadow:var(--shadow);
+  margin-bottom:14px;overflow-x:auto}
+svg.au{display:block;margin:0 auto;max-width:100%}
+.st circle{fill:var(--card);stroke:var(--ink);stroke-width:2.2;transition:.25s}
+.st.on circle{fill:var(--br);stroke:var(--br)}
+.st.on text{fill:#fff}
+.st text{font-size:13px;font-weight:800;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.ed{stroke:var(--mut);stroke-width:1.8;fill:none;marker-end:url(#a1);transition:.2s}
+.ed.on{stroke:var(--br);stroke-width:3.4}
+.el{font-size:12.5px;font-weight:800;fill:var(--mut);text-anchor:middle}
+.el.on{fill:var(--br)}
+.tape{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:12px 0 4px}
+.cel{width:38px;height:44px;border:2px solid var(--line);border-radius:10px;display:grid;place-items:center;
+  font-family:ui-monospace,Menlo,monospace;font-size:18px;font-weight:800;transition:.2s;background:var(--card)}
+.cel.past{opacity:.35}
+.cel.now{border-color:var(--br);background:color-mix(in srgb,var(--br) 12%,var(--card));transform:translateY(-4px)}
+.stk{display:flex;flex-direction:column-reverse;gap:3px;align-items:center;min-height:44px;justify-content:flex-end}
+.stk .cel{width:32px;height:30px;font-size:14px}
+
+/* ---------- bottom bar ---------- */
+.foot{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--card);
+  border-top:2px solid var(--line);padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+  transition:background .2s,border-color .2s}
+.foot .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.foot.good{background:color-mix(in srgb,var(--ok) 15%,var(--card));border-color:var(--ok)}
+.foot.bad{background:color-mix(in srgb,var(--bad) 15%,var(--card));border-color:var(--bad)}
+.fmsg{flex:1;min-width:0;font-size:14.5px;font-weight:600}
+.fmsg b{display:block;font-size:17px;font-weight:850;margin-bottom:1px}
+.foot.good .fmsg b{color:var(--okd)} .foot.bad .fmsg b{color:var(--badd)}
+body.dark .foot.good .fmsg b{color:#86efac} body.dark .foot.bad .fmsg b{color:#fca5a5}
+.go{border:0;border-radius:16px;padding:15px 26px;font-size:16.5px;font-weight:850;font-family:inherit;
+  cursor:pointer;background:var(--br);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:.12s;white-space:nowrap}
+.go:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.go:disabled{background:var(--line);color:var(--mut);box-shadow:none;cursor:default}
+.go.g{background:var(--okd)} .go.r{background:var(--badd)}
+.go.wide{width:100%;text-align:center}
+
+/* ---------- overlays ---------- */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(15,18,40,.55);backdrop-filter:blur(3px);
+  display:grid;place-items:center;padding:22px;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.ovc{background:var(--card);border-radius:26px;padding:30px 24px;max-width:400px;width:100%;
+  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop .35s cubic-bezier(.2,1.3,.4,1)}
+.ovc .em{font-size:62px;line-height:1;margin-bottom:10px}
+.ovc h2{font-size:24px;margin:0 0 6px;font-weight:850;letter-spacing:-.5px}
+.ovc p{margin:0 0 18px;color:var(--mut);font-size:15px}
+.stats{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
+.stat{background:var(--bg);border-radius:14px;padding:11px 16px;min-width:82px}
+.stat b{display:block;font-size:22px;font-weight:850;letter-spacing:-.5px}
+.stat span{font-size:11.5px;color:var(--mut);font-weight:700}
+
+/* animations */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}
+  40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .4s}
+@keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1)}}
+.bump{animation:bump .35s}
+.conf{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.conf i{position:absolute;width:9px;height:14px;border-radius:2px;animation:fall 1.5s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(640deg);opacity:0}}
+.center{text-align:center}
+.mini{font-size:12.5px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top" id="tbar"></div>
+  <div class="body" id="view"></div>
+</div>
+<div class="foot" id="foot" style="display:none"><div class="in" id="footin"></div></div>
+<script>
+/* =======================================================
+   ΜΙΚΡΟΣ ΚΙΝΗΤΗΡΑΣ ΑΥΤΟΜΑΤΩΝ
+   ======================================================= */
+const R=23, $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const nodeOf=(A,id)=>A.st.find(s=>s.id===id);
+
+function grp(A){ const g={};
+  A.ed.forEach(e=>{const k=e.f+'>'+e.t;(g[k]=g[k]||{f:e.f,t:e.t,s:[]}).s.push(e.l||e.s);});
+  return Object.values(g); }
+
+function path(A,g,bi){
+  const a=nodeOf(A,g.f), b=nodeOf(A,g.t);
+  if(g.f===g.t){ const x=a.x, y=a.y-R;
+    return {d:`M ${x-12} ${y+4} C ${x-29} ${y-36}, ${x+29} ${y-36}, ${x+12} ${y+4}`, lx:x, ly:y-28}; }
+  const dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L, px=-uy, py=ux;
+  const o = bi?16:0;
+  const sx=a.x+ux*R+px*o*.55, sy=a.y+uy*R+py*o*.55;
+  const ex=b.x-ux*(R+7)+px*o*.55, ey=b.y-uy*(R+7)+py*o*.55;
+  const mx=(a.x+b.x)/2+px*o, my=(a.y+b.y)/2+py*o;
+  return { d:o?`M ${sx} ${sy} Q ${mx} ${my} ${ex} ${ey}`:`M ${sx} ${sy} L ${ex} ${ey}`,
+           lx:mx+px*13, ly:my+py*13-2 };
+}
+
+function drawA(A, live, liveEd){
+  live=live||[]; liveEd=liveEd||[];
+  const gs=grp(A), pr=new Set(gs.map(g=>g.f+'|'+g.t));
+  let s=`<svg class="au" viewBox="0 0 ${A.w} ${A.h}" width="${A.w}" height="${A.h}"><defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/></marker></defs>`;
+  gs.forEach(g=>{
+    const bi = g.f!==g.t && pr.has(g.t+'|'+g.f), p=path(A,g,bi);
+    const on = liveEd.some(x=>x.f===g.f&&x.t===g.t);
+    s+=`<path class="ed${on?' on':''}" d="${p.d}" style="color:${on?'var(--br)':'var(--mut)'}"/>`;
+    s+=`<text class="el${on?' on':''}" x="${p.lx}" y="${p.ly}">${esc(g.s.join(','))}</text>`;
+  });
+  A.st.forEach(n=>{
+    if(n.i0){ s+=`<path class="ed" d="M ${n.x-R-22} ${n.y} L ${n.x-R-3} ${n.y}" style="color:var(--mut)"/>`; }
+    s+=`<g class="st${live.includes(n.id)?' on':''}">`;
+    if(n.f) s+=`<circle cx="${n.x}" cy="${n.y}" r="${R+5}" fill="none"/>`;
+    s+=`<circle cx="${n.x}" cy="${n.y}" r="${R}"/><text x="${n.x}" y="${n.y}">${esc(n.l)}</text></g>`;
+  });
+  return s+`</svg>`;
+}
+
+function ecl(A,set){ const o=new Set(set), st=[...set];
+  while(st.length){ const q=st.pop();
+    A.ed.filter(e=>e.f===q&&(e.s==='ε')).forEach(e=>{ if(!o.has(e.t)){o.add(e.t);st.push(e.t);} }); }
+  return [...o]; }
+function startS(A){ const s=A.st.find(x=>x.i0).id; return A.nd?ecl(A,[s]):[s]; }
+function stepS(A,cur,c){ let n=[],u=[];
+  cur.forEach(q=>A.ed.filter(e=>e.f===q&&e.s===c).forEach(e=>{ if(!n.includes(e.t))n.push(e.t); u.push({f:e.f,t:e.t}); }));
+  if(A.nd) n=ecl(A,n);
+  return {n,u}; }
+function accepts(A,w){ let c=startS(A);
+  for(const ch of w){ c=stepS(A,c,ch).n; if(!c.length) return false; }
+  return c.some(q=>nodeOf(A,q).f); }
+
+/* =======================================================
+   ΚΑΤΑΣΤΑΣΗ ΠΑΙΧΝΙΔΙΟΥ
+   ======================================================= */
+const G = { w:null, q:[], i:0, hearts:5, streak:0, xp:0, best:0,
+            done:{}, ans:null, locked:false, total:0, right:0 };
+
+const HMAX = 5;
+const view=$('#view'), tbar=$('#tbar'), foot=$('#foot'), footin=$('#footin');
+
+function save(){ return {v:1, xp:G.xp, best:G.best, done:G.done}; }
+function load(d){ if(!d) return; G.xp=d.xp||0; G.best=d.best||0; G.done=d.done||{}; }
+
+function worldDone(i){ return (G.done[i]||0) >= W[i].lv.length; }
+function unlocked(i){ return i===0 || worldDone(i-1); }
+function totalLv(){ return W.reduce((s,w)=>s+w.lv.length,0); }
+function totalDone(){ return Object.values(G.done).reduce((a,b)=>a+b,0); }
+
+/* =======================================================
+   ΧΑΡΤΗΣ ΚΟΣΜΩΝ
+   ======================================================= */
+function drawTop(){
+  if(G.w===null){
+    tbar.innerHTML = `<span class="xp" style="margin:0">⭐ ${G.xp} XP</span>
+      <span class="streak" style="margin-inline-start:auto">🔥 ${G.best}</span>
+      <button class="iconb" onclick="doSave()" title="Αποθήκευση">💾</button>
+      <button class="iconb" onclick="doLoad()" title="Φόρτωση">📂</button>
+      <button class="iconb" onclick="toggleTheme(this)">🌙</button>`;
+  } else {
+    const pct = G.total ? Math.round(G.right/G.total*100) : 0;
+    tbar.innerHTML = `<button class="iconb" onclick="quit()">✕</button>
+      <div class="pbar"><i style="width:${pct}%"></i></div>
+      <span class="streak">🔥 ${G.streak}</span>
+      <span class="hearts" id="hh">${'❤️'.repeat(G.hearts)}${'🤍'.repeat(HMAX-G.hearts)}</span>`;
+  }
+}
+
+function drawMap(){
+  G.w=null; foot.style.display='none'; drawTop();
+  const td=totalDone(), tl=totalLv();
+  let h = `<div class="hero"><h1>Θεωρία Υπολογισμού</h1>
+    <p>${td} από ${tl} πίστες · ${W.length} κόσμοι</p></div>`;
+  W.forEach((w,i)=>{
+    const d=G.done[i]||0, n=w.lv.length, pct=d/n, lock=!unlocked(i), fin=d>=n;
+    const c=2*Math.PI*18, off=c*(1-pct);
+    h += `<div class="wcard ${lock?'lock':''} ${fin?'done':''}" ${lock?'':`onclick="enter(${i})"`}>
+      <div class="wemo" style="background:${w.c}22">${lock?'🔒':w.e}</div>
+      <div class="wtxt"><b>${w.t}</b><small>${lock?'Τελείωσε πρώτα τον προηγούμενο':w.s}</small></div>
+      <div class="ring"><svg width="44" height="44">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--line)" stroke-width="5"/>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="${fin?'var(--ok)':w.c}" stroke-width="5"
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg>
+        <span>${fin?'✓':d+'/'+n}</span></div></div>`;
+  });
+  if(td>=tl) h += `<div class="factbox" style="margin-top:6px"><div class="facticon">🏆</div>
+    <div class="big">Τα τελείωσες όλα!</div>
+    <div class="sm">Τώρα άνοιξε το <b>test.html</b> και δούλεψε τις 304 ερωτήσεις — θα σου φανούν πολύ πιο εύκολες.</div></div>`;
+  h += `<div class="mini center" style="margin-top:18px">Η πρόοδος κρατιέται όσο η σελίδα είναι ανοιχτή.<br>Πάτα 💾 για να την κατεβάσεις.</div>`;
+  view.innerHTML=h;
+  window.scrollTo(0,0);
+}
+
+/* =======================================================
+   ΕΙΣΟΔΟΣ ΣΕ ΚΟΣΜΟ
+   ======================================================= */
+function enter(i){
+  G.w=i; G.q=W[i].lv.map((l,k)=>({l,k,retry:0})); G.i=0;
+  G.hearts=HMAX; G.streak=0; G.total=G.q.length; G.right=0; G.locked=false;
+  drawTop(); step();
+}
+function quit(){ drawMap(); }
+
+function step(){
+  if(G.i >= G.q.length){ finishWorld(); return; }
+  G.ans=null; G.locked=false;
+  foot.className='foot'; foot.style.display='none';
+  render(G.q[G.i].l);
+  window.scrollTo(0,0);
+}
+
+/* =======================================================
+   ΑΠΟΤΕΛΕΣΜΑ
+   ======================================================= */
+function judge(ok, msg, extra){
+  if(G.locked) return; G.locked=true;
+  const cur = G.q[G.i];
+  if(ok){
+    G.right++; G.streak++; G.xp += 10 + Math.min(G.streak,10);
+    if(G.streak > G.best) G.best = G.streak;
+    G.done[G.w] = Math.max(G.done[G.w]||0, 0);
+    foot.className='foot good';
+    footin.innerHTML = `<div class="fmsg"><b>${msg||'Σωστά!'}</b>${extra?extra:''}</div>
+      <button class="go g" onclick="next()">Συνέχεια</button>`;
+  } else {
+    G.hearts--; G.streak=0;
+    if(cur.retry===0){ cur.retry=1; G.q.push({l:cur.l,k:cur.k,retry:1}); G.total++; }
+    foot.className='foot bad';
+    footin.innerHTML = `<div class="fmsg"><b>${msg||'Όχι ακριβώς'}</b>${extra?extra:''}</div>
+      <button class="go r" onclick="next()">Κατάλαβα</button>`;
+    const hh=$('#hh'); if(hh){ hh.classList.add('bump'); setTimeout(()=>hh.classList.remove('bump'),400); }
+  }
+  foot.style.display='block'; drawTop();
+  if(!ok && G.hearts<=0) setTimeout(noHearts,700);
+}
+function next(){ G.i++; step(); }
+
+function noHearts(){
+  showOv(`<div class="em">💔</div><h2>Τέλειωσαν οι ζωές</h2>
+    <p>Δεν πειράζει — έτσι μαθαίνεις. Συνέχισε από εκεί που έμεινες.</p>
+    <button class="go wide" onclick="closeOv();G.hearts=3;drawTop()">Συνέχεια με 3 ❤️</button>
+    <button class="go wide" style="background:var(--line);color:var(--mut);margin-top:9px"
+      onclick="closeOv();drawMap()">Πίσω στον χάρτη</button>`);
+}
+
+function finishWorld(){
+  G.done[G.w] = W[G.w].lv.length;
+  confetti();
+  const acc = G.total ? Math.round(G.right/G.total*100) : 100;
+  const nx = G.w+1 < W.length;
+  showOv(`<div class="em">${acc>=90?'🏆':acc>=70?'🎉':'👏'}</div>
+    <h2>${W[G.w].t} ✓</h2><p>Τελείωσες τον κόσμο!</p>
+    <div class="stats">
+      <div class="stat"><b>${W[G.w].lv.length}</b><span>ΠΙΣΤΕΣ</span></div>
+      <div class="stat"><b>${acc}%</b><span>ΑΚΡΙΒΕΙΑ</span></div>
+      <div class="stat"><b>${G.xp}</b><span>XP</span></div></div>
+    ${nx?`<button class="go wide" onclick="closeOv();enter(${G.w+1})">Επόμενος κόσμος →</button>`:''}
+    <button class="go wide" style="${nx?'background:var(--line);color:var(--mut);margin-top:9px':''}"
+      onclick="closeOv();drawMap()">Χάρτης</button>`);
+}
+
+/* overlays + fx */
+function showOv(html){
+  const d=document.createElement('div'); d.className='ov'; d.id='ov';
+  d.innerHTML=`<div class="ovc">${html}</div>`; document.body.appendChild(d);
+}
+function closeOv(){ const o=$('#ov'); if(o) o.remove(); }
+function confetti(){
+  const c=document.createElement('div'); c.className='conf';
+  const cols=['#5b53d6','#22c55e','#f59e0b','#ef4444','#06b6d4','#a855f7'];
+  for(let i=0;i<70;i++){ const p=document.createElement('i');
+    p.style.left=Math.random()*100+'%'; p.style.top=-20+'px';
+    p.style.background=cols[i%cols.length];
+    p.style.animationDelay=(Math.random()*.5)+'s';
+    p.style.animationDuration=(1+Math.random())+'s'; c.appendChild(p); }
+  document.body.appendChild(c); setTimeout(()=>c.remove(),2600);
+}
+function toggleTheme(b){ document.body.classList.toggle('dark');
+  b.textContent = document.body.classList.contains('dark')?'☀️':'🌙'; }
+function doSave(){
+  const b=new Blob([JSON.stringify(save())],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='proodos-paixnidi.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+function doLoad(){
+  const f=document.createElement('input'); f.type='file'; f.accept='.json';
+  f.onchange=e=>{ const fl=e.target.files[0]; if(!fl) return; const r=new FileReader();
+    r.onload=()=>{ try{ load(JSON.parse(r.result)); drawMap(); }catch(_){ alert('Δεν διαβάστηκε το αρχείο.'); } };
+    r.readAsText(fl); };
+  f.click();
+}
+
+/* =======================================================
+   ΤΥΠΟΙ ΠΙΣΤΑΣ
+   ======================================================= */
+function render(L){
+  if(L.k==='f') return rFact(L);
+  if(L.k==='p') return rPick(L);
+  if(L.k==='t') return rTap(L);
+  if(L.k==='r') return rRun(L);
+  if(L.k==='o') return rOrd(L);
+}
+
+/* --- ΚΑΡΤΑ ΓΝΩΣΗΣ --- */
+function rFact(L){
+  view.innerHTML = `<div class="stage"><div class="qtitle">Κράτα αυτό</div>
+    <div class="factbox"><div class="facticon">${L.em||'💡'}</div>
+      <div class="big">${L.big}</div>${L.sm?`<div class="sm">${L.sm}</div>`:''}</div>
+    ${L.viz?`<div class="viz">${L.viz}</div>`:''}</div>`;
+  foot.className='foot'; foot.style.display='block';
+  footin.innerHTML = `<button class="go wide" onclick="G.right++;G.xp+=5;next()">Το ’πιασα 👍</button>`;
+}
+
+/* --- ΠΟΛΛΑΠΛΗ ΕΠΙΛΟΓΗ --- */
+function rPick(L){
+  const two = L.o.length===2 && L.o.every(o=>o.length<=14);
+  view.innerHTML = `<div class="stage"><div class="qtitle">${L.h||'Διάλεξε'}</div>
+    <div class="qbig">${L.q}</div>${L.s?`<div class="qsub">${L.s}</div>`:''}
+    ${L.viz?`<div class="viz">${L.viz}</div>`:''}
+    <div class="opts ${two?'two':''}" id="op">
+      ${L.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div></div>`;
+  $('#op').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i, ok=i===L.a;
+    $('#op').querySelectorAll('.opt').forEach((x,j)=>{ x.disabled=true;
+      if(j===L.a)x.classList.add('good'); else if(j===i)x.classList.add('bad'); else x.classList.add('fade'); });
+    if(!ok) b.classList.add('shake');
+    judge(ok, ok?'Σωστά!':'Η σωστή είναι η άλλη', `<span>${L.e}</span>`);
+  });
+}
+
+/* --- ΔΙΑΛΕΞΕ ΟΛΕΣ --- */
+function rTap(L){
+  view.innerHTML = `<div class="stage"><div class="qtitle">Διάλεξε όλες τις σωστές</div>
+    <div class="qbig">${L.q}</div>${L.s?`<div class="qsub">${L.s}</div>`:''}
+    ${L.viz?`<div class="viz">${L.viz}</div>`:''}
+    <div class="chips" id="cp">
+      ${L.it.map((x,i)=>`<button class="chip" data-i="${i}">${x[0]===''?'ε':esc(x[0])}</button>`).join('')}</div></div>`;
+  const sel=new Set();
+  const upd=()=>{ $('#gobtn').disabled = sel.size===0; };
+  $('#cp').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+    if(G.locked) return; const i=+b.dataset.i;
+    if(sel.has(i)){sel.delete(i);b.classList.remove('sel');} else {sel.add(i);b.classList.add('sel');}
+    upd();
+  });
+  foot.className='foot'; foot.style.display='block';
+  footin.innerHTML = `<button class="go wide" id="gobtn" disabled onclick="tapCheck()">Έλεγχος</button>`;
+  window._tap = {L,sel};
+}
+function tapCheck(){
+  const {L,sel}=window._tap;
+  let ok=true;
+  $('#cp').querySelectorAll('.chip').forEach((b,i)=>{
+    const should=!!L.it[i][1], picked=sel.has(i);
+    b.disabled=true; b.classList.remove('sel');
+    if(should&&picked) b.classList.add('good');
+    else if(!should&&picked){ b.classList.add('bad'); ok=false; }
+    else if(should&&!picked){ b.classList.add('miss'); ok=false; }
+  });
+  judge(ok, ok?'Τέλεια!':'Κοίτα ποιες ήταν', `<span>${L.e}</span>`);
+}
+
+/* --- ΠΡΟΒΛΕΨΕ ΚΑΙ ΔΕΣ --- */
+function rRun(L){
+  const ok = accepts(L.A, L.w);
+  view.innerHTML = `<div class="stage"><div class="qtitle">Πρόβλεψε</div>
+    <div class="qbig">${L.q||'Θα δεχτεί τη λέξη;'}</div>
+    ${L.s?`<div class="qsub">${L.s}</div>`:''}
+    <div class="viz" id="vz">${drawA(L.A, startS(L.A), [])}
+      <div class="tape" id="tp">${[...L.w].map((c,i)=>`<div class="cel ${i===0?'now':''}">${esc(c)}</div>`).join('')||'<div class="cel now">ε</div>'}</div>
+    </div>
+    <div class="opts two" id="op">
+      <button class="opt" data-v="1">✓ ΝΑΙ</button>
+      <button class="opt" data-v="0">✗ ΟΧΙ</button></div></div>`;
+  $('#op').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const said = b.dataset.v==='1', right = said===ok;
+    $('#op').querySelectorAll('.opt').forEach(x=>{ x.disabled=true;
+      const v=x.dataset.v==='1'; if(v===ok) x.classList.add('good'); else x.classList.add(said===v?'bad':'fade'); });
+    if(!right) b.classList.add('shake');
+    judge(right, right?'Σωστά!':(ok?'Το δέχεται!':'Δεν το δέχεται!'), `<span>${L.e}</span>`);
+    play(L.A, L.w);
+  });
+}
+function play(A,w){
+  let cur=startS(A), pos=0, ed=[];
+  const vz=$('#vz');
+  const paint=()=>{ vz.innerHTML = drawA(A,cur,ed)
+    + `<div class="tape">${[...w].map((c,i)=>`<div class="cel ${i<pos?'past':''} ${i===pos?'now':''}">${esc(c)}</div>`).join('')||'<div class="cel now">ε</div>'}</div>`; };
+  paint();
+  const t=setInterval(()=>{
+    if(pos>=w.length || !cur.length){ clearInterval(t); ed=[]; paint(); return; }
+    const r=stepS(A,cur,w[pos]); cur=r.n; ed=r.u; pos++; paint();
+  }, 620);
+}
+
+/* --- ΒΑΛΕ ΣΕ ΣΕΙΡΑ --- */
+function rOrd(L){
+  const sh = L.it.map((t,i)=>({t,i})).sort(()=>Math.random()-.5);
+  view.innerHTML = `<div class="stage"><div class="qtitle">Βάλε σε σειρά</div>
+    <div class="qbig">${L.q}</div>
+    <div class="opts" id="op">${sh.map(x=>`<button class="opt" data-i="${x.i}"><span class="num"></span>${x.t}</button>`).join('')}</div></div>`;
+  let want=0;
+  $('#op').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(G.locked) return;
+    const i=+b.dataset.i;
+    if(i===want){ b.classList.add('good'); b.disabled=true; b.innerHTML=`${want+1}. `+b.textContent; want++;
+      if(want===L.it.length) judge(true,'Τέλεια σειρά!',`<span>${L.e}</span>`);
+    } else {
+      b.classList.add('shake','bad');
+      $('#op').querySelectorAll('.opt').forEach((x,j)=>{ x.disabled=true; });
+      judge(false,'Λάθος σειρά',`<span>${L.e}</span>`);
+    }
+  });
+}
+
+/* =======================================================
+   ΑΥΤΟΜΑΤΑ (μικρά, για τις πίστες)
+   ======================================================= */
+const M = {
+  end1:{ w:300,h:150, st:[{id:'A',x:88,y:88,i0:1,l:'A'},{id:'B',x:212,y:88,f:1,l:'B'}],
+    ed:[{f:'A',t:'A',s:'0'},{f:'A',t:'B',s:'1'},{f:'B',t:'B',s:'1'},{f:'B',t:'A',s:'0'}]},
+  odd1:{ w:300,h:150, st:[{id:'A',x:88,y:88,i0:1,l:'A'},{id:'B',x:212,y:88,f:1,l:'B'}],
+    ed:[{f:'A',t:'A',s:'0'},{f:'A',t:'B',s:'1'},{f:'B',t:'A',s:'1'},{f:'B',t:'B',s:'0'}]},
+  c001:{ w:470,h:150, st:[{id:'A',x:58,y:88,i0:1,l:'A'},{id:'B',x:188,y:88,l:'B'},
+                          {id:'C',x:318,y:88,l:'C'},{id:'D',x:430,y:88,f:1,l:'D'}],
+    ed:[{f:'A',t:'A',s:'1'},{f:'A',t:'B',s:'0'},{f:'B',t:'C',s:'0'},{f:'B',t:'A',s:'1'},
+        {f:'C',t:'C',s:'0'},{f:'C',t:'D',s:'1'},{f:'D',t:'D',s:'0'},{f:'D',t:'D',s:'1'}]},
+  endab:{ w:330,h:190, st:[{id:'A',x:88,y:60,i0:1,l:'A'},{id:'B',x:240,y:60,l:'B'},
+                           {id:'C',x:164,y:148,f:1,l:'C'}],
+    ed:[{f:'A',t:'A',s:'b'},{f:'A',t:'B',s:'a'},{f:'B',t:'B',s:'a'},
+        {f:'B',t:'C',s:'b'},{f:'C',t:'B',s:'a'},{f:'C',t:'A',s:'b'}]},
+  nfa11:{ nd:1, w:410,h:150, st:[{id:'A',x:60,y:88,i0:1,l:'A'},{id:'B',x:190,y:88,l:'B'},
+                                 {id:'C',x:330,y:88,f:1,l:'C'}],
+    ed:[{f:'A',t:'A',s:'0'},{f:'A',t:'A',s:'1'},{f:'A',t:'B',s:'1'},{f:'B',t:'C',s:'1'},
+        {f:'C',t:'C',s:'0'},{f:'C',t:'C',s:'1'}]},
+  nfaAB:{ nd:1, w:400,h:150, st:[{id:'A',x:60,y:88,i0:1,l:'1'},{id:'B',x:190,y:88,l:'2'},
+                                 {id:'C',x:320,y:88,f:1,l:'3'}],
+    ed:[{f:'A',t:'A',s:'a'},{f:'A',t:'A',s:'b'},{f:'A',t:'B',s:'a'},{f:'B',t:'C',s:'b'}]}
+};
+
+/* βοηθητικά */
+const F  =(em,big,sm,viz)=>({k:'f',em,big,sm,viz});
+const P  =(q,o,a,e,s,viz)=>({k:'p',q,o,a,e,s,viz});
+const T  =(q,it,e,s,viz)=>({k:'t',q,it,e,s,viz});
+const RN =(A,w,e,q)=>({k:'r',A:M[A],w,e,q});
+const OD =(q,it,e)=>({k:'o',q,it,e});
+
+/* =======================================================
+   ΟΙ ΚΟΣΜΟΙ
+   ======================================================= */
+const W = [
+
+/* ---------- 1 ---------- */
+{t:'Λέξεις & Γλώσσες', s:'Τα βασικά — 12 πίστες', e:'🔤', c:'#5b53d6', lv:[
+ F('🎯','Όλο το μάθημα είναι ΕΝΑ πράγμα','Δίνεις μια λέξη σε μια μηχανή. Εκείνη λέει ΝΑΙ ή ΟΧΙ. Τέλος.'),
+ F('🔤','Αλφάβητο = τα γράμματα που επιτρέπονται','Π.χ. Σ = {0, 1}. Λέξη = μια σειρά από αυτά, π.χ. 0110.'),
+ P('Ποιο είναι ΛΕΞΗ στο αλφάβητο {0,1};',['0110','{0,1}'],0,
+   'Η λέξη είναι σειρά γραμμάτων. Το {0,1} είναι σύνολο — το αλφάβητο.'),
+ F('👜','Γλώσσα = μια σακούλα με λέξεις','Π.χ. η σακούλα «όλες οι λέξεις που τελειώνουν σε 1».'),
+ T('Ποιες ανήκουν στη σακούλα «τελειώνει σε 1»;',
+   [['101',1],['110',0],['1',1],['0',0],['011',1]],
+   'Κοιτάς ΜΟΝΟ το τελευταίο γράμμα. Τίποτα άλλο.'),
+ F('🕳️','ε = η άδεια λέξη','Λέξη χωρίς κανένα γράμμα. Μήκος 0. Υπάρχει κανονικά.'),
+ P('Και το ∅ τι είναι;',['Άδεια λέξη','Άδεια σακούλα'],1,
+   'ε = άδειο χαρτί. ∅ = φάκελος χωρίς κανένα χαρτί μέσα. Διαφορετικά πράγματα!'),
+ P('Πόσα πράγματα έχει η σακούλα {ε};',['0','1'],1,
+   'Έχει ένα χαρτί μέσα — απλώς το χαρτί είναι άδειο.'),
+ F('⭐','Το αστεράκι * = «όσες φορές θες»','ΚΑΙ μηδέν φορές. Γι’ αυτό το * δίνει πάντα και την ε.'),
+ P('Η σακούλα είναι άδεια. Τι δίνει το ∅*;',['Τίποτα','Την ε'],1,
+   'Ακόμη κι αν δεν έχεις τίποτα να κολλήσεις, το «μηδέν κολλημένα» είναι η ε. Πέφτει σε εξετάσεις!'),
+ T('Σακούλα Γ = {11, 0}. Ποιες φτιάχνονται κολλώντας κομμάτια της;',
+   [['110',1],['101',0],['11110',1],['1',0],['000',1]],
+   'Σπας τη λέξη σε κομμάτια. Κάθε κομμάτι πρέπει να είναι 11 ή 0. Μονό 1 δεν υπάρχει στη σακούλα.'),
+ F('🪆','Οι γλώσσες μπαίνουν η μία μέσα στην άλλη',
+   'Κανονικές ⊂ Με στοίβα ⊂ Αποφασίσιμες ⊂ Αναγνωρίσιμες. Θα τις δεις μία-μία.')
+]},
+
+/* ---------- 2 ---------- */
+{t:'Αυτόματα', s:'Κουτάκια και βελάκια — 14 πίστες', e:'⚙️', c:'#0ea5e9', lv:[
+ F('⚙️','Το αυτόματο είναι κουτάκια και βελάκια',
+   'Ξεκινάς σε ένα κουτάκι. Διαβάζεις γράμμα-γράμμα και ακολουθείς τα βελάκια.'),
+ F('🎯','Ο διπλός κύκλος = «καλό» κουτάκι',
+   'Αν ΤΕΛΕΙΩΣΕΙΣ εκεί, η λέξη γίνεται δεκτή. Αλλιώς όχι.', drawA(M.end1,['A'],[])),
+ RN('end1','101','Τελείωσε στο B (διπλός κύκλος). Το αυτόματο δέχεται όσες λέξεις τελειώνουν σε 1.'),
+ RN('end1','110','Το τελευταίο γράμμα είναι 0, οπότε καταλήγει στο A. Δεν είναι καλό κουτάκι.'),
+ RN('end1','1','Ένα γράμμα, ένα βήμα, και είσαι στο B.'),
+ F('⚠️','Μετράει ΠΟΥ ΤΕΛΕΙΩΝΕΙΣ',
+   'Όχι από πού πέρασες. Μπορεί να περάσεις από το καλό κουτάκι και μετά να φύγεις.'),
+ RN('odd1','11','Πέρασες από το B στο πρώτο 1 — αλλά το δεύτερο 1 σε ξαναπήγε στο A. Μετράει μόνο το ΤΕΛΟΣ.',
+   'Άλλο αυτόματο! Πρόσεξε: εδώ το 0 δεν σε κουνάει καθόλου.'),
+ P('Τι μετράει αυτό το αυτόματο;',['Το τελευταίο γράμμα','Πόσα 1 έχεις δει'],1,
+   'Κάθε 1 σε πετάει απέναντι. Καταλήγεις στο B όταν έχεις ΠΕΡΙΤΤΟ πλήθος από 1.',null,drawA(M.odd1,['A'],[])),
+ F('📏','ΚΑΝΟΝΙΚΗ γλώσσα = υπάρχει αυτόματο γι’ αυτήν','Αυτός είναι όλος ο ορισμός. Τίποτα παραπάνω.'),
+ RN('c001','10011','Μόλις βρεις 001 μπαίνεις στο D και δεν ξαναβγαίνεις.',
+   'Αυτό ψάχνει αν η λέξη έχει κάπου μέσα την 001.'),
+ RN('c001','0101','Δεν υπάρχουν πουθενά δύο συνεχόμενα 0 ακολουθούμενα από 1.'),
+ P('Τι θυμάται το αυτόματο καθώς διαβάζει;',['Όλη τη λέξη','Μόνο σε ποιο κουτάκι είναι'],1,
+   'Αυτό είναι και η αδυναμία του: πεπερασμένη μνήμη. Δεν μπορεί να μετρήσει απεριόριστα.'),
+ RN('endab','aab','Τα δύο τελευταία γράμματα είναι ab, άρα καταλήγεις στο C.',
+   'Νέο αλφάβητο: a και b.'),
+ P('Τι αναγνωρίζει αυτό;',['Αρχίζει με a','Τελειώνει σε ab'],1,
+   'Το C σημαίνει «μόλις είδα a και μετά b». Από το C με a γυρνάς στο B, γιατί το a μπορεί να ξεκινά νέο ab.',
+   null, drawA(M.endab,['A'],[]))
+]},
+
+/* ---------- 3 ---------- */
+{t:'Πολλοί δρόμοι', s:'Μη ντετερμινισμός (NFA) — 12 πίστες', e:'🎲', c:'#a855f7', lv:[
+ F('🎲','Μερικά αυτόματα έχουν ΠΟΛΛΑ βελάκια με το ίδιο γράμμα',
+   'Τότε δοκιμάζεις όλους τους δρόμους ταυτόχρονα. Λέγονται NFA.'),
+ F('✅','Αρκεί ΕΝΑΣ δρόμος να πετύχει',
+   'Οι υπόλοιποι μπορεί να πεθάνουν στη μέση. Δεν πειράζει καθόλου.', drawA(M.nfa11,['A'],[])),
+ RN('nfa11','0110','Υπάρχει δρόμος: μένεις στο A για το 0, μετά 1→B, μετά 1→C. Έφτασες στο καλό κουτάκι.',
+   'Πρόσεξε: από το A με 1 φεύγουν ΔΥΟ βελάκια.'),
+ RN('nfa11','0101','Δεν υπάρχουν πουθενά δύο συνεχόμενα 1, άρα κανένας δρόμος δεν φτάνει στο C.'),
+ P('Σε NFA, η λέξη γίνεται δεκτή αν…',['Όλοι οι δρόμοι πετύχουν','Έστω ΕΝΑΣ πετύχει'],1,
+   'Είναι το πιο συχνό λάθος του κεφαλαίου. Αρκεί ένας.'),
+ F('🆓','Υπάρχουν και ΤΖΑΜΠΑ βελάκια (ε)','Αλλάζεις κουτάκι χωρίς να διαβάσεις γράμμα.'),
+ P('Το NFA είναι πιο ΔΥΝΑΤΟ από το απλό αυτόματο;',['Ναι','Όχι, το ίδιο'],1,
+   'Είναι πιο ΒΟΛΙΚΟ, όχι πιο δυνατό. Κάθε NFA μετατρέπεται σε απλό DFA.'),
+ F('🔁','Η μετατροπή NFA → DFA','Κάθε κουτάκι του νέου αυτομάτου = μια ΟΜΑΔΑ κουτακιών του παλιού.'),
+ P('Είμαι στην ομάδα {1,2}. Με a: το 1 πάει στα {1,2}, το 2 πουθενά. Πού πάω;',['{1,2}','{2}'],0,
+   'Παίρνεις την ΕΝΩΣΗ όλων. Το 2 δεν προσθέτει τίποτα, άρα μένει {1,2}.'),
+ P('Πότε μια ομάδα είναι «καλό» κουτάκι;',['Αν όλα μέσα είναι καλά','Αν έστω ένα είναι καλό'],1,
+   'Ίδια λογική με πριν: αρκεί ένας δρόμος να πετύχει.'),
+ P('NFA με 3 κουτάκια. Το DFA το πολύ πόσα;',['3','8'],1,
+   'Οι ομάδες από 3 πράγματα είναι 2³ = 8. Στην πράξη κρατάς μόνο όσες χρειάζονται.'),
+ RN('nfaAB','abab','Ο δρόμος: μένω στο 1 για τα πρώτα ab, μετά a→2, b→3. Ένας δρόμος αρκεί.',
+   'Αυτό δέχεται όσες λέξεις τελειώνουν σε ab.')
+]},
+
+/* ---------- 4 ---------- */
+{t:'Κανονικές Εκφράσεις', s:'Συνταγές αντί για σχέδια — 13 πίστες', e:'✏️', c:'#ec4899', lv:[
+ F('✏️','Η κανονική έκφραση είναι μια σύντομη συνταγή',
+   'Αντί για διάγραμμα, γράφεις με σύμβολα τι λέξεις θέλεις.'),
+ F('🔣','Τρία μόνο σύμβολα','∪ = «ή» · κόλλημα = «και μετά» · * = «όσες φορές θες, ακόμη και μηδέν»'),
+ T('Ποιες λέξεις φτιάχνει η 0*10*;',
+   [['1',1],['010',1],['11',0],['00100',1],['0',0]],
+   'Όσα 0 θες, ΕΝΑ 1, όσα 0 θες. Δηλαδή: ακριβώς ένα 1 μέσα στη λέξη.'),
+ P('Τι σημαίνει το ba*;',['(ba) όσες φορές θες','b, μετά όσα a θες'],1,
+   'Το * κολλάει μόνο στο γράμμα δίπλα του. Σειρά: πρώτα *, μετά κόλλημα, τελευταία η ένωση ∪.'),
+ T('Ποιες φτιάχνει η (ΣΣ)*, με Σ = {0,1};',
+   [['',1],['01',1],['101',0],['0011',1],['1',0]],
+   'Κάθε γύρος τρώει ΔΥΟ γράμματα. Άρα: άρτιο μήκος. Η ε ανήκει (μήκος 0, άρτιο).'),
+ P('Ισχύει (a∪b)* = a* ∪ b*;',['Ναι','Όχι'],1,
+   'Η abba είναι στο αριστερό αλλά όχι στο δεξί. Το δεξί δίνει μόνο «όλα a» ή «όλα b».'),
+ P('Ισχύει (ab)* = a*b*;',['Ναι','Όχι'],1,
+   'Η abab είναι στο αριστερό αλλά όχι στο δεξί. Το δεξί θέλει όλα τα a μπροστά.'),
+ F('🔗','Τρεις τρόποι, ένα πράγμα',
+   'Αυτόματο ⟷ NFA ⟷ κανονική έκφραση. Και τα τρία περιγράφουν ΑΚΡΙΒΩΣ τις κανονικές γλώσσες.'),
+ P('Η a*b* περιέχει τη λέξη ba;',['Ναι','Όχι'],1,
+   'Πρώτα ΟΛΑ τα a, μετά ΟΛΑ τα b. Η ba είναι ανάποδα.'),
+ P('Πόσο κάνει το 1*∅;',['1*','∅'],1,
+   'Χρειάζεσαι ένα κομμάτι από κάθε πλευρά. Η ∅ δεν σου δίνει τίποτα, άρα δεν φτιάχνεται καμία λέξη.'),
+ F('🔄','Από αυτόματο σε έκφραση','Σβήνεις κουτάκια ένα-ένα. Ο κανόνας: (μπαίνω)(βρόχος)*(βγαίνω).'),
+ P('Σβήνω κουτάκι. Μπαίνω με a, βρόχος b, βγαίνω με c. Τι γράφω;',['abc','ab*c'],1,
+   'Ο ΒΡΟΧΟΣ παίρνει το αστεράκι — μπορείς να τον γυρίσεις όσες φορές θες, ή καμία.'),
+ P('Δύο φοιτητές δίνουν διαφορετικές εκφράσεις για το ίδιο αυτόματο.',
+   ['Μόνο ένας έχει δίκιο','Μπορεί και οι δύο'],1,
+   'Η ίδια γλώσσα γράφεται με πολλούς ισοδύναμους τρόπους. Π.χ. a(ba)* = (ab)*a.')
+]},
+
+/* ---------- 5 ---------- */
+{t:'Τι ΔΕΝ γίνεται', s:'Κλειστότητα & λήμμα άντλησης — 14 πίστες', e:'🚫', c:'#f59e0b', lv:[
+ F('🧱','Πράξεις σε κανονικές → πάλι κανονικές',
+   'Ένωση, τομή, συμπλήρωμα, κόλλημα, αστεράκι. Όλα μένουν μέσα στην οικογένεια.'),
+ F('🔄','Συμπλήρωμα = «όλες οι υπόλοιπες λέξεις»','Στο DFA: αντίστρεψε καλά και κακά κουτάκια. Τέλος.'),
+ P('Το ίδιο κόλπο δουλεύει και σε NFA;',['Ναι','Όχι'],1,
+   'Σε NFA μια λέξη μπορεί να έχει ΚΑΙ καλό ΚΑΙ κακό δρόμο. Πρώτα το κάνεις DFA, μετά αντιστρέφεις.'),
+ P('Θες αυτόματο για «L₁ ΚΑΙ L₂ μαζί». Πώς;',['Τα τρέχω παράλληλα','Τα βάζω στη σειρά'],0,
+   'Κρατάς ζευγάρι κουτακιών. Για ΤΟΜΗ: καλό όταν ΚΑΙ ΤΑ ΔΥΟ είναι καλά. Για ΕΝΩΣΗ: όταν έστω ένα.'),
+ F('🚫','Τώρα το δύσκολο: κάποιες γλώσσες ΔΕΝ γίνονται',
+   'Η πιο διάσημη: 0ⁿ1ⁿ — τόσα 0 όσα και 1, με τα 0 πρώτα.'),
+ P('Γιατί δεν γίνεται;',['Είναι πολύ μεγάλη','Θέλει απεριόριστο μέτρημα'],1,
+   'Το αυτόματο έχει ΠΕΠΕΡΑΣΜΕΝΑ κουτάκια. Δεν χωράει να θυμάται «είδα 1000 μηδενικά».'),
+ F('🎣','Λήμμα άντλησης = το εργαλείο της απόδειξης',
+   'Χρησιμεύει ΜΟΝΟ για να δείξεις ότι κάτι ΔΕΝ είναι κανονικό. Ποτέ το αντίθετο.'),
+ F('🔁','Η ιδέα του',
+   'Αν η λέξη είναι μεγάλη, ο δρόμος περνά αναγκαστικά από βρόχο. Και τον βρόχο τον γυρνάς 0, 2, 100 φορές.'),
+ OD('Βάλε στη σειρά τα βήματα της απόδειξης',
+   ['Υποθέτω ότι ΕΙΝΑΙ κανονική','Παίρνω μια μεγάλη λέξη της γλώσσας',
+    'Δείχνω ότι ο βρόχος τη χαλάει','ΑΤΟΠΟ → άρα ΔΕΝ είναι κανονική'],
+   'Πάντα απόδειξη σε άτοπο. Το κρίσιμο βήμα είναι η ΕΠΙΛΟΓΗ της λέξης.'),
+ P('Το λήμμα μπορεί να δείξει ότι κάτι ΕΙΝΑΙ κανονικό;',['Ναι','Όχι, ποτέ'],1,
+   'Δουλεύει μόνο προς τη μία κατεύθυνση. Για να δείξεις ότι ΕΙΝΑΙ, φτιάχνεις αυτόματο ή έκφραση.'),
+ P('Πόσες φορές να γυρίσεις τον βρόχο για να βγάλεις άτοπο;',['1 φορά','0 ή 2 φορές'],1,
+   'Με 1 φορά παίρνεις πίσω την αρχική λέξη — δεν κερδίζεις τίποτα.'),
+ T('Ποιες ΔΕΝ είναι κανονικές;',
+   [['0ⁿ1ⁿ',1],['τελειώνει σε 1',0],['ίσα 0 και 1',1],['έχει 001 μέσα',0],['w·w',1]],
+   'Όποτε χρειάζεσαι απεριόριστο μέτρημα ή να θυμάσαι ολόκληρη λέξη — δεν γίνεται με αυτόματο.'),
+ P('Η {aⁿbⁿ | n < 3} είναι κανονική;',['Όχι','Ναι'],1,
+   'ΠΑΓΙΔΑ. n = 0,1,2 → μόνο τρεις λέξεις: ε, ab, aabb. Πεπερασμένη γλώσσα = πάντα κανονική.'),
+ F('🧩','Κόλπο για ασκήσεις',
+   'Αν κολλάς: τέμνε τη γλώσσα με μια απλή κανονική (π.χ. 0*1*) και πέσε σε γνωστή μη κανονική.')
+]},
+
+/* ---------- 6 ---------- */
+{t:'Η Στοίβα', s:'Γραμματικές & αυτόματα στοίβας — 13 πίστες', e:'📚', c:'#14b8a6', lv:[
+ F('📚','Δίνουμε στη μηχανή μια ΣΤΟΙΒΑ','Σαν σωρός από πιάτα: βάζεις πάνω, παίρνεις από πάνω.'),
+ F('🔢','Τώρα μπορεί να μετρήσει!',
+   'Για κάθε 0 βάζεις ένα πιάτο. Για κάθε 1 παίρνεις ένα. Άδειασε ακριβώς στο τέλος; ΝΑΙ.'),
+ P('Άρα η 0ⁿ1ⁿ τώρα γίνεται;',['Ναι','Όχι'],0,
+   'Ναι! Αυτές λέγονται γλώσσες ΧΩΡΙΣ ΣΥΜΦΡΑΖΟΜΕΝΑ.'),
+ F('📝','Γραμματική = κανόνες που ΦΤΙΑΧΝΟΥΝ λέξεις',
+   'Ο κανόνας S → 0S1 βάζει ένα 0 αριστερά και ένα 1 δεξιά ΤΑΥΤΟΧΡΟΝΑ.'),
+ OD('Φτιάξε τη λέξη 0011 με τους κανόνες S → 0S1 και S → ε',
+   ['S','0S1','00S11','0011'],
+   'Κάθε βήμα αντικαθιστά το S. Στο τέλος το S γίνεται ε και εξαφανίζεται.'),
+ T('Ποιες φτιάχνει η S → aSb | ε;',
+   [['ab',1],['aabb',1],['ba',0],['',1],['abab',0]],
+   'Πάντα ίσα a μπροστά και b πίσω, συμμετρικά. Η ba είναι ανάποδα, η abab δεν είναι συμμετρική.'),
+ F('🔄','Η στοίβα βγάζει τα πράγματα ΑΝΑΠΟΔΑ','Ό,τι βάλεις πρώτο, βγαίνει τελευταίο.'),
+ P('Άρα η στοίβα πιάνει εύκολα…',['w και μετά w ανάποδα','w και μετά ξανά w'],0,
+   'Ανάποδα = δωρεάν, γιατί έτσι δουλεύει η στοίβα. Ίδια σειρά = αδύνατο.'),
+ P('Η aⁿbⁿcⁿ γίνεται με στοίβα;',['Ναι','Όχι'],1,
+   'Η στοίβα ξοδεύεται στη σύγκριση a με b. Μετά είναι άδεια και δεν ξέρει τίποτα για τα c.'),
+ P('Δύο γλώσσες με στοίβα. Η ΤΟΜΗ τους γίνεται πάντα με στοίβα;',['Ναι','Όχι'],1,
+   'ΔΙΑΦΟΡΑ από τις κανονικές! Εδώ η τομή μπορεί να σε βγάλει έξω από την οικογένεια.'),
+ F('⚠️','Δύο πράγματα που ΔΕΝ κληρονομούνται',
+   'Οι γλώσσες με στοίβα δεν είναι κλειστές σε ΤΟΜΗ ούτε σε ΣΥΜΠΛΗΡΩΜΑ. Οι κανονικές είναι.'),
+ P('Στα απλά αυτόματα το «μαντεύω» δεν δίνει δύναμη. Στα αυτόματα στοίβας;',
+   ['Ούτε εκεί','Εκεί δίνει'],1,
+   'Στα αυτόματα στοίβας το μη ντετερμινιστικό είναι ΓΝΗΣΙΩΣ πιο δυνατό. Ρωτιέται.'),
+ T('Ποιες ΓΙΝΟΝΤΑΙ με στοίβα;',
+   [['0ⁿ1ⁿ',1],['ισορροπημένες παρενθέσεις',1],['aⁿbⁿcⁿ',0],['w·w',0],['παλίνδρομα',1]],
+   'Μία μέτρηση ή μία αντιστροφή: ναι. Δύο ταυτόχρονες μετρήσεις ή επανάληψη: όχι.')
+]},
+
+/* ---------- 7 ---------- */
+{t:'Μηχανές Turing', s:'Το πιο δυνατό μοντέλο — 13 πίστες', e:'🎞️', c:'#6366f1', lv:[
+ F('🎞️','Η μηχανή Turing μπορεί να ΓΡΑΨΕΙ','Και να πάει και αριστερά. Άρα ξαναδιαβάζει όσο θέλει.'),
+ F('♾️','Αυτό της δίνει απεριόριστη μνήμη',
+   'Είναι το πιο δυνατό μοντέλο που υπάρχει. Ό,τι λύνει ένας υπολογιστής, το λύνει κι αυτή.'),
+ P('Η 0ⁿ1ⁿ γίνεται με μηχανή Turing;',['Ναι','Όχι'],0,
+   'Εύκολα: μαρκάρεις ένα 0 και ένα 1 κάθε φορά, μέχρι να τελειώσουν μαζί.'),
+ F('🔑','ΤΟ πιο σημαντικό σημείο του μαθήματος',
+   'ΑΠΟΦΑΣΙΖΕΙ = σταματάει ΠΑΝΤΑ. ΑΝΑΓΝΩΡΙΖΕΙ = μπορεί να κολλήσει για πάντα.'),
+ P('Δέχεται σωστά τις λέξεις της L, αλλά σε κάποιες άλλες τρέχει για πάντα. Τι κάνει;',
+   ['Αποφασίζει την L','Αναγνωρίζει την L'],1,
+   'Απόφαση = εγγυημένος τερματισμός σε ΚΑΘΕ είσοδο. Εδώ δεν το έχουμε.'),
+ P('Στα απλά αυτόματα, «αναγνωρίζει» και «αποφασίζει» διαφέρουν;',['Ναι','Όχι, ταυτίζονται'],1,
+   'Το αυτόματο διαβάζει τη λέξη και σταματά πάντα. Η διαφορά υπάρχει ΜΟΝΟ στις μηχανές Turing.'),
+ F('📥','Η μηχανή μπορεί και να ΥΠΟΛΟΓΙΖΕΙ',
+   'Αντί για ΝΑΙ/ΟΧΙ, αφήνει μια απάντηση γραμμένη στην ταινία. Π.χ. w ↦ w#w.'),
+ P('«Φτιάξε μηχανή που ΥΠΟΛΟΓΙΖΕΙ τη γλώσσα B». Σωστή διατύπωση;',['Ναι','Όχι'],1,
+   'Οι ΓΛΩΣΣΕΣ αποφασίζονται. Οι ΣΥΝΑΡΤΗΣΕΙΣ υπολογίζονται. Παγίδα εξετάσεων.'),
+ P('Στο τέλος, στην ταινία είναι πάντα η αρχική λέξη;',['Ναι','Όχι'],1,
+   'Η μηχανή γράφει πάνω της και τη χαλάει. Σε ΑΥΤΟΜΑΤΟ όμως ισχύει — εκεί η ταινία είναι μόνο για διάβασμα.'),
+ P('Μπορεί μια μηχανή Turing να έχει μόνο ΕΝΑ κουτάκι;',['Ναι','Όχι'],1,
+   'Χρειάζεται ένα «ΝΑΙ» και ένα «ΟΧΙ» κουτάκι, και ο ορισμός λέει ρητά ότι είναι διαφορετικά.'),
+ F('🧭','Θέση Church-Turing',
+   '«Αλγόριθμος» = «μηχανή Turing που σταματά». Το δεχόμαστε ως παραδοχή και δουλεύουμε με αυτό.'),
+ T('Ποιες γίνονται με μηχανή Turing;',
+   [['0ⁿ1ⁿ',1],['aⁿbⁿcⁿ',1],['w·w',1],['τελειώνει σε 1',1]],
+   'ΟΛΕΣ. Η μηχανή Turing πιάνει ό,τι είδαμε μέχρι τώρα — και πολλά ακόμη.'),
+ P('«Κάνει μοναδικό υπολογισμό και σταματά πάντα.» Σωστό;',
+   ['Σωστό','Μοναδικό ναι, τερματισμό όχι'],1,
+   'Ο ντετερμινισμός εγγυάται έναν δρόμο. Δεν εγγυάται ότι ο δρόμος τελειώνει.')
+]},
+
+/* ---------- 8 ---------- */
+{t:'Άλυτα & Ταχύτητα', s:'Halting, αναγωγές, P και NP — 15 πίστες', e:'🚧', c:'#ef4444', lv:[
+ F('🚧','Υπάρχουν προβλήματα που ΚΑΝΕΝΑΣ δεν λύνει',
+   'Όχι επειδή δεν τα βρήκαμε ακόμα. Έχει ΑΠΟΔΕΙΧΘΕΙ ότι δεν υπάρχει αλγόριθμος.'),
+ F('🔢','Γιατί;',
+   'Οι μηχανές είναι όσες και οι αριθμοί 1, 2, 3… Τα προβλήματα είναι ΠΕΡΙΣΣΟΤΕΡΑ. Δεν φτάνουν.'),
+ F('🛑','Το διάσημο: το πρόβλημα τερματισμού',
+   '«Θα κολλήσει αυτό το πρόγραμμα ή θα τελειώσει;» Δεν απαντιέται γενικά. Ποτέ.'),
+ P('L_TM = «δέχεται η μηχανή M τη λέξη w;». Τι ισχύει;',
+   ['Αναγνωρίσιμη, όχι αποφασίσιμη','Ούτε καν αναγνωρίσιμη'],0,
+   'Μπορείς να την τρέξεις και να δεις. Αλλά αν κολλήσει, κολλάς μαζί της — άρα δεν αποφασίζεις.'),
+ F('🪞','Πώς αποδεικνύεται',
+   'Φτιάχνεις μηχανή που κάνει το ΑΝΤΙΘΕΤΟ απ’ ό,τι λέει η υποτιθέμενη λύση, και την τρέχεις στον εαυτό της.'),
+ F('➡️','Αναγωγή = «αν ξέρω το Β, ξέρω και το Α»',
+   'Μετατρέπεις κάθε ερώτηση για το Α σε ερώτηση για το Β.'),
+ P('Θέλω να δείξω ότι το Γ είναι ΑΛΥΤΟ. Τι κάνω;',
+   ['Ανάγω το Γ σε κάτι λυμένο','Ανάγω κάτι άλυτο ΣΤΟ Γ'],1,
+   'Η δυσκολία ταξιδεύει προς τα ΕΜΠΡΟΣ. Βάζεις το Γ δεξιά: L_TM ≤ Γ.'),
+ P('Και αν θέλω να δείξω ότι το Γ ΛΥΝΕΤΑΙ;',
+   ['Ανάγω το Γ σε κάτι λυμένο','Ανάγω κάτι άλυτο ΣΤΟ Γ'],0,
+   'Ανάποδη φορά: Γ ≤ (κάτι που ξέρω να λύνω). Η ευκολία ταξιδεύει προς τα ΠΙΣΩ.'),
+ F('🍚','Θεώρημα Rice',
+   'Κάθε ερώτηση για τη ΓΛΩΣΣΑ που αναγνωρίζει μια μηχανή είναι άλυτη. Κενή; πεπερασμένη; κανονική; — όλα.'),
+ P('Ποια από τις δύο ΛΥΝΕΤΑΙ;',
+   ['Είναι κενή η γλώσσα της M;','Έχει η M πάνω από 10 κουτάκια;'],1,
+   'Το δεύτερο δεν αφορά τη ΓΛΩΣΣΑ, αφορά το κείμενο της μηχανής. Το μετράς και τελείωσες.'),
+ F('⏱️','Αλλάζουμε ερώτηση',
+   'Μέχρι τώρα ρωτούσαμε «λύνεται;». Από εδώ και πέρα: «λύνεται ΓΡΗΓΟΡΑ;»'),
+ F('🐢','Πολυωνυμικό εναντίον εκθετικού',
+   'Με n = 60: το n² κάνει 3.600 βήματα. Το 2ⁿ κάνει περισσότερα από τα δευτερόλεπτα της ηλικίας του σύμπαντος.'),
+ P('Τι είναι η κλάση P;',['Ό,τι λύνεται','Ό,τι λύνεται γρήγορα'],1,
+   'P = λύνεται σε ΠΟΛΥΩΝΥΜΙΚΟ χρόνο από ντετερμινιστική μηχανή που σταματά πάντα.'),
+ P('«Τα NP-πλήρη δεν είναι αποφασίσιμα.» Σωστό;',['Σωστό','Λάθος'],1,
+   'ΜΕΓΑΛΗ παγίδα. Λύνονται σίγουρα — δοκιμάζεις όλους τους συνδυασμούς. Απλώς ίσως αργά. Θέμα ΤΑΧΥΤΗΤΑΣ, όχι ύπαρξης.'),
+ F('🏁','Τα κατάφερες!',
+   'Αυτή είναι όλη η ύλη. Τώρα άνοιξε το test.html — οι ερωτήσεις θα σου φαίνονται πολύ πιο λογικές.')
+]}
+
+];
+
+/* εκκίνηση */
+drawMap();
+</script>
+</body>
+</html>
