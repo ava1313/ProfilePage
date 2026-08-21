@@ -793,6 +793,70 @@ img {
   font-weight: 600;
 }
 
+.recogGrid {
+  display: grid;
+  gap: 18px;
+}
+
+.recogCard {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top left, rgba(255, 209, 102, 0.12), transparent 42%),
+    var(--panel);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow);
+}
+
+.recogTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.recogCard h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.recogIssuer {
+  margin: 10px 0 0;
+  color: var(--accent-soft);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.recogBlurb {
+  max-width: 68ch;
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.recogActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+/* the badge ships with inline styles, so the hover lift has to live here */
+.recogActions a[href*="threejsresources"] {
+  transform: translateY(0);
+}
+
+.recogActions a[href*="threejsresources"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4) !important;
+}
+
 .skillColumns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
