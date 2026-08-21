@@ -246,6 +246,13 @@ const PROJECTS = {
     tags: ['Open to junior roles','Freelance','On-site / remote'],
     actions: [['primary','mailto:stratosav1999@gmail.com','Email me'],['ghost','https://www.linkedin.com/in/stratis-avagianos798753231/','LinkedIn']]
   },
+  tjs: {
+    cat: 'Recognition', title: 'Featured on Three.js Resources',
+    body: `<p>This room was reviewed and accepted into the <strong>Three.js Resources</strong> showcase &mdash; a curated directory of WebGL work.</p>
+           <p>The whole scene is a single self-contained HTML file: no model files, no textures on disk, every surface drawn procedurally, and every interaction hand-written rather than pulled in from a physics engine.</p>`,
+    tags: ['Three.js','WebGL','Procedural','Zero assets'],
+    actions: [['primary','https://threejsresources.com/showcase/interactive-portfolio?ref=badge','View the listing'],['ghost','profile.html#recognition','More on the portfolio']]
+  },
   cert: {
     cat: 'Certification', title: 'Novibet Backend Academy',
     body: `<p>Certificate of Achievement for completing the <strong>Novibet Backend Academy</strong> training program in .NET Programming, held in July 2026.</p>
@@ -944,6 +951,58 @@ certGroup.userData.project = 'cert';
 certGroup.userData.ring = certGlow;
 certGroup.userData.flatGlow = true;   // a wall halo: fade it, but never spin it
 interactive.push(certGroup);
+
+/* =========================================================
+   THREE.JS RESOURCES PLAQUE
+   Hung directly beneath the certificate so the two read as a
+   pair. Same frame stock, darker plate so it doesn't compete.
+========================================================= */
+const TJS_X = CERT_X, TJS_Y = 2.25, TJS_W = 1.52, TJS_H = 0.63;
+const tjsTex = canvasTexture(1024, 424, (g,w,hh)=>{
+  const bg=g.createLinearGradient(0,0,0,hh);
+  bg.addColorStop(0,'#131a29'); bg.addColorStop(1,'#0b101a');
+  g.fillStyle=bg; g.fillRect(0,0,w,hh);
+  g.strokeStyle='rgba(79,216,196,.42)'; g.lineWidth=5; g.strokeRect(20,20,w-40,hh-40);
+  // their play-mark
+  g.fillStyle='#4fd8c4';
+  g.beginPath(); g.moveTo(96,146); g.lineTo(96,278); g.lineTo(206,212); g.closePath(); g.fill();
+  g.textAlign='left';
+  g.fillStyle='#9aa7bf'; g.font='500 32px sans-serif';
+  g.fillText('FEATURED ON', 252, 166);
+  g.fillStyle='#f2f6ff'; g.font='bold 60px sans-serif';
+  g.fillText('THREE.JS RESOURCES', 252, 238);
+  g.fillStyle='#4fd8c4'; g.font='500 27px monospace';
+  g.fillText('showcase / interactive portfolio / 2026', 252, 296);
+});
+
+const tjsGroup = new THREE.Group();
+const tjsGlow = new THREE.Mesh(
+  new THREE.PlaneGeometry(TJS_W + .40, TJS_H + .40),
+  new THREE.MeshBasicMaterial({ color:0x4fd8c4, transparent:true, opacity:0, depthWrite:false })
+);
+tjsGlow.position.set(TJS_X, TJS_Y, -3.048);
+tjsGroup.add(tjsGlow);
+
+const tjsPlate = new THREE.Mesh(
+  new THREE.PlaneGeometry(TJS_W, TJS_H),
+  new THREE.MeshBasicMaterial({ map:tjsTex.tex })
+);
+tjsPlate.position.set(TJS_X, TJS_Y, -3.03);
+tjsGroup.add(tjsPlate);
+
+const tw = TJS_W/2, th = TJS_H/2, tb = .045;
+tjsGroup.add(
+  box(TJS_W + .16, .09, .12, frameMat, TJS_X, TJS_Y + th + tb, -3.0),
+  box(TJS_W + .16, .09, .12, frameMat, TJS_X, TJS_Y - th - tb, -3.0),
+  box(.09, TJS_H + .16, .12, frameMat, TJS_X - tw - tb, TJS_Y, -3.0),
+  box(.09, TJS_H + .16, .12, frameMat, TJS_X + tw + tb, TJS_Y, -3.0)
+);
+
+room.add(tjsGroup);
+tjsGroup.userData.project = 'tjs';
+tjsGroup.userData.ring = tjsGlow;
+tjsGroup.userData.flatGlow = true;
+interactive.push(tjsGroup);
 
 /* =========================================================
    THE REST OF THE ROOM
@@ -2239,7 +2298,7 @@ function pushLog(){
 setInterval(()=>{ if(!document.hidden) pushLog(); }, 2600);
 
 const tip=document.getElementById('tip');
-const TIP_LABELS={pc:'The dev rig',phone:'TinyWins (Flutter)',esp:'Emergency Button (ESP32)',pi:'Raspberry Pi lab',plant:'Greenhouse node',pad:'Unity & the game dream',window:'Piraeus · contact',cert:'Novibet certificate',
+const TIP_LABELS={pc:'The dev rig',phone:'TinyWins (Flutter)',esp:'Emergency Button (ESP32)',pi:'Raspberry Pi lab',plant:'Greenhouse node',pad:'Unity & the game dream',window:'Piraeus · contact',cert:'Novibet certificate',tjs:'Three.js Resources',
   lamp:'Desk lamp · click for light'};
 
 /* ---------- hotspot pins: HTML markers projected from 3D ---------- */
@@ -2252,6 +2311,7 @@ const PIN_ANCHORS = {
   pad:    new THREE.Vector3(2.05, 1.88,  .55),
   cert:   new THREE.Vector3(-2.35,4.30, -3.0),
   window: new THREE.Vector3( .80, 4.32, -3.0),
+  tjs:    new THREE.Vector3(-3.22, 2.25, -3.0),
   lamp:   new THREE.Vector3(-2.72, 2.98, -.72)
 };
 const pinsEl = document.getElementById('pins');
@@ -2412,7 +2472,7 @@ document.getElementById('enter').onclick=()=>{
   setTimeout(()=>document.getElementById('hint').classList.add('hide'), FLY_MS+9000);
   // labels introduce themselves once the camera has landed, in two waves so
   // neighbouring ones never overlap, then collapse back to quiet pulsing dots
-  const WAVE_A = ['pc','esp','plant','cert','phone'];
+  const WAVE_A = ['pc','esp','plant','cert','phone'];   // tjs rides in wave B, away from cert
   const wave = keys => pins.forEach(p=>p.el.classList.toggle('reveal', keys.includes(p.key)));
   setTimeout(()=>wave(WAVE_A), FLY_MS+300);
   setTimeout(()=>wave(Object.keys(PIN_ANCHORS).filter(k=>!WAVE_A.includes(k))), FLY_MS+4100);
