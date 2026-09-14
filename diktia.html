@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Δίκτυα Υπολογιστών — Πακέτο Επανάληψης &amp; Εξέτασης</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f6; --ink:#15181d; --muted:#5c6470;
+  --line:#dfe3ea; --accent:#2f6fd0; --accent-soft:#e7f0fd;
+  --ok:#1a7f4b; --ok-soft:#e4f6ec; --bad:#c0392b; --bad-soft:#fdeceb;
+  --warn:#9a6b00; --warn-soft:#fdf3dc;
+  --radius:12px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11141a; --panel:#181c24; --panel2:#1f242e; --ink:#e8ecf3; --muted:#9aa4b2;
+    --line:#2a313d; --accent:#6ea8fe; --accent-soft:#1c2a40;
+    --ok:#4ade80; --ok-soft:#14301f; --bad:#f87171; --bad-soft:#331b1b;
+    --warn:#fbbf24; --warn-soft:#332a12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11141a; --panel:#181c24; --panel2:#1f242e; --ink:#e8ecf3; --muted:#9aa4b2;
+  --line:#2a313d; --accent:#6ea8fe; --accent-soft:#1c2a40;
+  --ok:#4ade80; --ok-soft:#14301f; --bad:#f87171; --bad-soft:#331b1b;
+  --warn:#fbbf24; --warn-soft:#332a12;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI",Roboto,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header.top{border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:20}
+.top-inner{max-width:980px;margin:0 auto;padding:12px 16px}
+h1{font-size:1.25rem;margin:0 0 2px;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:.85rem;margin:0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tab{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+  padding:7px 12px;border-radius:999px;cursor:pointer;font-size:.86rem;font-weight:600}
+.tab:hover{border-color:var(--accent)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab.dim{opacity:.45}
+.tab .cnt{display:inline-block;margin-left:5px;background:var(--panel);color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:0 6px;font-size:.72rem;font-weight:700}
+.tab.active .cnt{background:rgba(255,255,255,.22);color:#fff;border-color:transparent}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 6px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:600}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.chip{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);
+  padding:5px 10px;border-radius:999px;cursor:pointer;font-size:.78rem;font-weight:600}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.scorebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin:10px 0}
+.score-num{font-size:1.1rem;font-weight:700}
+.bar{flex:1 1 160px;height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;min-width:120px}
+.bar > i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px;margin:12px 0}
+.q-head{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.q-num{font-family:var(--mono);font-size:.78rem;color:var(--muted);flex:0 0 auto;padding-top:3px;min-width:42px}
+.q-text{flex:1 1 auto;font-weight:600}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin-right:6px;white-space:nowrap}
+.star{appearance:none;border:none;background:none;cursor:pointer;font-size:1rem;color:var(--muted);padding:0 2px;line-height:1}
+.star.on{color:var(--warn)}
+.opts{display:flex;flex-direction:column;gap:6px;margin:10px 0 0}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;
+  padding:9px 12px;cursor:pointer;background:var(--panel);transition:.15s}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-top:5px;flex:0 0 auto}
+.opt.correct{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.locked{cursor:default}
+.tf-row{display:flex;gap:8px;margin-top:10px}
+.tf-btn{flex:0 0 auto;min-width:96px;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:700;font-size:.88rem}
+.tf-btn:hover{border-color:var(--accent)}
+.tf-btn.correct{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.tf-btn.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.gap-in{font-family:var(--mono);font-size:.92rem;padding:6px 9px;border-radius:7px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);min-width:170px;max-width:100%}
+.gap-in.correct{border-color:var(--ok);background:var(--ok-soft)}
+.gap-in.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.gap-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.fb{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:.9rem;border:1px solid var(--line);background:var(--panel2)}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok)}
+.fb.no{background:var(--bad-soft);border-color:var(--bad)}
+.fb b{font-weight:700}
+details.ans{margin-top:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);padding:0 12px}
+details.ans summary{cursor:pointer;font-weight:700;font-size:.86rem;padding:9px 0;color:var(--accent);list-style:none}
+details.ans summary::-webkit-details-marker{display:none}
+details.ans summary::before{content:"▸ ";}
+details.ans[open] summary::before{content:"▾ ";}
+details.ans .body{padding:2px 0 12px;font-size:.93rem}
+h2.sec{font-size:1.05rem;margin:26px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--accent);display:inline-block}
+h3{font-size:.98rem;margin:16px 0 4px}
+.theory p, .fb p, details .body p{margin:6px 0}
+ul{margin:6px 0;padding-left:20px}
+li{margin:3px 0}
+code, .fx{font-family:var(--mono);background:var(--panel2);border:1px solid var(--line);
+  border-radius:5px;padding:1px 5px;font-size:.88em}
+.fx.block{display:block;padding:9px 12px;margin:8px 0;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin:8px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+th{background:var(--panel2)}
+.tbl-wrap{overflow-x:auto}
+.search-wrap{display:flex;gap:8px;align-items:center;margin-top:10px}
+.search-box{position:relative;flex:1 1 auto;display:flex;align-items:center}
+.search-box::before{content:"🔍";position:absolute;left:11px;font-size:.9rem;opacity:.65;pointer-events:none}
+#q{width:100%;padding:9px 34px 9px 34px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);font-size:.92rem;font-family:inherit}
+#q:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+#q::-webkit-search-cancel-button,#q::-webkit-search-decoration{-webkit-appearance:none;display:none}
+#qclear{position:absolute;right:6px;appearance:none;border:none;background:none;color:var(--muted);
+  cursor:pointer;font-size:1.1rem;line-height:1;padding:4px 6px;border-radius:6px}
+#qclear:hover{color:var(--bad);background:var(--panel2)}
+#qcount{flex:0 0 auto;font-size:.78rem;color:var(--muted);white-space:nowrap}
+mark{background:var(--warn-soft);color:inherit;border-bottom:2px solid var(--warn);
+  border-radius:3px;padding:0 1px;font-weight:700}
+@media(max-width:560px){
+  #qcount{display:none}
+  #q{font-size:16px}
+  .sub{display:none}
+}
+.hidden{display:none !important}
+.muted{color:var(--muted);font-size:.85rem}
+.pill{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:6px;
+  padding:1px 7px;font-size:.75rem;font-weight:700;margin-left:6px}
+footer{color:var(--muted);font-size:.8rem;text-align:center;padding:26px 16px 40px}
+.empty{color:var(--muted);text-align:center;padding:40px 10px;font-style:italic}
+@media(max-width:560px){
+  .top-inner{padding:9px 12px}
+  h1{font-size:1.02rem;line-height:1.25}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;margin-top:8px;padding-bottom:2px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;padding:6px 11px;font-size:.82rem}
+  .search-wrap{margin-top:8px}
+  #q{padding:8px 32px}
+  .wrap{padding:12px}
+  .q-num{min-width:36px;font-size:.72rem}
+  .tf-btn{min-width:0;flex:1 1 0}
+  .card{padding:13px 14px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <h1>Δίκτυα Υπολογιστών — Πακέτο Επανάληψης &amp; Εξέτασης</h1>
+    <p class="sub">Οικονομικό Πανεπιστήμιο Αθηνών · Τμήμα Πληροφορικής · Εαρινό εξάμηνο 2025–2026 · βάσει της διδαχθείσας ύλης, των διαφανειών, των φροντιστηριακών ασκήσεων και παλαιότερων θεμάτων</p>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="search-wrap">
+      <div class="search-box">
+        <input id="q" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Αναζήτηση σε ερωτήσεις, απαντήσεις και θεωρία…  (π.χ. κουπονιων, BGP, jitter)">
+        <button id="qclear" title="Καθαρισμός (Esc)" hidden>✕</button>
+      </div>
+      <span id="qcount"></span>
+    </div>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+<footer>
+  Μελετητικό βοήθημα — οι απαντήσεις είναι υποδειγματικές, όχι επίσημες λύσεις του μαθήματος.
+</footer>
+<script>
+const UNITS = [
+  {id:"basics",   name:"1. Βασικές έννοιες"},
+  {id:"link",     name:"2. Επίπεδο συνδέσμου"},
+  {id:"routing",  name:"3. Δρομολόγηση"},
+  {id:"qos",      name:"4. Συμφόρηση & QoS"},
+  {id:"internet", name:"5. Διαδικτύωση & Internet"},
+  {id:"transport",name:"6. Επίπεδο μεταφοράς"},
+  {id:"perf",     name:"7. Απόδοση δικτύων"},
+  {id:"app",      name:"8. Επίπεδο εφαρμογής"}
+];
+
+const THEORY = [
+{id:"basics", html:`
+<h3>Πολυπλεξία</h3>
+<ul>
+<li><b>FDM</b> (διαίρεση συχνότητας) και <b>TDM</b> (διαίρεση χρόνου): <b>στατική</b> δέσμευση πόρων (ζώνη ή χρονοθυρίδα) ανά ροή → κατάλληλα για κίνηση <b>σταθερού ρυθμού</b>, μη αποδοτικά για <b>εκρηκτική (bursty)</b> κίνηση, γιατί ο δεσμευμένος πόρος μένει αδρανής όταν η πηγή σιωπά.</li>
+<li><b>Στατιστική πολυπλεξία</b>: διαίρεση χρόνου <b>κατ' απαίτηση</b> (on demand) σε επίπεδο πακέτου. Ο σύνδεσμος μένει αδρανής μόνο αν δεν υπάρχει κανένα πακέτο → <b>βέλτιστη αξιοποίηση</b> εύρους ζώνης. Τίμημα: κάθε πακέτο χρειάζεται πληροφορία ελέγχου (διεύθυνση/ετικέτα), απαιτείται <b>ενταμίευση</b>, και σε συμφόρηση υπάρχει <b>υπερχείλιση ενταμιευτών</b>.</li>
+<li><b>CDMA</b>: διαίρεση με κώδικες.</li>
+</ul>
+<h3>Μεταγωγή</h3>
+<ul>
+<li><b>Μεταγωγή κυκλώματος</b>: δεσμεύεται κατ' αποκλειστικότητα φυσικό κύκλωμα από άκρο σε άκρο για όλη τη διάρκεια της κλήσης.</li>
+<li><b>Μεταγωγή πακέτων</b>: μηνύματα → πακέτα, <b>store-and-forward</b> σε κάθε κόμβο.
+  <ul>
+   <li><b>Αυτοδύναμα πακέτα (datagrams)</b>, π.χ. Internet: κάθε πακέτο φέρει <b>πλήρη διεύθυνση προορισμού</b> (καθολικά μοναδική) και προωθείται <b>ανεξάρτητα</b>.</li>
+   <li><b>Εικονικά κυκλώματα</b>, π.χ. ATM, Frame Relay, MPLS: το κύκλωμα στήνεται <b>πριν</b> τη μεταφορά, όλα τα πακέτα της ροής ακολουθούν την <b>ίδια διαδρομή</b>, η κεφαλίδα φέρει <b>ετικέτα (VCI)</b> με <b>τοπική</b> μόνο σημασία — σε κάθε μεταγωγέα γίνεται και <b>μετατροπή</b> της ετικέτας.</li>
+  </ul>
+</li>
+</ul>
+<h3>Καθυστερήσεις</h3>
+<div class="fx block">Χρόνος μετάδοσης  D_T = (μέγεθος πακέτου) / (ρυθμός συνδέσμου R)
+Χρόνος διάδοσης   D_P = (απόσταση) / (ταχύτητα σήματος, ~2–2.5·10^8 m/s)
+Συνολική καθυστέρηση ενός βήματος = D_T + D_P + (αναμονή σε ουρά) + (επεξεργασία)</div>
+<p class="muted">Ο χρόνος διάδοσης <b>δεν</b> εξαρτάται από το μέγεθος του πακέτου· ο χρόνος μετάδοσης <b>δεν</b> εξαρτάται από την απόσταση.</p>
+<h3>Διαστρωμάτωση</h3>
+<ul>
+<li><b>Υπηρεσία</b> = τι προσφέρει ένα επίπεδο στο αμέσως ανώτερο. <b>Διεπαφή</b> = πώς προσπελαύνεται. <b>Πρωτόκολλο</b> = πώς υλοποιείται (κανόνες επικοινωνίας <b>ομοτίμων</b> οντοτήτων).</li>
+<li>Το λογισμικό επιπέδου N επικοινωνεί μόνο με: N−1 και N+1 <b>στον ίδιο κόμβο</b>, και με το <b>ομότιμο επίπεδο N</b> σε απομακρυσμένους κόμβους.</li>
+<li><b>Ενθυλάκωση</b>: το N-PDU γίνεται ωφέλιμο φορτίο του (N−1)-PDU, με νέα κεφαλίδα (και ουρά στο 2ο επίπεδο).</li>
+<li>Πλεονεκτήματα: τμηματοποίηση, αφαίρεση, επαναχρησιμοποίηση. Μειονέκτημα: απόκρυψη πληροφορίας → ενδεχομένως μη αποδοτική υλοποίηση.</li>
+<li><b>OSI (7 επίπεδα)</b>: Φυσικό, Ζεύξης, Δικτύου, Μεταφοράς, Συνόδου, Παρουσίασης, Εφαρμογής — κυρίως <b>πρότυπο αναφοράς</b>. <b>Internet</b>: Link – Internet (IP) – Transport (TCP/UDP) – Application, απλούστερο και επιτυχημένο.</li>
+<li><b>Μοντέλο κλεψύδρας</b>: ένα και μόνο πρωτόκολλο επιπέδου δικτύου (IP), απλό → εύκολη επέκταση και καθολική διασυνδεσιμότητα.</li>
+</ul>
+<h3>Ενδιάμεσοι κόμβοι</h3>
+<div class="tbl-wrap"><table>
+<tr><th>Συσκευή</th><th>Προωθεί βάσει</th></tr>
+<tr><td>Επαναλήπτης (repeater)/hub</td><td>Επίπεδο 1 — bits/σήματα</td></tr>
+<tr><td>Γέφυρα / μεταγωγέας (switch)</td><td>Επίπεδο 2 — διευθύνσεις πλαισίου (MAC)</td></tr>
+<tr><td>Δρομολογητής (router)</td><td>Επίπεδο 3 — διεύθυνση IP</td></tr>
+<tr><td>Πύλη εφαρμογών / firewall</td><td>Έως και επίπεδο 7</td></tr>
+</table></div>
+<h3>Υπηρεσίες</h3>
+<ul>
+<li><b>Εγγυημένες</b>: συμβόλαιο (SLA) με εγγυήσεις απωλειών/καθυστέρησης/jitter, αίτηση πόρων, <b>έλεγχος αποδοχής</b> και αστυνόμευση — η αίτηση μπορεί να απορριφθεί.</li>
+<li><b>Ελαστικές / best effort</b> (Internet): καμία εγγύηση, υποβάθμιση σε συμφόρηση, καμία αίτηση πόρων. Η ευφυΐα και οι βελτιώσεις μετατίθενται στα <b>άκρα</b> (απλός πυρήνας), σε αντίθεση με τη «φιλοσοφία» του τηλεφωνικού δικτύου / ATM (περίπλοκος πυρήνας, απλά άκρα).</li>
+</ul>
+`},
+
+{id:"link", html:`
+<h3>Ρόλος και υπηρεσίες του 2ου επιπέδου</h3>
+<ul>
+<li>Μεταφέρει <b>πλαίσια</b> μεταξύ <b>γειτονικών</b> κόμβων (ένα «βήμα» ήδη καθορισμένο) — point-to-point ζεύξη ή μέσα από το ίδιο LAN.</li>
+<li>Σε κάθε δρομολογητή τρέχει <b>μία</b> διαδικασία επιπέδου δικτύου αλλά <b>πολλές</b> διαδικασίες επιπέδου 2 — μία <b>ανά διεπαφή</b>.</li>
+<li>Λειτουργίες: <b>πλαισίωση</b> (εντοπισμός ορίων), <b>έλεγχος σφαλμάτων</b>, <b>αναμετάδοση</b>, <b>έλεγχος ροής</b>.</li>
+<li>Το πλαίσιο = κεφαλίδα (τύπος, αριθμός σειράς, αριθμός επιβεβαίωσης, διευθύνσεις σε LAN) + δεδομένα (το πακέτο επιπέδου 3) + <b>ουρά/επίμετρο</b> με bits ελέγχου σφαλμάτων. Δημιουργείται <b>πριν</b> και διαγράφεται <b>μετά</b> από κάθε βήμα.</li>
+</ul>
+<h3>Ανίχνευση vs διόρθωση σφαλμάτων</h3>
+<ul>
+<li>Με N bits πληροφορίας και M bits ελέγχου: 2<sup>N</sup> επιτρεπτές από 2<sup>N+M</sup> δυνατές ακολουθίες → μη επιτρεπτή ακολουθία ⇒ σφάλμα.</li>
+<li><b>Διόρθωση</b> (FEC): όταν η αναμετάδοση είναι αδύνατη/αργή (CD, εφαρμογές πραγματικού χρόνου, δορυφορικές ζεύξεις). <b>Ανίχνευση</b>: όταν είναι δυνατές αναμεταδόσεις — απλούστεροι κώδικες.</li>
+<li>Τα σφάλματα στην πράξη εμφανίζονται σε <b>εκρήξεις (bursts)</b>, όχι ανεξάρτητα.</li>
+</ul>
+<div class="fx block">PER = 1 − (1 − BER)^N ≈ N · BER,  όταν N·BER ≪ 1
+π.χ. N = 10^5 bits, BER = 10^-7 ⇒ PER ≈ 10^-2</div>
+<h3>Παύση και αναμονή (Stop-and-Wait)</h3>
+<ul>
+<li>Χωρίς αρίθμηση <b>πλαισίων</b> → ο παραλήπτης δεν ξεχωρίζει το <b>αντίγραφο</b> από νέο πλαίσιο.</li>
+<li>Χωρίς αρίθμηση <b>ACK</b> → ο αποστολέας δεν ξέρει ποιο πλαίσιο επιβεβαιώνεται.</li>
+<li>Αρκεί <b>1 bit</b> αρίθμησης (0/1) → <b>πρωτόκολλο εναλλασσόμενου bit (ABP)</b>, γνωστό και ως ARQ / PAR.</li>
+<li>Το διπλότυπο <b>επιβεβαιώνεται ξανά</b> αλλά <b>απορρίπτεται</b>.</li>
+</ul>
+<div class="fx block">S = D_TP + D_P + (επεξ.) + D_TA + D_P        (κύκλος ενός πλαισίου)
+Αποδοτικότητα  E = D_TP / S = (P/R) / (P/R + 2·D_P + P_ACK/R)
+Ρυθμός μετάδοσης πληροφορίας = (ωφέλιμα bits πλαισίου) / S</div>
+<p>Αν υπάρχουν σφάλματα με πιθανότητα p (ανά πλαίσιο) και timeout ίσο με τον κύκλο, ο μέσος αριθμός μεταδόσεων ανά επιτυχία είναι 1/(1−p), άρα <span class="fx">E<sub>p</sub> = E · (1 − p)</span>.</p>
+<p><b>Συμπεράσματα:</b> το E <b>μειώνεται</b> όταν αυξάνεται ο ρυθμός R (με σταθερά τα υπόλοιπα) ή όταν μεγαλώνει η απόσταση· <b>βελτιώνεται</b> με μεγαλύτερο πλαίσιο ή μικρότερο D<sub>P</sub>. Άρα το stop-and-wait ταιριάζει σε <b>σύντομους</b> συνδέσμους.</p>
+<p>Το μέγεθος πλαισίου περιορίζεται από: το μέγιστο της τεχνολογίας (MTU), την ανάγκη μικρής PER, τα επιτρεπτά μεγέθη PDU ανώτερων επιπέδων και την πραγματική κίνηση των εφαρμογών.</p>
+<h3>Κυλιόμενο παράθυρο</h3>
+<ul>
+<li>Το stop-and-wait είναι ειδική περίπτωση με παράθυρο 1.</li>
+<li>Για <b>πλήρη αξιοποίηση</b> του συνδέσμου χρειάζεται παράθυρο τουλάχιστον ίσο με τον αριθμό πλαισίων που «χωρούν» σε έναν κύκλο: <span class="fx">w<sub>min</sub> = ⌈S / D_TP⌉</span>.</li>
+<li>Αρίθμηση κυκλικά 0…MAX_SEQ (modulo MAX_SEQ+1)· με m bits πεδίου: MAX_SEQ ≤ 2<sup>m</sup>−1.</li>
+</ul>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Go-Back-N</th><th>Selective Repeat</th></tr>
+<tr><td>Παράθυρο παραλήπτη</td><td><b>r = 1</b> — δέχεται μόνο στη σειρά</td><td><b>r &gt; 1</b> (ενταμίευση εκτός σειράς)</td></tr>
+<tr><td>Εκτός σειράς πλαίσια</td><td>Απορρίπτονται</td><td>Αποθηκεύονται</td></tr>
+<tr><td>Μετά από timeout</td><td>Αναμετάδοση του πλαισίου <b>και όλων των επομένων</b></td><td>Αναμετάδοση <b>μόνο</b> του συγκεκριμένου</td></tr>
+<tr><td>Συνθήκη αρίθμησης</td><td>s ≤ MAX_SEQ, δηλ. εύρος ≥ s+1</td><td>r ≤ (MAX_SEQ+1)/2 και r ≤ s (τυπικά r = s = (MAX_SEQ+1)/2)</td></tr>
+<tr><td>Κόστος</td><td>Σπατάλη εύρους ζώνης</td><td>Μνήμη & πολυπλοκότητα στον δέκτη</td></tr>
+</table></div>
+<p><b>Αθροιστικά ACK:</b> το ACK n σημαίνει «έλαβα σωστά και στη σειρά έως το n».</p>
+<h3>Βελτιώσεις</h3>
+<ul>
+<li><b>Εμβόλιμη επιβεβαίωση (piggybacking)</b>: το ACK ταξιδεύει μέσα σε πλαίσιο δεδομένων της αντίθετης κατεύθυνσης → λιγότερα πλαίσια.</li>
+<li><b>Χρονόμετρο επιβεβαίωσης</b>: ξεκινά με τη λήψη νέου πλαισίου, σταματά αν σταλεί εμβόλιμο ACK, αλλιώς στέλνεται χωριστό ACK. Πολύ μικρό → δεν εξοικονομούνται πλαίσια· πολύ μεγάλο → καθυστερούν οι αναμεταδόσεις ή προκαλούνται αναίτιες.</li>
+</ul>
+`},
+
+{id:"routing", html:`
+<h3>Υπηρεσίες επιπέδου δικτύου</h3>
+<ul>
+<li><b>Ασυνδεσμική (datagram)</b>: καμία εγκαθίδρυση, ανεξάρτητη προώθηση, πλήρης διεύθυνση σε κάθε πακέτο, <b>απλός</b> πυρήνας, ανθεκτικότητα σε βλάβες δρομολογητών, εύκολη προσαρμογή. Πακέτα εκτός σειράς/απώλειες → τα διορθώνει το επίπεδο 4.</li>
+<li><b>Συνδεσμική (εικονικά κυκλώματα)</b>: setup, κατάσταση ανά σύνδεση στους δρομολογητές, σύντομες ετικέτες, εύκολη <b>δέσμευση πόρων και QoS</b>, αλλά ευπάθεια σε βλάβη κόμβου και ανάγκη μνήμης/κατάστασης.</li>
+<li><b>SDN</b>: διαχωρισμός επιπέδου ελέγχου (λογικά κεντρικός ελεγκτής) από το επίπεδο δεδομένων (προώθηση).</li>
+</ul>
+<h3>Αλγόριθμοι δρομολόγησης</h3>
+<ul>
+<li><b>Αρχή της βελτιστοποίησης</b>: αν ο J βρίσκεται στη βέλτιστη διαδρομή I→K, τότε η βέλτιστη διαδρομή J→K ακολουθεί το ίδιο μονοπάτι. Συνέπεια: το σύνολο των βέλτιστων διαδρομών προς έναν προορισμό σχηματίζει <b>δένδρο (sink tree)</b> — άρα δεν υπάρχουν βρόχοι.</li>
+<li><b>Dijkstra</b> (συντομότερης διαδρομής): σε κάθε βήμα «μονιμοποιείται» ο κοντινότερος μη μόνιμος κόμβος και ενημερώνονται οι ετικέτες των γειτόνων του.</li>
+<li><b>Πλημμύρα (flooding)</b>: κάθε εισερχόμενο πακέτο προωθείται σε <b>όλες</b> τις γραμμές εκτός αυτής από την οποία ήρθε. Εξαιρετικά ανθεκτικό και βρίσκει πάντα τη συντομότερη διαδρομή, αλλά σπάταλο· περιορισμός με μετρητή hops ή αριθμούς σειράς.</li>
+<li><b>Διανύσματα απόστασης (DV)</b>: κάθε κόμβος στέλνει <b>περιοδικά στους γείτονες</b> το διάνυσμα των εκτιμήσεών του. Νέα εκτίμηση: <span class="fx">D<sub>x</sub>(y) = min<sub>v</sub> { c(x,v) + D<sub>v</sub>(y) }</span>. Πρόβλημα: <b>count-to-infinity</b> — οι «καλές ειδήσεις» διαδίδονται γρήγορα, οι «κακές» αργά. Μερική λύση: split horizon (με/χωρίς poisoned reverse) — δεν λύνει όλες τις τοπολογίες.</li>
+<li><b>Κατάσταση συνδέσμων (LS)</b>: (1) ανακάλυψη γειτόνων (HELLO), (2) μέτρηση κόστους κάθε συνδέσμου (π.χ. ECHO / RTT ή 1/εύρος ζώνης), (3) κατασκευή πακέτου LSP, (4) <b>πλημμύρα</b> του σε όλο το δίκτυο (με αριθμούς σειράς και πεδίο <i>age</i> για αποφυγή παλαιών/διπλών), (5) τοπική εκτέλεση <b>Dijkstra</b> στον πλήρη χάρτη. Γρήγορη σύγκλιση, δεν πάσχει από count-to-infinity· κόστος μνήμης/υπολογισμού. Παραδείγματα: <b>OSPF</b>, <b>IS-IS</b>.</li>
+<li><b>Ιεραρχική δρομολόγηση</b>: χωρισμός σε περιοχές/AS· κάθε δρομολογητής ξέρει λεπτομερώς μόνο την περιοχή του και μία εγγραφή ανά ξένη περιοχή → <b>δραστική μείωση πινάκων</b>, με τίμημα ενδεχομένως <b>μη βέλτιστες</b> διαδρομές. Βέλτιστο πλήθος επιπέδων για N δρομολογητές: ln N, με e·ln N εγγραφές.</li>
+</ul>
+<h3>Ειδικές μορφές δρομολόγησης</h3>
+<ul>
+<li><b>Εκπομπή (broadcast)</b>: ξεχωριστό πακέτο ανά προορισμό (σπάταλο) · πλημμύρα · <b>πολλαπλή διανομή με δένδρο επικάλυψης (spanning tree)</b> — βέλτιστο σε εύρος ζώνης αλλά απαιτεί γνώση του δένδρου · <b>προώθηση αντίστροφης διαδρομής (RPF)</b>: ο κόμβος προωθεί το πακέτο μόνο αν έφτασε από τη γραμμή που χρησιμοποιεί ο ίδιος για να στείλει <b>προς</b> την πηγή — καλή προσέγγιση χωρίς γνώση του δένδρου.</li>
+<li><b>Πολυδιανομή (multicast)</b>: αποστολή σε <b>ομάδα</b>· χρήση δένδρων ανά ομάδα (κλάδεμα — pruning — του spanning tree), core-based trees για μεγάλες αραιές ομάδες. Στο Internet: διευθύνσεις κλάσης D και <b>IGMP</b>.</li>
+<li><b>Πλησιοδιανομή (anycast)</b>: παράδοση σε <b>έναν</b> (τον «πλησιέστερο») από τους κόμβους που μοιράζονται τη διεύθυνση — προκύπτει «δωρεάν» από την κανονική δρομολόγηση.</li>
+<li><b>Κινητό IP</b>: μόνιμη <b>home address</b> + <b>care-of address</b> στο ξένο δίκτυο· ο <b>home agent</b> υποκλέπτει τα πακέτα και τα προωθεί με <b>διοχέτευση σε σήραγγα (tunneling)</b> στη care-of address· ο αποστολέας μπορεί να ενημερωθεί για βελτιστοποίηση (αποφυγή <i>triangle routing</i>).</li>
+<li><b>Ad hoc (AODV/DSR)</b>: δρομολόγηση <b>κατ' απαίτηση</b> — ROUTE REQUEST με πλημμύρα, ROUTE REPLY κατά την αντίστροφη διαδρομή, συντήρηση με HELLO και ακύρωση διαδρομών όταν σπάσει σύνδεσμος.</li>
+</ul>
+<h3>Ομότιμα δίκτυα — Chord</h3>
+<ul>
+<li>Επικαλυπτικό (overlay) δίκτυο πάνω από το Internet· κόμβοι και κλειδιά αντιστοιχίζονται με hash (SHA-1) σε κυκλικό χώρο 2<sup>m</sup>.</li>
+<li>Το κλειδί k ανήκει στον <b>successor(k)</b> — τον πρώτο κόμβο ίσο ή μεγαλύτερο του k στον κύκλο.</li>
+<li>Με μόνο τον δείκτη successor η αναζήτηση είναι <b>O(n)</b>. Με <b>finger table</b> m εγγραφών (η i-οστή δείχνει στον successor του n+2<sup>i−1</sup>) η αναζήτηση γίνεται σε <b>O(log n)</b> βήματα.</li>
+</ul>
+`},
+
+{id:"qos", html:`
+<h3>Συμφόρηση</h3>
+<ul>
+<li>Ορισμός: ο <b>προσφερόμενος φόρτος υπερβαίνει τη διεκπεραιωτική ικανότητα</b> του δικτύου.</li>
+<li>Αιτίες: πολλές ροές προς την ίδια έξοδο, αργοί σύνδεσμοι/επεξεργαστές, ανεπαρκής μνήμη — <b>η προσθήκη μνήμης δεν λύνει το πρόβλημα</b> (τα πακέτα καθυστερούν τόσο που έχουν ήδη αναμεταδοθεί).</li>
+<li><b>Έλεγχος ροής</b> = ζήτημα <b>ενός ζεύγους</b> αποστολέα–παραλήπτη (να μην πνιγεί ο δέκτης). <b>Έλεγχος συμφόρησης</b> = <b>καθολικό</b> ζήτημα, αφορά όλους τους κόμβους και τις γραμμές.</li>
+<li>Λύσεις βρόχου <b>ανοικτού</b> (πρόληψη: σχεδίαση, πολιτικές, αστυνόμευση) και <b>κλειστού</b> (ανάδραση: παρακολούθηση → ενημέρωση → προσαρμογή· choke packets, backpressure, ECN, RED, απόρριψη φορτίου).</li>
+<li>Όταν τίποτε δεν αρκεί: <b>απόρριψη φορτίου (load shedding)</b> με πολιτική «wine vs milk» (για δεδομένα το παλιό είναι πιο πολύτιμο, για πολυμέσα το νέο).</li>
+</ul>
+<h3>Ποιότητα υπηρεσίας: παράμετροι</h3>
+<ul>
+<li>Εύρος ζώνης, <b>καθυστέρηση</b>, <b>παραμόρφωση χρονισμού (jitter)</b> = μεταβλητότητα της καθυστέρησης, <b>απώλειες</b>, αξιοπιστία.</li>
+<li><b>Jitter</b>: ενοχλεί εφαρμογές <b>πραγματικού χρόνου</b> (τηλεφωνία/VoIP, βίντεο, τηλεδιάσκεψη), όχι e-mail/μεταφορά αρχείων. Αντιμετώπιση: <b>ενταμίευση στον δέκτη (playout buffer)</b> — εξομαλύνει το jitter <b>με τίμημα επιπλέον αρχική καθυστέρηση</b>· επίσης χρονοσήμανση πακέτων (RTP), προτεραιότητα/ρύθμιση χρονοπρογραμματισμού στους δρομολογητές, μικρά πακέτα σε συμφορημένους συνδέσμους.</li>
+</ul>
+<h3>Τεχνικές επίτευξης QoS</h3>
+<ul>
+<li><b>Υπερδιαστασιολόγηση</b>: απλή αλλά ακριβή.</li>
+<li><b>Μορφοποίηση (shaping)</b> vs <b>αστυνόμευση (policing)</b>: η μορφοποίηση εξομαλύνει την κίνηση στην είσοδο, η αστυνόμευση ελέγχει τη συμμόρφωση με το συμβόλαιο (και απορρίπτει/σημειώνει τα μη συμμορφούμενα).</li>
+<li><b>Τρύπιος κουβάς (leaky bucket)</b>: <b>σταθερός</b> ρυθμός εξόδου — καταργεί τις ριπές· αν γεμίσει, <b>χάνονται δεδομένα</b>.</li>
+<li><b>Κουβάς κουπονιών (token bucket)</b>: κουπόνια παράγονται με ρυθμό ρ και συσσωρεύονται έως B· η μετάδοση καταναλώνει κουπόνια → <b>επιτρέπονται ριπές</b> μέχρι B. Αν γεμίσει ο κουβάς <b>χάνονται κουπόνια, όχι δεδομένα</b>. Όταν αδειάσει, ο ρυθμός εξόδου πέφτει στο ρ.</li>
+</ul>
+<div class="fx block">Μέγιστη διάρκεια ριπής με ρυθμό M:   B + ρ·S = M·S  ⇒  S = B / (M − ρ)
+Όγκος της μέγιστης ριπής = M·S = B·M/(M−ρ) > B
+Ελάχιστο B ώστε ριπή διάρκειας T με ρυθμό M να περάσει ανέπαφη:  B = T·(M − ρ)</div>
+<ul>
+<li><b>Δέσμευση πόρων</b> (εύρος ζώνης, χώρος ενταμιευτή, κύκλοι CPU) και <b>έλεγχος αποδοχής</b> βάσει περιγραφέα κίνησης (flow spec).</li>
+<li><b>Χρονοπρογραμματισμός πακέτων</b>: FIFO (μια «άπληστη» ροή μπορεί να μονοπωλήσει), <b>fair queueing</b> (round robin ανά ροή — σε bytes, ώστε να μην ευνοούνται τα μεγάλα πακέτα), <b>weighted fair queueing (WFQ)</b> με βάρη ανά ροή.</li>
+</ul>
+<h3>ATM και κλάσεις υπηρεσιών</h3>
+<ul>
+<li>Εικονικά κυκλώματα, <b>κελιά σταθερού μήκους 53 bytes</b> (5 κεφαλίδα + 48 φορτίο) → απλή/γρήγορη μεταγωγή σε υλικό. Συμβόλαιο κίνησης με παραμέτρους (PCR, SCR, MBS, CDV…).</li>
+<li>Κλάσεις: <b>CBR</b> (σταθερός ρυθμός, εξομοίωση κυκλώματος), <b>VBR</b> real-time / non-real-time, <b>ABR</b> (με ανάδραση, ελάχιστος εγγυημένος ρυθμός), <b>UBR</b> (best effort).</li>
+</ul>
+<h3>QoS στο Internet</h3>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Ολοκληρωμένες υπηρεσίες (IntServ)</th><th>Διαφοροποιημένες υπηρεσίες (DiffServ)</th></tr>
+<tr><td>Κοκκοποίηση</td><td><b>Ανά ροή</b></td><td><b>Ανά κλάση</b></td></tr>
+<tr><td>Κατάσταση στους δρομολογητές</td><td>Ναι, ανά ροή (soft state)</td><td>Όχι — μόνο ανά κλάση</td></tr>
+<tr><td>Σηματοδοσία</td><td><b>RSVP</b> (δέσμευση από τον <b>παραλήπτη</b>, με μηνύματα PATH/RESV)</td><td>Καμία· σήμανση στο πεδίο <b>DS/TOS</b></td></tr>
+<tr><td>Κλιμακωσιμότητα</td><td>Χαμηλή</td><td>Υψηλή</td></tr>
+<tr><td>Υπηρεσίες</td><td>Guaranteed / Controlled load</td><td><b>Expedited Forwarding</b> (EF), <b>Assured Forwarding</b> (AF — 4 κλάσεις × 3 βαθμίδες απόρριψης)</td></tr>
+</table></div>
+`},
+
+{id:"internet", html:`
+<h3>Διαδικτύωση</h3>
+<ul>
+<li>Τα δίκτυα διαφέρουν σε: υπηρεσία (συνδεσμική/ασυνδεσμική), πρωτόκολλα, διευθυνσιοδότηση, <b>μέγιστο μέγεθος πακέτου</b>, ποιότητα, ασφάλεια, χρέωση.</li>
+<li><b>Συνενωμένα εικονικά κυκλώματα</b> (concatenated VC) vs <b>ασυνδεσμική διαδικτύωση</b> (το μοντέλο του IP — απλότητα και ευρωστία, με τίμημα την απουσία εγγυήσεων).</li>
+</ul>
+<h3>Τα βήματα αποστολής πακέτου από άκρο σε άκρο (LANs μέσω IP)</h3>
+<ol>
+<li>Ο υπολογιστής παίρνει διεύθυνση, μάσκα, default gateway και DNS server — συνήθως μέσω <b>DHCP</b>.</li>
+<li>Το όνομα του προορισμού μεταφράζεται σε IP μέσω <b>DNS</b> (ερώτημα UDP, θύρα 53).</li>
+<li>Με τη <b>μάσκα υποδικτύου</b> κρίνεται αν ο προορισμός είναι στο ίδιο υποδίκτυο. Αν <b>ναι</b> → το πλαίσιο στέλνεται απευθείας στη MAC του προορισμού· αν <b>όχι</b> → στέλνεται στη MAC του <b>δρομολογητή-πύλης</b> (η IP προορισμού μένει αναλλοίωτη).</li>
+<li>Η MAC του επόμενου άλματος βρίσκεται με <b>ARP</b> (broadcast αίτηση, unicast απάντηση, cache).</li>
+<li>Σε κάθε δρομολογητή: αποθυλάκωση του πακέτου, αναζήτηση στον πίνακα με <b>ταίριασμα μακρύτερου προθέματος</b>, μείωση TTL, επανυπολογισμός checksum κεφαλίδας, ενθυλάκωση σε <b>νέο πλαίσιο</b> για το επόμενο βήμα (νέες MAC διευθύνσεις).</li>
+<li>Αν υπάρχει <b>NAT</b>, ο δρομολογητής αντικαθιστά ιδιωτική IP + θύρα πηγής με δημόσια IP + νέα θύρα, κρατώντας πίνακα αντιστοίχισης για την αντίστροφη κατεύθυνση.</li>
+</ol>
+<h3>Διοχέτευση σε σήραγγα (tunneling)</h3>
+<p>Όταν δύο όμοια δίκτυα (π.χ. δύο IPv6 «νησίδες» ή δύο υποκαταστήματα) συνδέονται μέσω ενός <b>διαφορετικού</b> ενδιάμεσου δικτύου: το αρχικό πακέτο <b>ενθυλακώνεται ολόκληρο</b> ως φορτίο σε πακέτο του ενδιάμεσου δικτύου και αποθυλακώνεται στο άλλο άκρο της σήραγγας. Το ενδιάμεσο δίκτυο «βλέπει» μόνο τη δική του κεφαλίδα. Χρήσεις: IPv6-over-IPv4, VPN, Mobile IP.</p>
+<h3>Θρυμματισμός (fragmentation)</h3>
+<ul>
+<li>Απαιτείται όταν το πακέτο υπερβαίνει το <b>MTU</b> ενός δικτύου στη διαδρομή.</li>
+<li><b>Διαφανής</b> (επανασυναρμολόγηση σε κάθε έξοδο — απαιτεί εικονικά κυκλώματα) vs <b>μη διαφανής</b> (IPv4: επανασυναρμολόγηση <b>μόνο στον τελικό προορισμό</b>).</li>
+<li>Πεδία IPv4: <b>Identification</b> (κοινό σε όλα τα θρύμματα), <b>Fragment offset</b> (σε μονάδες 8 bytes), σημαία <b>MF</b> (More Fragments), σημαία <b>DF</b> (Don't Fragment).</li>
+<li>Αποφυγή: <b>Path MTU Discovery</b> — αποστολή με DF=1 και προσαρμογή βάσει ICMP μηνυμάτων.</li>
+<li>Στο <b>IPv6 δεν επιτρέπεται θρυμματισμός από ενδιάμεσο δρομολογητή</b> — μόνο από τον αποστολέα (κεφαλίδα επέκτασης Fragment).</li>
+</ul>
+<h3>MPLS</h3>
+<ul>
+<li><b>Μεταγωγή βάσει ετικέτας</b>: προστίθεται ετικέτα (shim header 32 bits) μεταξύ επιπέδου 2 και 3 → «επίπεδο 2,5».</li>
+<li>Η προώθηση γίνεται με <b>απλή αναζήτηση σταθερού μήκους</b> (ευρετήριο πίνακα) αντί για ταίριασμα μακρύτερου προθέματος → <b>ταχύτερη</b>.</li>
+<li>Επιτρέπει <b>traffic engineering</b>, VPN, QoS ανά LSP. Οι ετικέτες έχουν <b>τοπική</b> σημασία και αλλάζουν σε κάθε άλμα (swapping)· υποστηρίζεται <b>στοίβα ετικετών</b>.</li>
+</ul>
+<h3>OSPF</h3>
+<ul>
+<li>Πρωτόκολλο <b>κατάστασης συνδέσμων</b>, <b>εσωτερικό</b> (εντός AS / IGP), ανοικτό πρότυπο.</li>
+<li>Ιεραρχία: <b>περιοχές (areas)</b> με υποχρεωτική <b>ραχοκοκαλιά (backbone, area 0)</b>· δρομολογητές εσωτερικοί, συνόρων περιοχής (ABR), ραχοκοκαλιάς και συνόρων AS (ASBR).</li>
+<li>Υποστηρίζει πολλαπλές μετρικές, εξισορρόπηση φόρτου σε ισοδύναμες διαδρομές, αυθεντικοποίηση, δίκτυα πολλαπλής πρόσβασης μέσω <b>designated router</b>.</li>
+</ul>
+<h3>BGP</h3>
+<ul>
+<li><b>Εξωτερικό</b> πρωτόκολλο πύλης — δρομολόγηση <b>μεταξύ αυτόνομων συστημάτων (AS)</b>· εκτελείται μεταξύ <b>συνοριακών δρομολογητών (gateway routers)</b>.</li>
+<li>Πρωτόκολλο <b>διανυσμάτων διαδρομής (path vector)</b>: αντί για απόσταση, ανταλλάσσεται η <b>πλήρης διαδρομή (AS-PATH)</b> + η IP του <b>NEXT HOP</b> για κάθε <b>πρόθεμα</b>. Έτσι (α) αποφεύγονται εύκολα οι βρόχοι και (β) εφαρμόζονται <b>πολιτικές</b> (ποια AS αποφεύγω, από πού δέχομαι/διαφημίζω).</li>
+<li><b>eBGP</b> μεταξύ διαφορετικών AS, <b>iBGP</b> εντός του AS (για να μάθουν όλοι οι εσωτερικοί δρομολογητές τις εξωτερικές διαδρομές). Τα μηνύματα μεταφέρονται πάνω από <b>TCP</b> (θύρα 179) για αξιοπιστία.</li>
+<li>Μηνύματα: <b>OPEN, UPDATE, KEEPALIVE, NOTIFICATION</b>.</li>
+</ul>
+<h3>IPv6</h3>
+<ul>
+<li>Διευθύνσεις <b>128 bits</b>, βασική κεφαλίδα <b>σταθερού μήκους 40 bytes</b> με <b>λιγότερα πεδία</b> (8 αντί για 13).</li>
+<li>Καταργήθηκαν: <b>checksum κεφαλίδας</b>, πεδία θρυμματισμού (πήγαν σε κεφαλίδα επέκτασης), IHL/Options.</li>
+<li><b>Κεφαλίδες επέκτασης</b> (hop-by-hop, routing, fragment, authentication, ESP, destination options) — αλυσίδα μέσω του πεδίου <i>Next header</i>.</li>
+<li>Νέα: πεδία <b>Flow label</b> και <b>Traffic class</b>, αυτόματη διαμόρφωση, καλύτερη υποστήριξη ασφάλειας και κινητικότητας. Μετάβαση κυρίως με <b>διπλή στοίβα</b> και <b>tunneling</b> μεταξύ νησίδων IPv6.</li>
+</ul>
+<h3>Ιεραρχική δομή παρόχων</h3>
+<ul>
+<li><b>Tier-1</b> (διεθνής κάλυψη) — συνδέονται μεταξύ τους ως ίσοι με <b>peering</b> (χωρίς πληρωμή)· <b>Tier-2</b> (περιφερειακοί) — είναι <b>πελάτες</b> των Tier-1 (transit, με πληρωμή) και κάνουν peering μεταξύ τους· <b>Tier-3/τοπικοί ISP</b> — δίκτυα πρόσβασης, πελάτες ανώτερων βαθμίδων.</li>
+<li><b>IXP</b>: σημεία ανταλλαγής κίνησης. <b>Δίκτυα παρόχων περιεχομένου</b> (Google, Akamai, Microsoft) χτίζουν δικά τους δίκτυα και συνδέονται απευθείας με access ISPs, <b>παρακάμπτοντας</b> τους Tier-1/περιφερειακούς.</li>
+</ul>
+`},
+
+{id:"transport", html:`
+<h3>Σύγκριση επιπέδων 2 και 4</h3>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Επίπεδο 2 (ζεύξη)</th><th>Επίπεδο 4 (μεταφορά)</th></tr>
+<tr><td>Εμβέλεια</td><td>Ένα βήμα, γειτονικοί κόμβοι</td><td>Από άκρο σε άκρο, μέσω υποδικτύου</td></tr>
+<tr><td>Διευθυνσιοδότηση</td><td>Ο παραλήπτης υπονοείται από τη γραμμή</td><td>Απαιτείται <b>ρητή διευθυνσιοδότηση</b> (TSAP/θύρα)</td></tr>
+<tr><td>Εγκαθίδρυση</td><td>Απλή</td><td>Δύσκολη — καθυστερημένα διπλότυπα ⇒ <b>τριπλή χειραψία</b></td></tr>
+<tr><td>Αποθήκευση πακέτων</td><td>Δεν «επιβιώνουν» στη γραμμή</td><td>Πακέτα μπορούν να «κοιμούνται» στο δίκτυο</td></tr>
+<tr><td>Ενταμίευση</td><td>Λίγοι, σταθεροί ενταμιευτές</td><td>Πολλές συνδέσεις ⇒ <b>δυναμική</b> κατανομή</td></tr>
+</table></div>
+<h3>Διευθυνσιοδότηση και «ανακάλυψη»</h3>
+<ul>
+<li>Οι διευθύνσεις του επιπέδου μεταφοράς (<b>TSAP</b> / <b>θύρες</b>) αντιστοιχούν σε <b>διεργασίες</b> — σε αντίθεση με τις NSAP (IP) που αντιστοιχούν σε <b>κόμβους/διεπαφές</b>.</li>
+<li>Τρόποι εύρεσης: <b>γνωστές θύρες (well-known ports)</b> για καθιερωμένες υπηρεσίες (80, 25, 53…)· <b>εξυπηρετητής ονομάτων / καταλόγου</b> (name server, portmapper) όπου οι υπηρεσίες δηλώνονται και ο πελάτης ρωτά· <b>εξυπηρετητής διεργασιών (process server / inetd)</b> που ακούει σε πολλές θύρες και <b>ξεκινά</b> τον κατάλληλο εξυπηρετητή μόνο όταν χρειαστεί (αποδοτική διαχείριση σπάνια χρησιμοποιούμενων υπηρεσιών).</li>
+</ul>
+<h3>Εγκαθίδρυση: τριπλή χειραψία</h3>
+<ul>
+<li>Πρόβλημα: <b>καθυστερημένα διπλότυπα</b> πακέτα εγκαθίδρυσης μπορούν να δημιουργήσουν πλαστές συνδέσεις. Περιορισμός χρόνου ζωής με TTL/hop count και «φράγμα χρόνου T».</li>
+<li>Λύση (Tomlinson): <b>τριπλή χειραψία</b> με αρχικούς αριθμούς σειράς από ρολόι. CR(seq=x) → ACK(seq=y, ack=x+1) → DATA/ACK(seq=x+1, ack=y+1). Κάθε πλευρά επιβεβαιώνει τον <b>αριθμό που επέλεξε η άλλη</b>, οπότε ένα καθυστερημένο διπλότυπο απορρίπτεται (λάθος ack).</li>
+</ul>
+<h3>Αποδέσμευση</h3>
+<ul>
+<li><b>Ασύμμετρη</b>: μία πλευρά κλείνει — κίνδυνος απώλειας δεδομένων. <b>Συμμετρική</b>: κάθε κατεύθυνση κλείνει ανεξάρτητα (half-close).</li>
+<li><b>Πρόβλημα των δύο στρατών</b>: δεν υπάρχει πρωτόκολλο με πεπερασμένο πλήθος μηνυμάτων που να εγγυάται συμφωνία πάνω σε <b>αναξιόπιστο</b> κανάλι. Πρακτική λύση: τριπλή χειραψία αποδέσμευσης (FIN/ACK) + <b>χρονόμετρα</b>.</li>
+</ul>
+<h3>Έλεγχος ροής και πολυπλεξία</h3>
+<ul>
+<li>Παράθυρο παραλήπτη που ανακοινώνεται δυναμικά (credit)· αν το δίκτυο είναι αξιόπιστο, οι ενταμιευτές χρειάζονται κυρίως στον <b>δέκτη</b>.</li>
+<li><b>Πολυπλεξία</b>: πολλές συνδέσεις μεταφοράς πάνω από μία σύνδεση δικτύου (upward) ή μία σύνδεση σε πολλαπλές διαδρομές δικτύου (downward).</li>
+<li><b>Ανάκαμψη από κατάρρευση</b>: αν καταρρεύσει ένας κόμβος, δεν υπάρχει τρόπος πλήρως ασφαλούς ανάκαμψης στο επίπεδο N — <b>η ανάκαμψη πρέπει να γίνει στο επίπεδο N+1</b> (τελικά στην εφαρμογή), γιατί ο πελάτης δεν ξέρει αν το πακέτο γράφτηκε πριν ή μετά την κατάρρευση.</li>
+</ul>
+<h3>UDP και RTP</h3>
+<ul>
+<li><b>UDP</b>: κεφαλίδα <b>8 bytes</b> (θύρα πηγής, θύρα προορισμού, μήκος, άθροισμα ελέγχου). <b>Καμία</b> εγκαθίδρυση, αξιοπιστία, έλεγχος ροής ή συμφόρησης — μόνο πολυπλεξία/αποπολυπλεξία και προαιρετικός έλεγχος σφαλμάτων. Κατάλληλο για DNS, RPC, ροές πραγματικού χρόνου.</li>
+<li><b>RTP</b>: πάνω από UDP (στον χώρο χρήστη). Παρέχει <b>αριθμό σειράς</b> (ανίχνευση απωλειών/αναδιάταξης), <b>χρονοσήμανση (timestamp)</b> για συγχρονισμό και αντιμετώπιση jitter, και αναγνώριση τύπου φορτίου. Το <b>RTCP</b> δίνει ανάδραση ποιότητας. Δεν παρέχει εγγυήσεις — η αναπαραγωγή βασίζεται σε <b>playout buffer</b>.</li>
+</ul>
+<h3>TCP</h3>
+<ul>
+<li>Αξιόπιστη, <b>αμφίδρομη ροή bytes</b> με έλεγχο ροής και συμφόρησης· η σύνδεση προσδιορίζεται από την <b>τετράδα</b> (IP πηγής, θύρα πηγής, IP προορισμού, θύρα προορισμού).</li>
+<li>Κεφαλίδα <b>20 bytes</b> (χωρίς επιλογές): θύρες, <b>Sequence number</b> (αριθμεί <b>bytes</b>, όχι τμήματα), <b>Acknowledgement number</b> (<b>αθροιστικό</b> — το <b>επόμενο αναμενόμενο byte</b>), μήκος κεφαλίδας, σημαίες <b>SYN/ACK/FIN/RST/PSH/URG</b>, <b>Window size</b>, checksum, urgent pointer· επιλογές: <b>MSS</b>, window scale, <b>SACK</b>, timestamps.</li>
+<li><b>Εγκαθίδρυση</b>: SYN(x) → SYN+ACK(y, x+1) → ACK(y+1). <b>Αποδέσμευση</b>: FIN/ACK ανά κατεύθυνση + κατάσταση <b>TIME_WAIT</b> (2×MSL).</li>
+<li><b>Πολιτική μετάδοσης</b>: παράθυρο αποστολέα = <span class="fx">min{ παράθυρο παραλήπτη (rwnd), παράθυρο συμφόρησης (cwnd) }</span>. Το rwnd έρχεται από το άλλο άκρο· το cwnd υπολογίζεται <b>τοπικά</b>.</li>
+<li><b>Σύνδρομο ανόητου παραθύρου</b> → λύση Clark (ο δέκτης δεν ανακοινώνει μικροσκοπικά παράθυρα) και <b>αλγόριθμος Nagle</b> (ο αποστολέας συσσωρεύει μικρά δεδομένα μέχρι να έρθει ACK).</li>
+</ul>
+<h4>Έλεγχος συμφόρησης</h4>
+<ul>
+<li>Ένδειξη συμφόρησης = <b>λήξη χρονομέτρου / απώλεια</b> (το IP δεν δίνει ρητή ένδειξη). Η υπόθεση «απώλεια = συμφόρηση» είναι <b>λανθασμένη σε ασύρματες ζεύξεις</b>, όπου οι απώλειες οφείλονται σε σφάλματα μετάδοσης.</li>
+<li><b>Αργή εκκίνηση</b>: cwnd = 1 MSS, +1 MSS ανά ACK ⇒ <b>διπλασιασμός ανά RTT</b> (εκθετικά), μέχρι το <b>κατώφλι</b> (αρχικά 64 KB).</li>
+<li><b>Αποφυγή συμφόρησης</b>: +1/W MSS ανά ACK ⇒ <b>+1 MSS ανά RTT</b> (γραμμικά).</li>
+<li><b>Timeout (TCP Tahoe)</b>: κατώφλι ← cwnd/2, cwnd ← 1 MSS, επιστροφή σε αργή εκκίνηση. (Reno: με 3 διπλά ACK → fast retransmit / fast recovery, cwnd ← cwnd/2 χωρίς πλήρη μηδενισμό.)</li>
+<li><b>AIMD</b> (additive increase – multiplicative decrease) ⇒ <b>δικαιοσύνη του TCP</b>: συνδέσεις που μοιράζονται σύνδεσμο συγκλίνουν σε ίση κατανομή. Με additive decrease ή multiplicative increase η διαφορά <b>δεν</b> εξαλείφεται.</li>
+</ul>
+<div class="fx block">Μέση τιμή παραθύρου = (W/2 + W)/2 = 3W/4
+Μέσος ρυθμός διεκπεραίωσης TCP ≈ 3W / (4·RTT)</div>
+<h4>Χρονόμετρα TCP</h4>
+<ul>
+<li><b>Αναμετάδοσης (RTO)</b> — το κύριο· <b>επιμονής (persistence)</b> — περιοδική διερεύνηση όταν έχει ανακοινωθεί παράθυρο 0 (αποφυγή αδιεξόδου αν χαθεί η ανακοίνωση ανοίγματος)· <b>keepalive</b>· <b>TIME_WAIT (2·MSL)</b>.</li>
+</ul>
+<div class="fx block">Αλγόριθμος Jacobson (εκτίμηση από μετρήσεις M του RTT):
+RTT   ← α·RTT + (1−α)·M          (τυπικά α = 7/8)
+D     ← α·D  + (1−α)·|RTT − M|    (εκτίμηση απόκλισης)
+Timeout = RTT + 4·D
+Κανόνας Karn: οι μετρήσεις από αναμεταδοθέντα τμήματα ΔΕΝ χρησιμοποιούνται·
+αντ' αυτού το timeout διπλασιάζεται σε κάθε αναμετάδοση (exponential backoff).</div>
+<p><b>Ενέργειες σε timeout:</b> αναμετάδοση του παλαιότερου μη επιβεβαιωμένου τμήματος, διπλασιασμός του RTO, κατώφλι ← cwnd/2 και cwnd ← 1 MSS (αργή εκκίνηση).</p>
+<h4>Ειδικά θέματα</h4>
+<ul>
+<li><b>Ασύρματο TCP</b>: λύση με <b>διαχωρισμό της σύνδεσης</b> (indirect TCP) ή <b>snooping agent</b> στον σταθμό βάσης που αναμεταδίδει τοπικά και αποκρύπτει τις απώλειες από τον αποστολέα.</li>
+<li><b>T/TCP</b> (transactional TCP): συγχωνεύει εγκαθίδρυση + δεδομένα + αποδέσμευση, ώστε μια συναλλαγή αίτησης/απάντησης να ολοκληρώνεται σε λίγα πακέτα.</li>
+<li><b>ECN</b>: ρητή σήμανση συμφόρησης από τους δρομολογητές, πριν προκύψει απώλεια.</li>
+</ul>
+`},
+
+{id:"perf", html:`
+<h3>Προβλήματα απόδοσης</h3>
+<ul>
+<li>Προσωρινές υπερφορτίσεις, ασυμμετρία πόρων, «καταιγίδες εκπομπής» (broadcast storms), κακός συντονισμός χρονομέτρων, ανεπαρκής ρύθμιση παραμέτρων παρά την επάρκεια εύρους ζώνης.</li>
+<li>Πολλά προβλήματα οφείλονται σε <b>λογισμικό/επεξεργασία</b>, όχι στη χωρητικότητα των γραμμών.</li>
+</ul>
+<h3>Γινόμενο καθυστέρησης × εύρους ζώνης</h3>
+<div class="fx block">BDP = Εύρος ζώνης (bps) × RTT (s)    [bits «εν πτήσει»]
+Απαιτούμενο παράθυρο για πλήρη αξιοποίηση ≥ BDP
+Ρυθμός διεκπεραίωσης ≈ min{ R, W / RTT }</div>
+<ul>
+<li>Σε <b>σύνδεσμο μεγάλου BDP</b> («μακρύς παχύς σωλήνας») ένα μικρό παράθυρο αφήνει τη γραμμή αδρανή· εκεί το stop-and-wait και τα μικρά παράθυρα καταρρέουν.</li>
+<li>Για μικρά αρχεία η καθυστέρηση κυριαρχείται από το <b>RTT</b> (χειραψίες, αργή εκκίνηση) και όχι από τον ρυθμό της γραμμής — γι' αυτό η αύξηση της χωρητικότητας δεν βοηθά πάντα.</li>
+</ul>
+<h3>Μέτρηση επίδοσης</h3>
+<ul>
+<li>Βήματα: εντοπισμός του πραγματικού «στενού λαιμού», μέτρηση με <b>επαρκές δείγμα</b>, κατανόηση των αιτίων πριν από κάθε αλλαγή, μία αλλαγή τη φορά.</li>
+<li>Παγίδες: μικρό μέγεθος δείγματος, μεγάλη διακύμανση, χονδροειδής ανάλυση ρολογιού, ασυνήθιστες συνθήκες (cache warm/cold), <b>κρυφή μνήμη</b> που αλλοιώνει τα αποτελέσματα, εξαγωγή συμπερασμάτων πέρα από το μετρημένο εύρος (extrapolation).</li>
+</ul>
+<h3>Σχεδίαση για βελτιωμένη απόδοση</h3>
+<ul>
+<li>Ο <b>χρόνος CPU</b> είναι συχνά πιο κρίσιμος από το εύρος ζώνης → μείωση αριθμού πακέτων (συνάθροιση), μείωση <b>αντιγραφών</b> δεδομένων, μείωση εναλλαγών περιβάλλοντος και διακοπών.</li>
+<li>Λιγότερα και <b>μεγαλύτερα</b> πακέτα: μικρότερο σχετικό overhead, λιγότερες διακοπές· αλλά μεγαλύτερη PER και καθυστέρηση.</li>
+<li><b>Γρήγορη επεξεργασία TPDU</b>: «γρήγορο μονοπάτι» (fast path) για τη συνήθη περίπτωση, προϋπολογισμένα πρότυπα κεφαλίδων, <b>header prediction</b>, αποφυγή αντιγραφών (scatter-gather), αποδοτικός χειρισμός χρονομέτρων (timer wheel).</li>
+<li>Αποφυγή του «συνδρόμου ανόητου παραθύρου» και του overhead μικρών μηνυμάτων (Nagle).</li>
+</ul>
+`},
+
+{id:"app", html:`
+<h3>Ηλεκτρονικό ταχυδρομείο</h3>
+<ul>
+<li>Συστατικά: <b>πράκτορας χρήστη (UA)</b>, <b>πράκτορας μεταφοράς μηνυμάτων (MTA / mail server)</b>, γραμματοκιβώτια.</li>
+<li>Βασικές λειτουργίες: σύνθεση, μεταφορά, αναφορά, εμφάνιση, διάθεση· επιπλέον λίστες, προώθηση, αυτόματες απαντήσεις.</li>
+<li><b>Φάκελος</b> (envelope — πληροφορία για τη μεταφορά) vs <b>μήνυμα</b> (κεφαλίδες + σώμα). Κεφαλίδες RFC 5322: <code>To:, Cc:, Bcc:, From:, Sender:, Subject:, Date:, Received:, Message-Id:, Reply-To:</code>.</li>
+<li><b>MIME</b>: επιτρέπει μη-ASCII κείμενο και πολυμέσα <b>χωρίς να αλλάξει το SMTP</b>, μέσω κεφαλίδων <code>MIME-Version, Content-Type (type/subtype), Content-Transfer-Encoding (base64, quoted-printable)</code> και <code>multipart</code>.</li>
+<li><b>SMTP</b> (θύρα 25 / 587): πρωτόκολλο <b>ASCII</b> πάνω από <b>TCP</b>, <b>push</b>, μεταξύ του UA/εξυπηρετητή αποστολής και των <b>mail servers</b> — δηλαδή για τη <b>μεταφορά</b> του μηνύματος προς τον εξυπηρετητή του παραλήπτη. Εντολές: HELO/EHLO, MAIL FROM, RCPT TO, DATA, QUIT. Επεκτάσεις (ESMTP): αυθεντικοποίηση, TLS, μεγάλα μηνύματα.</li>
+<li><b>Τελική παράδοση</b> (από το γραμματοκιβώτιο στον χρήστη — <b>pull</b>): <b>POP3</b> (θύρα 110 — κατέβασμα και συνήθως διαγραφή, ελάχιστη κατάσταση στον εξυπηρετητή), <b>IMAP</b> (θύρα 143 — τα μηνύματα μένουν στον εξυπηρετητή, φάκελοι, αναζήτηση, πολλαπλές συσκευές), <b>webmail</b> (HTTP).</li>
+</ul>
+<h3>Παγκόσμιος Ιστός</h3>
+<ul>
+<li>Αρχιτεκτονική πελάτη–εξυπηρετητή. <b>URL</b> = <code>πρωτόκολλο://όνομα-κόμβου[:θύρα]/διαδρομή</code>.</li>
+<li>Βήματα πελάτη: ανάλυση URL → DNS → TCP προς θύρα 80/443 → HTTP αίτηση → απόκριση → εμφάνιση (και αιτήσεις για τα ενσωματωμένα αντικείμενα) → κλείσιμο.</li>
+<li>Εξυπηρετητής: πολυνηματικός/με «μπροστινό» κόμβο (front end) και <b>φάρμα εξυπηρετητών</b>· τα βήματα επεξεργασίας αίτησης (ανάλυση, έλεγχος πρόσβασης, ανάγνωση αρχείου ή <b>δυναμική παραγωγή</b>, καθορισμός MIME type, απάντηση, καταγραφή).</li>
+</ul>
+<h3>HTTP</h3>
+<ul>
+<li>Πρωτόκολλο <b>χωρίς κατάσταση (stateless)</b> πάνω από TCP· μέθοδοι: <b>GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT</b>.</li>
+<li>Κωδικοί απόκρισης: <b>1xx</b> πληροφοριακά, <b>2xx</b> επιτυχία (200 OK), <b>3xx</b> ανακατεύθυνση (301/302, <b>304 Not Modified</b>), <b>4xx</b> σφάλμα πελάτη (403, 404), <b>5xx</b> σφάλμα εξυπηρετητή (500, 503).</li>
+<li>Κεφαλίδες: <code>Host, User-Agent, Accept, If-Modified-Since, Cookie, Set-Cookie, Content-Type, Content-Length, Last-Modified, Expires, Location, Cache-Control, Connection</code>.</li>
+<li><b>HTTP/1.0</b>: μία σύνδεση TCP ανά αντικείμενο. <b>HTTP/1.1</b>: <b>επίμονες συνδέσεις</b> (προεπιλογή) και <b>διοχέτευση (pipelining)</b> → λιγότερες χειραψίες και λιγότερη επίδραση της αργής εκκίνησης. Η κεφαλίδα <code>Host</code> είναι υποχρεωτική (πολλοί ιστότοποι σε μία IP).</li>
+<li><b>Cookies</b>: μικρά αρχεία που θέτει ο εξυπηρετητής (<code>Set-Cookie</code>) και επιστρέφει ο πελάτης (<code>Cookie</code>) — δίνουν <b>κατάσταση</b> σε ένα stateless πρωτόκολλο. Πεδία: domain, path, content (ζεύγη ονόματος–τιμής), expires (μη μόνιμα = «session cookies»), secure. Χρήσεις: καλάθι αγορών, εξατομίκευση, σύνοδοι, παρακολούθηση (third-party cookies → ζητήματα ιδιωτικότητας).</li>
+</ul>
+<h3>Συνολική συνεργασία πρωτοκόλλων για μία αίτηση HTTP</h3>
+<ol>
+<li><b>DNS</b>: ερώτημα (UDP, θύρα 53) για την IP του web server· ο πελάτης χρησιμοποιεί αυθαίρετη μη δεσμευμένη θύρα πηγής. Ενδεχομένως επαναληπτικά/αναδρομικά ερωτήματα σε άλλους DNS servers.</li>
+<li><b>TCP</b>: τριπλή χειραψία προς τη θύρα 80 της IP του server. Κάθε τμήμα ενθυλακώνεται σε πακέτο IP και σε πλαίσια επιπέδου 2 βήμα-βήμα (ARP για κάθε επόμενο άλμα, NAT αν υπάρχει ιδιωτική διεύθυνση).</li>
+<li>Μαζί με το 3ο τμήμα της χειραψίας (ή αμέσως μετά) στέλνεται η <b>HTTP GET</b> για το αρχείο.</li>
+<li>Ο server απαντά με <b>HTTP απόκριση</b> (κωδικός + κεφαλίδες + σώμα)· για μεγάλο αρχείο σε <b>πολλά τμήματα</b>, ρυθμιζόμενα από τα παράθυρα ελέγχου ροής και συμφόρησης του TCP.</li>
+<li><b>Τερματισμός</b> της σύνδεσης TCP με FIN/ACK.</li>
+</ol>
+<h3>Βελτιώσεις απόδοσης</h3>
+<ul>
+<li><b>Κρυφή μνήμη (caching)</b> στον φυλλομετρητή και σε <b>πληρεξούσιο (proxy)</b> — μοιράζεται μεταξύ χρηστών ενός οργανισμού/ISP: μειώνει καθυστέρηση, κίνηση προς το εξωτερικό και φόρτο του server. Έλεγχος φρεσκάδας με <code>Expires</code>, <code>If-Modified-Since</code> (→ <b>304</b>), <code>Cache-Control</code>. Ιεραρχία πληρεξούσιων.</li>
+<li>Δεν είναι όλα κρυπτογραφήσιμα/cacheable: δυναμικό ή εξατομικευμένο περιεχόμενο, cookies, HTTPS.</li>
+</ul>
+<h3>Δίκτυα διανομής περιεχομένου (CDN)</h3>
+<ul>
+<li>Ιδιωτικό δίκτυο εξυπηρετητών-πληρεξούσιων με <b>προ-ενταμιευμένο</b> περιεχόμενο κοντά στους χρήστες. Νέος επιχειρηματικός ρόλος: το CDN <b>χρεώνει τους παρόχους περιεχομένου</b>· ωφελείται και ο ISP (καλύτερος χρόνος απόκρισης, λιγότερη transit κίνηση).</li>
+<li>Το περιεχόμενο <b>ωθείται (push)</b> από τον διακομιστή προέλευσης στους κόμβους του CDN — δεν περιμένει αίτηση, σε αντίθεση με τον κλασικό proxy.</li>
+<li>Επιλογή εξυπηρετητή κυρίως <b>μέσω DNS</b> (εγγραφές <b>CNAME</b>/NS προς το domain του CDN), με κριτήρια: εγγύτητα στη διεύθυνση IP του πελάτη, <b>φόρτος</b> των υποψηφίων εξυπηρετητών και των συνδέσμων, κατοχή του περιεχομένου. Εναλλακτικά με ανακατεύθυνση HTTP (κεφαλίδα <code>Location</code>).</li>
+<li>Οι σελίδες «μετασχηματίζονται»: τα URL των υπερσυνδέσμων τροποποιούνται ώστε να δείχνουν στο domain του CDN.</li>
+</ul>
+`}
+];
+const TF = [
+{u:"basics", q:"Η στατιστική πολυπλεξία δεσμεύει στατικά μια χρονοθυρίδα για κάθε ροή, όπως και το TDM.", a:false,
+ e:"Λάθος. Η στατική δέσμευση χρονοθυρίδων είναι το TDM. Η στατιστική πολυπλεξία μοιράζει τον σύνδεσμο <b>κατ' απαίτηση</b>, ανά πακέτο, και ο σύνδεσμος μένει αδρανής μόνο όταν δεν υπάρχει κανένα πακέτο προς αποστολή."},
+{u:"basics", q:"Τα FDM και TDM είναι ακατάλληλα για εκρηκτική (bursty) κίνηση.", a:true,
+ e:"Σωστό. Επειδή δεσμεύουν πόρους στατικά, ο δεσμευμένος πόρος μένει αδρανής όσο η πηγή σιωπά. Είναι κατάλληλα για κίνηση σταθερού ρυθμού (π.χ. σταθερή τηλεφωνία, GSM)."},
+{u:"basics", q:"Στη μεταγωγή εικονικών κυκλωμάτων η ετικέτα (VCI) της κεφαλίδας έχει καθολική σημασία σε όλο το δίκτυο.", a:false,
+ e:"Λάθος. Η ετικέτα έχει <b>τοπική</b> σημασία: σε κάθε μεταγωγέα γίνεται και μετατροπή της ετικέτας (label swapping), εκτός από την επιλογή θύρας εξόδου."},
+{u:"basics", q:"Στα δίκτυα αυτοδύναμων πακέτων κάθε πακέτο περιέχει την πλήρη διεύθυνση προορισμού και προωθείται ανεξάρτητα από τα υπόλοιπα.", a:true,
+ e:"Σωστό — αυτή είναι η ουσία της datagram μεταγωγής (μοντέλο Internet)."},
+{u:"basics", q:"Το λογισμικό πρωτοκόλλου επιπέδου N επικοινωνεί απευθείας μόνο με τα επίπεδα N−1 και N+1 του ίδιου κόμβου και με το ομότιμο επίπεδο N απομακρυσμένων κόμβων.", a:true,
+ e:"Σωστό. Αυτή είναι η θεμελιώδης αρχή της διαστρωμάτωσης· η «επικοινωνία» με το ομότιμο επίπεδο είναι λογική και υλοποιείται μέσω των κατώτερων επιπέδων."},
+{u:"basics", q:"Το Internet παρέχει εξ ορισμού εγγυήσεις ποιότητας υπηρεσίας στις ροές των χρηστών.", a:false,
+ e:"Λάθος. Το Internet παρέχει υπηρεσία <b>best effort</b> — καμία εγγύηση. Οι βελτιώσεις μετατίθενται στα άκρα, ενώ ο πυρήνας μένει απλός."},
+{u:"basics", q:"Το «μοντέλο κλεψύδρας» του Internet οφείλεται στο ότι υπάρχει ένα και μοναδικό, απλό πρωτόκολλο επιπέδου δικτύου, το IP.", a:true,
+ e:"Σωστό. Ο «λαιμός» της κλεψύδρας είναι το IP· από πάνω και από κάτω υπάρχει μεγάλη ποικιλία, γεγονός που διευκολύνει την επεκτασιμότητα και τη διασυνδεσιμότητα."},
+{u:"basics", q:"Ο χρόνος διάδοσης ενός πακέτου σε έναν σύνδεσμο εξαρτάται από το μέγεθος του πακέτου.", a:false,
+ e:"Λάθος. Ο χρόνος <b>διάδοσης</b> = απόσταση / ταχύτητα σήματος, ανεξάρτητος από το μέγεθος. Ο χρόνος <b>μετάδοσης</b> = μέγεθος / ρυθμός εξαρτάται από το μέγεθος αλλά όχι από την απόσταση."},
+{u:"basics", q:"Οι γέφυρες και οι μεταγωγείς (switches) προωθούν βάσει πληροφορίας του 2ου επιπέδου, ενώ οι δρομολογητές βάσει του 3ου.", a:true,
+ e:"Σωστό. Repeaters: επίπεδο 1· switches/bridges: επίπεδο 2· routers: επίπεδο 3· πύλες εφαρμογών και firewalls φτάνουν έως το επίπεδο εφαρμογής."},
+{u:"basics", q:"Στη μεταγωγή κυκλώματος οι πόροι παραμένουν δεσμευμένοι ακόμη και όταν δεν μεταδίδεται τίποτε.", a:true,
+ e:"Σωστό — αυτή ακριβώς η αποκλειστική δέσμευση για όλη τη διάρκεια της κλήσης είναι που κάνει τη μεταγωγή κυκλώματος μη αποδοτική για δεδομένα."},
+
+{u:"link", q:"Σε κάθε δρομολογητή εκτελείται μία διαδικασία επιπέδου δικτύου αλλά πολλές διαδικασίες επιπέδου 2, μία ανά διεπαφή.", a:true,
+ e:"Σωστό. Κάθε διεπαφή έχει δικό της πρωτόκολλο ζεύξης (και δική της διεύθυνση επιπέδου 2)."},
+{u:"link", q:"Οι κώδικες διόρθωσης σφαλμάτων προτιμώνται όταν η αναμετάδοση είναι αδύνατη ή πολύ αργή.", a:true,
+ e:"Σωστό — π.χ. σε CD, δορυφορικές ζεύξεις και εφαρμογές πραγματικού χρόνου. Αλλού προτιμάται η απλούστερη ανίχνευση με αναμετάδοση."},
+{u:"link", q:"Αν BER = 10⁻⁷ και το πλαίσιο έχει N = 10⁵ bits, τότε PER ≈ 10⁻².", a:true,
+ e:"Σωστό. PER = 1 − (1−BER)^N ≈ N·BER = 10⁵ · 10⁻⁷ = 10⁻²."},
+{u:"link", q:"Στην πράξη τα σφάλματα μετάδοσης είναι ανεξάρτητα μεταξύ τους.", a:false,
+ e:"Λάθος. Εμφανίζονται σε <b>εκρήξεις (bursts)</b>. Αυτό σημαίνει ότι για δεδομένο BER το PER είναι μικρότερο απ' ό,τι προβλέπει ο τύπος της ανεξαρτησίας, και εξηγεί τη χρήση κωδίκων ειδικά για burst errors."},
+{u:"link", q:"Στο πρωτόκολλο παύσης και αναμονής με θόρυβο αρκεί ένα μόνο bit αρίθμησης πλαισίων.", a:true,
+ e:"Σωστό. Αρκεί να διακρίνεται ένα πλαίσιο από το αμέσως προηγούμενο και το αμέσως επόμενό του — δύο αριθμοί σειράς (0/1), δηλαδή πρωτόκολλο εναλλασσόμενου bit (ABP)."},
+{u:"link", q:"Αν ο παραλήπτης λάβει διπλότυπο πλαίσιο, το απορρίπτει και δεν στέλνει επιβεβαίωση.", a:false,
+ e:"Λάθος. Το απορρίπτει αλλά <b>το επιβεβαιώνει ξανά</b> — γιατί το διπλότυπο σημαίνει ότι το προηγούμενο ACK πιθανόν χάθηκε ή άργησε."},
+{u:"link", q:"Η αποδοτικότητα του stop-and-wait βελτιώνεται όταν αυξάνεται ο ρυθμός R της γραμμής, με σταθερά τα υπόλοιπα μεγέθη.", a:false,
+ e:"Λάθος — <b>μειώνεται</b>. Καθώς το E = (P/R) / (P/R + 2·D_P + P_ACK/R), αυξάνοντας το R ο χρόνος μετάδοσης μικραίνει ενώ το 2·D_P μένει σταθερό, οπότε ο λόγος πέφτει. Στις διαφάνειες: 50 Mbps → E = 3,7%, 500 Mbps → 0,4%, 5 Gbps → 0,04%."},
+{u:"link", q:"Η αποδοτικότητα του stop-and-wait βελτιώνεται αν αυξηθεί το μέγεθος του πλαισίου.", a:true,
+ e:"Σωστό: με P = P_ACK = 125 bytes → E = 3,7%· με 1250 bytes → 22,2%· με 12500 bytes → 44,4%. Όμως το μέγεθος περιορίζεται από το MTU, την PER (αυξάνεται με το μέγεθος) και τα PDU των ανώτερων επιπέδων."},
+{u:"link", q:"Στο Go-Back-N το παράθυρο του παραλήπτη είναι ίσο με 1.", a:true,
+ e:"Σωστό. Ο παραλήπτης δέχεται μόνο πλαίσια στη σωστή σειρά και απορρίπτει όσα φτάσουν εκτός σειράς."},
+{u:"link", q:"Στο Go-Back-N, μετά από λήξη χρονομέτρου αναμεταδίδεται μόνο το πλαίσιο που χάθηκε.", a:false,
+ e:"Λάθος — αυτό κάνει το Selective Repeat. Στο GBN αναμεταδίδεται το πλαίσιο <b>και όλα τα επόμενα</b> που έχουν ήδη σταλεί."},
+{u:"link", q:"Στο Selective Repeat το παράθυρο του παραλήπτη μπορεί να είναι έως (MAX_SEQ+1)/2.", a:true,
+ e:"Σωστό: r ≤ (MAX_SEQ+1)/2 και r ≤ s, ώστε να μην μπορεί το νέο παράθυρο να επικαλυφθεί με το παλιό και να μπερδευτούν νέα πλαίσια με αναμεταδόσεις. Τυπικά λαμβάνουμε r = s = (MAX_SEQ+1)/2."},
+{u:"link", q:"Το αθροιστικό ACK με αριθμό n σημαίνει «έλαβα σωστά και στη σειρά όλα τα πλαίσια μέχρι και το n».", a:true,
+ e:"Σωστό. Έτσι η απώλεια ενός ACK καλύπτεται από το επόμενο."},
+{u:"link", q:"Η εμβόλιμη επιβεβαίωση (piggybacking) μειώνει το πλήθος των μεταδιδόμενων πλαισίων.", a:true,
+ e:"Σωστό: το ACK «ταξιδεύει» μέσα σε πλαίσιο δεδομένων της αντίθετης κατεύθυνσης, με ένα επιπλέον πεδίο κεφαλίδας, αντί να σταλεί χωριστό πλαίσιο ελέγχου."},
+{u:"link", q:"Αν το χρονόμετρο αναμετάδοσης ρυθμιστεί σε πολύ μικρή τιμή, προκαλούνται περιττές αναμεταδόσεις.", a:true,
+ e:"Σωστό. Αν είναι πολύ μεγάλο, καθυστερούν αδικαιολόγητα οι «αναπόφευκτες» αναμεταδόσεις. Η τιμή προκύπτει από: χρόνο μετάδοσης πλαισίου + διάδοσης + επεξεργασίας + μετάδοσης ACK + διάδοσης."},
+{u:"link", q:"Ο έλεγχος ροής στο επίπεδο 2 χρειάζεται μόνο όταν το κανάλι εισάγει σφάλματα.", a:false,
+ e:"Λάθος. Ακόμη και σε τέλειο κανάλι, το επίπεδο δικτύου του παραλήπτη μπορεί να μην είναι έτοιμο· ο έλεγχος ροής υπάρχει για να μην υπερχειλίσει ο παραλήπτης."},
+
+{u:"routing", q:"Σύμφωνα με την αρχή της βελτιστοποίησης, αν ο κόμβος J βρίσκεται στη βέλτιστη διαδρομή I→K, τότε η βέλτιστη διαδρομή J→K ακολουθεί το ίδιο μονοπάτι.", a:true,
+ e:"Σωστό. Συνέπεια: το σύνολο των βέλτιστων διαδρομών προς έναν προορισμό σχηματίζει δένδρο (sink tree), άρα δεν περιέχει βρόχους."},
+{u:"routing", q:"Ο αλγόριθμος διανυσμάτων απόστασης αντιδρά εξίσου γρήγορα στις «καλές» και στις «κακές ειδήσεις».", a:false,
+ e:"Λάθος. Οι καλές ειδήσεις διαδίδονται γρήγορα, οι κακές αργά — αυτό είναι το πρόβλημα <b>count-to-infinity</b>. Μερική αντιμετώπιση: split horizon / poisoned reverse."},
+{u:"routing", q:"Στον αλγόριθμο κατάστασης συνδέσμων κάθε δρομολογητής πλημμυρίζει το δίκτυο με την κατάσταση των δικών του συνδέσμων και στη συνέχεια υπολογίζει τοπικά τις διαδρομές με Dijkstra.", a:true,
+ e:"Σωστό. Τα πέντε βήματα: ανακάλυψη γειτόνων, μέτρηση κόστους, κατασκευή LSP, πλημμύρα του LSP, υπολογισμός συντομότερων διαδρομών."},
+{u:"routing", q:"Στα πακέτα κατάστασης συνδέσμων χρησιμοποιούνται αριθμοί σειράς και πεδίο ηλικίας (age) για να αποφεύγονται διπλότυπα και παλαιές πληροφορίες.", a:true,
+ e:"Σωστό — αλλιώς μια παλιά ή διπλή διάδοση θα μπορούσε να αλλοιώσει μόνιμα τη βάση δεδομένων της τοπολογίας."},
+{u:"routing", q:"Η ιεραρχική δρομολόγηση μειώνει το μέγεθος των πινάκων αλλά μπορεί να οδηγήσει σε μη βέλτιστες διαδρομές.", a:true,
+ e:"Σωστό. Είναι το τίμημα της συνάθροισης: ο δρομολογητής ξέρει λεπτομέρειες μόνο για την περιοχή του και μία εγγραφή ανά ξένη περιοχή."},
+{u:"routing", q:"Στην πλημμύρα κάθε εισερχόμενο πακέτο προωθείται σε όλες τις γραμμές εξόδου, συμπεριλαμβανομένης εκείνης από την οποία έφτασε.", a:false,
+ e:"Λάθος — προωθείται σε όλες <b>εκτός</b> από εκείνη από την οποία έφτασε."},
+{u:"routing", q:"Η προώθηση αντίστροφης διαδρομής (reverse path forwarding) χρησιμοποιείται για δρομολόγηση εκπομπής.", a:true,
+ e:"Σωστό: ο δρομολογητής προωθεί το πακέτο εκπομπής μόνο αν έφτασε από τη γραμμή που θα χρησιμοποιούσε ο ίδιος για να στείλει <b>προς την πηγή</b> — απλή προσέγγιση του spanning tree χωρίς να το γνωρίζει."},
+{u:"routing", q:"Στην πλησιοδιανομή (anycast) το πακέτο παραδίδεται σε όλα τα μέλη της ομάδας.", a:false,
+ e:"Λάθος — αυτό είναι η πολυδιανομή (multicast). Στην πλησιοδιανομή παραδίδεται σε <b>ένα</b> μέλος, συνήθως το «πλησιέστερο», και προκύπτει σχεδόν δωρεάν από την κανονική δρομολόγηση."},
+{u:"routing", q:"Στο Chord, με πίνακα finger m εγγραφών, η αναζήτηση ενός κλειδιού απαιτεί O(log n) βήματα.", a:true,
+ e:"Σωστό. Χωρίς finger table, με μόνο τον δείκτη successor, η αναζήτηση θα ήταν O(n). Η i-οστή εγγραφή δείχνει στον successor του n + 2^(i−1)."},
+{u:"routing", q:"Στο κινητό IP, ο οικείος πράκτορας (home agent) προωθεί με διοχέτευση σε σήραγγα τα πακέτα στην care-of address του κινητού κόμβου.", a:true,
+ e:"Σωστό. Ο κινητός κόμβος κρατά τη μόνιμη home address (ώστε να μη «σπάσουν» οι συνδέσεις) και δηλώνει στον home agent την τρέχουσα care-of address."},
+{u:"routing", q:"Στα δίκτυα ad hoc η δρομολόγηση είναι κατ' απαίτηση: η διαδρομή αναζητείται μόνο όταν χρειαστεί, με μήνυμα ROUTE REQUEST που διαδίδεται με πλημμύρα.", a:true,
+ e:"Σωστό (AODV/DSR). Η απάντηση ROUTE REPLY επιστρέφει κατά την αντίστροφη διαδρομή, ενώ η συντήρηση γίνεται με περιοδικά HELLO."},
+{u:"routing", q:"Η ασυνδεσμική υπηρεσία επιπέδου δικτύου είναι πιο ανθεκτική σε βλάβη ενδιάμεσου δρομολογητή από τα εικονικά κυκλώματα.", a:true,
+ e:"Σωστό. Στα εικονικά κυκλώματα η βλάβη ενός κόμβου καταστρέφει όλα τα VC που περνούν από αυτόν, ενώ τα datagrams απλώς δρομολογούνται αλλού."},
+
+{u:"qos", q:"Ο έλεγχος ροής αφορά το ζεύγος αποστολέα–παραλήπτη, ενώ ο έλεγχος συμφόρησης αφορά όλο το δίκτυο.", a:true,
+ e:"Σωστό. Είναι δυνατόν να υπάρχει συμφόρηση χωρίς πρόβλημα ροής (γρήγορος δέκτης, φορτωμένο δίκτυο) και αντίστροφα (αργός δέκτης, άδειο δίκτυο)."},
+{u:"qos", q:"Η προσθήκη περισσότερης μνήμης ενταμίευσης στους δρομολογητές λύνει το πρόβλημα της συμφόρησης.", a:false,
+ e:"Λάθος. Με τεράστιους ενταμιευτές τα πακέτα καθυστερούν τόσο που έχουν ήδη αναμεταδοθεί από την πηγή, οπότε η κατάσταση χειροτερεύει (bufferbloat)."},
+{u:"qos", q:"Ο αλγόριθμος του τρύπιου κουβά επιτρέπει ριπές στην έξοδο.", a:false,
+ e:"Λάθος. Ο τρύπιος κουβάς επιβάλλει <b>σταθερό</b> ρυθμό εξόδου και εξαφανίζει τις ριπές. Ριπές (έως το περιεχόμενο του κουβά) επιτρέπει ο <b>κουβάς κουπονιών</b>."},
+{u:"qos", q:"Στον κουβά κουπονιών, η μέγιστη διάρκεια ριπής με ρυθμό M δίνεται από S = B/(M − ρ).", a:true,
+ e:"Σωστό. Προκύπτει από B + ρ·S = M·S. Ο όγκος της μέγιστης ριπής είναι M·S = B·M/(M−ρ) > B, γιατί ενώ εξέρχεται κίνηση παράγονται και νέα κουπόνια."},
+{u:"qos", q:"Αν γεμίσει ο κουβάς κουπονιών, χάνονται δεδομένα.", a:false,
+ e:"Λάθος. Χάνονται <b>κουπόνια</b>, όχι δεδομένα — δηλαδή απλώς δεν συσσωρεύεται επιπλέον «δικαίωμα» μετάδοσης ριπής. Απώλεια δεδομένων συμβαίνει στον τρύπιο κουβά όταν αυτός γεμίσει."},
+{u:"qos", q:"Η παραμόρφωση χρονισμού (jitter) είναι η μεταβλητότητα της καθυστέρησης άφιξης των πακέτων.", a:true,
+ e:"Σωστό. Ενοχλεί κυρίως εφαρμογές πραγματικού χρόνου (VoIP, βίντεο, τηλεδιάσκεψη) και όχι e-mail ή μεταφορά αρχείων."},
+{u:"qos", q:"Η ενταμίευση στον δέκτη (playout buffer) εξομαλύνει το jitter χωρίς κανένα κόστος.", a:false,
+ e:"Λάθος. Το κόστος είναι η <b>επιπλέον αρχική καθυστέρηση</b> αναπαραγωγής — γι' αυτό υπάρχει όριο στο πόσο μεγάλος μπορεί να είναι ο buffer σε διαδραστικές εφαρμογές."},
+{u:"qos", q:"Οι Διαφοροποιημένες Υπηρεσίες (DiffServ) απαιτούν κατάσταση ανά ροή σε κάθε δρομολογητή.", a:false,
+ e:"Λάθος — αυτό είναι χαρακτηριστικό των Ολοκληρωμένων Υπηρεσιών (IntServ/RSVP). Οι DiffServ λειτουργούν <b>ανά κλάση</b>, χωρίς κατάσταση ανά ροή, και γι' αυτό κλιμακώνονται πολύ καλύτερα."},
+{u:"qos", q:"Στο RSVP η δέσμευση πόρων ξεκινά από τον παραλήπτη.", a:true,
+ e:"Σωστό. Ο αποστολέας στέλνει μηνύματα PATH· ο παραλήπτης απαντά με RESV κατά την αντίστροφη διαδρομή, δεσμεύοντας πόρους — πράγμα που βοηθά και στην πολυδιανομή."},
+{u:"qos", q:"Ο χρονοπρογραμματισμός FIFO εμποδίζει μια «άπληστη» ροή να μονοπωλήσει τον σύνδεσμο.", a:false,
+ e:"Λάθος — το FIFO δεν προσφέρει καμία προστασία. Αυτό το πετυχαίνει το <b>fair queueing</b> (και το WFQ με βάρη), που εξυπηρετεί τις ουρές των ροών εκ περιτροπής, σε επίπεδο bytes."},
+{u:"qos", q:"Τα κελιά ATM έχουν σταθερό μήκος 53 bytes, εκ των οποίων 5 bytes κεφαλίδα.", a:true,
+ e:"Σωστό. Το σταθερό μικρό μήκος επιτρέπει πολύ γρήγορη μεταγωγή σε υλικό και προβλέψιμη καθυστέρηση."},
+{u:"qos", q:"Η αστυνόμευση (policing) και η μορφοποίηση (shaping) της κίνησης είναι ακριβώς το ίδιο πράγμα.", a:false,
+ e:"Λάθος. Η <b>μορφοποίηση</b> εξομαλύνει την εξερχόμενη κίνηση (με ενταμίευση), ενώ η <b>αστυνόμευση</b> ελέγχει τη συμμόρφωση με το συμβόλαιο και απορρίπτει ή σημειώνει τα μη συμμορφούμενα πακέτα."},
+
+{u:"internet", q:"Στο IPv4 η επανασυναρμολόγηση των θρυμμάτων γίνεται σε κάθε ενδιάμεσο δρομολογητή.", a:false,
+ e:"Λάθος. Ο θρυμματισμός στο IP είναι <b>μη διαφανής</b>: η επανασυναρμολόγηση γίνεται μόνο στον <b>τελικό προορισμό</b>."},
+{u:"internet", q:"Στο IPv6 ο θρυμματισμός δεν επιτρέπεται σε ενδιάμεσο δρομολογητή — μόνο στον αποστολέα.", a:true,
+ e:"Σωστό. Ο αποστολέας χρησιμοποιεί Path MTU Discovery και, αν χρειαστεί, κεφαλίδα επέκτασης Fragment. Έτσι επιταχύνεται η προώθηση."},
+{u:"internet", q:"Στη διοχέτευση σε σήραγγα (tunneling) το αρχικό πακέτο ενθυλακώνεται ολόκληρο ως φορτίο σε πακέτο του ενδιάμεσου δικτύου.", a:true,
+ e:"Σωστό. Το ενδιάμεσο δίκτυο «βλέπει» μόνο τη δική του κεφαλίδα· η αποθυλάκωση γίνεται στο άλλο άκρο της σήραγγας. Χρήσεις: IPv6 over IPv4, VPN, Mobile IP."},
+{u:"internet", q:"Το MPLS προωθεί πακέτα με αναζήτηση ετικέτας σταθερού μήκους αντί για ταίριασμα μακρύτερου προθέματος.", a:true,
+ e:"Σωστό — γι' αυτό είναι ταχύτερο. Η ετικέτα μπαίνει μεταξύ επιπέδων 2 και 3 («επίπεδο 2,5»), έχει τοπική σημασία και αλλάζει σε κάθε άλμα."},
+{u:"internet", q:"Το OSPF είναι πρωτόκολλο διανυσμάτων απόστασης που εκτελείται μεταξύ αυτόνομων συστημάτων.", a:false,
+ e:"Λάθος σε δύο σημεία: το OSPF είναι πρωτόκολλο <b>κατάστασης συνδέσμων</b> και είναι <b>εσωτερικό</b> (εντός ενός AS). Το μεταξύ AS πρωτόκολλο είναι το BGP."},
+{u:"internet", q:"Το BGP ανταλλάσσει πλήρεις διαδρομές (AS-PATH), γεγονός που επιτρέπει την εφαρμογή πολιτικών και την εύκολη αποφυγή βρόχων.", a:true,
+ e:"Σωστό. Επειδή κάθε δρομολογητής βλέπει ολόκληρη τη διαδρομή, απορρίπτει όποια περιέχει το δικό του AS, και μπορεί να επιλέγει βάσει εμπορικών/πολιτικών κριτηρίων."},
+{u:"internet", q:"Τα μηνύματα του BGP μεταφέρονται πάνω από UDP για ταχύτητα.", a:false,
+ e:"Λάθος. Μεταφέρονται πάνω από <b>TCP</b> (θύρα 179) για αξιοπιστία. Τύποι μηνυμάτων: OPEN, UPDATE, KEEPALIVE, NOTIFICATION."},
+{u:"internet", q:"Το iBGP εκτελείται μεταξύ δρομολογητών του ίδιου AS.", a:true,
+ e:"Σωστό: το eBGP ανταλλάσσει διαδρομές μεταξύ διαφορετικών AS, ενώ το iBGP διαδίδει τις εξωτερικές διαδρομές <b>εντός</b> του AS. Οι gateway routers τρέχουν και τα δύο."},
+{u:"internet", q:"Οι διευθύνσεις IPv6 είναι 128 bits και η βασική κεφαλίδα έχει σταθερό μήκος 40 bytes.", a:true,
+ e:"Σωστό. Η βασική κεφαλίδα έχει λιγότερα πεδία (8 αντί 13), χωρίς checksum κεφαλίδας και χωρίς πεδία θρυμματισμού, τα οποία μεταφέρθηκαν σε κεφαλίδες επέκτασης."},
+{u:"internet", q:"Το IPv6 διατηρεί το άθροισμα ελέγχου κεφαλίδας του IPv4.", a:false,
+ e:"Λάθος — καταργήθηκε, ώστε να μην χρειάζεται επανυπολογισμός σε κάθε άλμα. Ο έλεγχος σφαλμάτων γίνεται στα επίπεδα 2 και 4."},
+{u:"internet", q:"Στην ιεραρχία των παρόχων, ένας Tier-2 ISP πληρώνει τον Tier-1 για συνδεσιμότητα (transit), ενώ οι Tier-1 συνδέονται μεταξύ τους ως ίσοι (peering).", a:true,
+ e:"Σωστό. Επιπλέον, Tier-2 μπορούν να κάνουν peering και μεταξύ τους, ενώ οι πάροχοι περιεχομένου χτίζουν δικά τους δίκτυα και συνδέονται απευθείας σε access ISPs, παρακάμπτοντας τους Tier-1."},
+{u:"internet", q:"Κατά την προώθηση ενός πακέτου IP μέσα από δρομολογητές, η διεύθυνση IP προορισμού αλλάζει σε κάθε άλμα.", a:false,
+ e:"Λάθος. Οι διευθύνσεις IP πηγής/προορισμού μένουν σταθερές (εκτός αν υπάρχει NAT)· αυτό που αλλάζει σε κάθε άλμα είναι οι <b>διευθύνσεις επιπέδου 2</b> του νέου πλαισίου, ενώ το TTL μειώνεται."},
+
+{u:"transport", q:"Οι διευθύνσεις του επιπέδου μεταφοράς (θύρες/TSAP) αντιστοιχούν σε διεργασίες, ενώ οι διευθύνσεις IP σε κόμβους/διεπαφές.", a:true,
+ e:"Σωστό. Γι' αυτό χρειάζεται ρητή διευθυνσιοδότηση στο επίπεδο 4 — σε αντίθεση με το επίπεδο 2, όπου ο παραλήπτης υπονοείται από τη γραμμή."},
+{u:"transport", q:"Η τριπλή χειραψία χρειάζεται για να αποφευχθεί η δημιουργία σύνδεσης από καθυστερημένα διπλότυπα πακέτα εγκαθίδρυσης.", a:true,
+ e:"Σωστό. Κάθε πλευρά επιλέγει αρχικό αριθμό σειράς και επιβεβαιώνει τον αριθμό της άλλης, οπότε ένα καθυστερημένο διπλότυπο απορρίπτεται επειδή φέρει λάθος αριθμό επιβεβαίωσης."},
+{u:"transport", q:"Το πρόβλημα των δύο στρατών δείχνει ότι η αξιόπιστη αποδέσμευση σύνδεσης πάνω από αναξιόπιστο κανάλι δεν μπορεί να λυθεί με πεπερασμένο πλήθος μηνυμάτων.", a:true,
+ e:"Σωστό. Στην πράξη χρησιμοποιείται τριπλή χειραψία αποδέσμευσης (FIN/ACK) μαζί με χρονόμετρα, που δουλεύει «αρκετά καλά»."},
+{u:"transport", q:"Το UDP παρέχει έλεγχο ροής και έλεγχο συμφόρησης.", a:false,
+ e:"Λάθος. Το UDP προσφέρει μόνο πολυπλεξία/αποπολυπλεξία μέσω θυρών και προαιρετικό άθροισμα ελέγχου. Καμία εγκαθίδρυση, αξιοπιστία, έλεγχο ροής ή συμφόρησης. Κεφαλίδα 8 bytes."},
+{u:"transport", q:"Το RTP παρέχει αριθμούς σειράς και χρονοσημάνσεις, αλλά όχι εγγυήσεις παράδοσης.", a:true,
+ e:"Σωστό. Τρέχει τυπικά πάνω από UDP, στον χώρο χρήστη· οι χρονοσημάνσεις βοηθούν στον συγχρονισμό και στην αντιμετώπιση του jitter μέσω playout buffer. Η ανάδραση ποιότητας γίνεται με RTCP."},
+{u:"transport", q:"Στο TCP οι αριθμοί σειράς αριθμούν τμήματα (segments).", a:false,
+ e:"Λάθος — αριθμούν <b>bytes</b>. Ο αριθμός σειράς ενός τμήματος είναι ο αριθμός του πρώτου byte που μεταφέρει."},
+{u:"transport", q:"Ο αριθμός επιβεβαίωσης του TCP δηλώνει το επόμενο byte που αναμένει ο παραλήπτης.", a:true,
+ e:"Σωστό — αθροιστική επιβεβαίωση. Αν λείπει ένα ενδιάμεσο τμήμα, ο δέκτης συνεχίζει να ζητά το ίδιο byte, ακόμη κι αν έχει λάβει μεταγενέστερα τμήματα."},
+{u:"transport", q:"Στο TCP το παράθυρο του αποστολέα είναι το ελάχιστο του παραθύρου παραλήπτη και του παραθύρου συμφόρησης.", a:true,
+ e:"Σωστό. Το πρώτο (rwnd) ανακοινώνεται από το άλλο άκρο και αφορά τον έλεγχο ροής· το δεύτερο (cwnd) υπολογίζεται τοπικά και αφορά τη συμφόρηση."},
+{u:"transport", q:"Στη φάση αργής εκκίνησης το παράθυρο συμφόρησης αυξάνει γραμμικά με τον χρόνο.", a:false,
+ e:"Λάθος. Αυξάνει κατά 1 MSS ανά ACK, άρα περίπου <b>διπλασιάζεται ανά RTT</b> — δηλαδή εκθετικά. Γραμμική αύξηση (+1 MSS ανά RTT) έχουμε στη φάση αποφυγής συμφόρησης."},
+{u:"transport", q:"Στο TCP Tahoe, μετά από λήξη χρονομέτρου το κατώφλι γίνεται ίσο με το μισό του τρέχοντος παραθύρου και το cwnd επανέρχεται σε 1 MSS.", a:true,
+ e:"Σωστό, και ακολουθεί νέα φάση αργής εκκίνησης μέχρι το νέο κατώφλι."},
+{u:"transport", q:"Ο μέσος ρυθμός διεκπεραίωσης του TCP προσεγγίζεται από 3W/(4·RTT), όπου W η μέγιστη τιμή του παραθύρου.", a:true,
+ e:"Σωστό: στη φάση αποφυγής συμφόρησης το παράθυρο κινείται γραμμικά μεταξύ W/2 και W, άρα η μέση τιμή του είναι (W/2 + W)/2 = 3W/4."},
+{u:"transport", q:"Η προσθετική αύξηση με προσθετική μείωση (AIAD) του παραθύρου οδηγεί επίσης σε δίκαιη κατανομή του εύρους ζώνης.", a:false,
+ e:"Λάθος. Με AIAD η αρχική διαφορά μεταξύ των δύο ροών <b>διατηρείται</b>. Μόνο το AIMD (προσθετική αύξηση – πολλαπλασιαστική μείωση) συγκλίνει στη δίκαιη κατανομή."},
+{u:"transport", q:"Σε ασύρματες ζεύξεις το TCP ερμηνεύει λανθασμένα ως συμφόρηση τις απώλειες που οφείλονται σε σφάλματα μετάδοσης.", a:true,
+ e:"Σωστό, και μειώνει άσκοπα το cwnd. Λύσεις: διαχωρισμός σύνδεσης (indirect TCP) ή snooping agent στον σταθμό βάσης με τοπικές αναμεταδόσεις."},
+{u:"transport", q:"Ο κανόνας του Karn λέει ότι οι μετρήσεις RTT από αναμεταδοθέντα τμήματα δεν πρέπει να χρησιμοποιούνται στην εκτίμηση του RTT.", a:true,
+ e:"Σωστό, γιατί δεν ξέρουμε αν το ACK αφορά την αρχική ή την αναμετάδοση. Αντ' αυτού, το timeout διπλασιάζεται σε κάθε αναμετάδοση (exponential backoff)."},
+{u:"transport", q:"Το χρονόμετρο επιμονής (persistence timer) υπάρχει για να μην «κολλήσει» η σύνδεση αν χαθεί η ανακοίνωση ανοίγματος παραθύρου.", a:true,
+ e:"Σωστό. Όταν ο δέκτης έχει ανακοινώσει παράθυρο 0, ο αποστολέας ελέγχει περιοδικά με μικρό πακέτο διερεύνησης."},
+{u:"transport", q:"Η ανάκαμψη μετά από κατάρρευση ενός κόμβου μπορεί πάντοτε να επιτευχθεί πλήρως στο επίπεδο μεταφοράς.", a:false,
+ e:"Λάθος. Αποδεικνύεται ότι η ανάκαμψη από κατάρρευση στο επίπεδο N πρέπει να γίνει στο επίπεδο <b>N+1</b> — τελικά στην εφαρμογή — γιατί υπάρχει πάντα «παράθυρο» όπου δεν είναι γνωστό αν το πακέτο γράφτηκε πριν ή μετά την κατάρρευση."},
+{u:"transport", q:"Το ECN επιτρέπει στο δίκτυο να δηλώνει ρητά συμφόρηση πριν προκύψει απώλεια πακέτων.", a:true,
+ e:"Σωστό. Είναι η εναλλακτική στην έμμεση ένδειξη μέσω απώλειας, που είναι ιδιαίτερα προβληματική σε ασύρματα δίκτυα."},
+
+{u:"perf", q:"Το γινόμενο καθυστέρησης × εύρους ζώνης δίνει το πλήθος των bits που «χωρούν» στον σωλήνα και καθορίζει το απαιτούμενο μέγεθος παραθύρου.", a:true,
+ e:"Σωστό. Σε συνδέσμους μεγάλου BDP («μακρύς παχύς σωλήνας») ένα μικρό παράθυρο αφήνει τη γραμμή σε μεγάλο βαθμό αδρανή."},
+{u:"perf", q:"Για τη μεταφορά μικρών αρχείων, η αύξηση της χωρητικότητας της γραμμής βελτιώνει σημαντικά τον συνολικό χρόνο.", a:false,
+ e:"Λάθος. Για μικρά αρχεία ο χρόνος κυριαρχείται από το RTT (χειραψίες, αργή εκκίνηση), όχι από τον ρυθμό μετάδοσης."},
+{u:"perf", q:"Τα περισσότερα προβλήματα απόδοσης δικτύων οφείλονται στο λογισμικό και στην επεξεργασία, όχι στη χωρητικότητα των γραμμών.", a:true,
+ e:"Σωστό — γι' αυτό η σχεδίαση επικεντρώνεται σε μείωση αντιγραφών δεδομένων, διακοπών, εναλλαγών περιβάλλοντος και πλήθους πακέτων."},
+{u:"perf", q:"Η χρήση μεγαλύτερων πακέτων έχει μόνο θετικές συνέπειες.", a:false,
+ e:"Λάθος. Μειώνει το σχετικό overhead και τις διακοπές, αλλά αυξάνει την πιθανότητα σφάλματος πλαισίου και την καθυστέρηση (ιδίως για διαδραστικές εφαρμογές)."},
+
+{u:"app", q:"Το SMTP χρησιμοποιείται για τη μεταφορά μηνυμάτων προς και μεταξύ των εξυπηρετητών ηλεκτρονικού ταχυδρομείου.", a:true,
+ e:"Σωστό. Είναι πρωτόκολλο <b>push</b>, ASCII, πάνω από TCP (θύρα 25/587), μεταξύ του πράκτορα/εξυπηρετητή αποστολής και του εξυπηρετητή του παραλήπτη (MTA σε MTA)."},
+{u:"app", q:"Το POP3 και το IMAP χρησιμοποιούνται για την τελική παράδοση/ανάκτηση των μηνυμάτων από το γραμματοκιβώτιο στον χρήστη.", a:true,
+ e:"Σωστό — είναι πρωτόκολλα <b>pull</b>. Στο POP3 τα μηνύματα συνήθως κατεβαίνουν και διαγράφονται· στο IMAP μένουν στον εξυπηρετητή με φακέλους και αναζήτηση, κατάλληλο για πολλαπλές συσκευές."},
+{u:"app", q:"Για να υποστηριχθούν τα πολυμέσα στο e-mail χρειάστηκε να αλλάξει το πρωτόκολλο SMTP.", a:false,
+ e:"Λάθος. Το <b>MIME</b> σχεδιάστηκε ακριβώς ώστε να <b>μην</b> αλλάξει το SMTP: προσθέτει δομή και κωδικοποίηση (base64, quoted-printable) στο σώμα του μηνύματος, μέσω νέων κεφαλίδων."},
+{u:"app", q:"Το HTTP είναι πρωτόκολλο χωρίς κατάσταση (stateless) και τα cookies καλύπτουν αυτή την έλλειψη.", a:true,
+ e:"Σωστό. Ο server θέτει το cookie με <code>Set-Cookie</code> και ο πελάτης το επιστρέφει με <code>Cookie</code> — έτσι υλοποιούνται σύνοδοι, καλάθια αγορών, εξατομίκευση και παρακολούθηση."},
+{u:"app", q:"Στο HTTP/1.1 οι επίμονες συνδέσεις (persistent connections) είναι η προεπιλογή.", a:true,
+ e:"Σωστό. Μία σύνδεση TCP εξυπηρετεί πολλαπλά αντικείμενα → λιγότερες χειραψίες και μικρότερη επίδραση της αργής εκκίνησης. Με pipelining οι αιτήσεις στέλνονται χωρίς αναμονή της προηγούμενης απόκρισης."},
+{u:"app", q:"Ο κωδικός απόκρισης 304 (Not Modified) σχετίζεται με τη λειτουργία της κρυφής μνήμης.", a:true,
+ e:"Σωστό. Ο πελάτης/proxy στέλνει υπό όρους αίτηση με <code>If-Modified-Since</code>· αν δεν έχει αλλάξει το αντικείμενο, ο server απαντά 304 χωρίς σώμα, εξοικονομώντας εύρος ζώνης."},
+{u:"app", q:"Ένας πληρεξούσιος (proxy) με κρυφή μνήμη μειώνει την καθυστέρηση και την κίνηση προς το εξωτερικό δίκτυο.", a:true,
+ e:"Σωστό — και μειώνει και τον φόρτο των αρχικών εξυπηρετητών. Δεν είναι όμως όλα cacheable: δυναμικό ή εξατομικευμένο περιεχόμενο και κρυπτογραφημένη κίνηση δεν ωφελούνται."},
+{u:"app", q:"Στο CDN το περιεχόμενο τοποθετείται στους κόμβους εκ των προτέρων, χωρίς να περιμένει αίτηση χρήστη.", a:true,
+ e:"Σωστό: το περιεχόμενο διανέμεται (push) από τον διακομιστή προέλευσης σε επιλεγμένους κόμβους — σε αντίθεση με τον κλασικό proxy που ενταμιεύει μόνο ό,τι ζητήθηκε."},
+{u:"app", q:"Η επιλογή του κατάλληλου εξυπηρετητή CDN για κάθε πελάτη γίνεται κατά κύριο λόγο μέσω του DNS.", a:true,
+ e:"Σωστό, με εγγραφές CNAME/NS προς το domain του CDN. Κριτήρια: εγγύτητα στη διεύθυνση IP του πελάτη, φόρτος των υποψηφίων εξυπηρετητών και των συνδέσμων. Εναλλακτικά: ανακατεύθυνση HTTP με την κεφαλίδα <code>Location</code>."},
+{u:"app", q:"Η κεφαλίδα Host στο HTTP/1.1 είναι προαιρετική.", a:false,
+ e:"Λάθος — είναι υποχρεωτική, γιατί πολλοί ιστότοποι μπορεί να φιλοξενούνται στην ίδια διεύθυνση IP (virtual hosting) και ο server πρέπει να ξέρει ποιον ζητά ο πελάτης."},
+{u:"app", q:"Στην πρώτη πρόσβαση σε ένα URL, η αίτηση DNS στέλνεται τυπικά με UDP στη θύρα 53.", a:true,
+ e:"Σωστό, με αυθαίρετη μη δεσμευμένη θύρα πηγής. Αν ο DNS server απαντήσει παραπέμποντας σε άλλον, η διαδικασία επαναλαμβάνεται."}
+];
+const MCQ = [
+{u:"basics", q:"Ποιο είναι το κύριο <b>μειονέκτημα</b> της στατιστικής πολυπλεξίας σε σχέση με το TDM;",
+ o:["Δεν αξιοποιεί καλά το εύρος ζώνης του συνδέσμου",
+    "Απαιτεί πληροφορία ελέγχου ανά πακέτο και ενταμίευση, με κίνδυνο υπερχείλισης σε συμφόρηση",
+    "Δεν μπορεί να χρησιμοποιηθεί σε οπτικές ίνες",
+    "Απαιτεί δέσμευση συχνοτήτων ανά ροή"], c:1,
+ e:"Η στατιστική πολυπλεξία δίνει την <b>καλύτερη</b> αξιοποίηση εύρους ζώνης. Το τίμημα είναι ότι κάθε πακέτο χρειάζεται ετικέτα/διεύθυνση, απαιτείται ενταμίευση και, σε συμφόρηση, μπορεί να υπερχειλίσουν οι ενταμιευτές."},
+{u:"basics", q:"Σε ποιο επίπεδο του OSI γίνεται η «από άκρο σε άκρο μεταφορά δεδομένων μεταξύ δύο τερματικών σταθμών»;",
+ o:["Επίπεδο δικτύου (3)","Επίπεδο μεταφοράς (4)","Επίπεδο συνόδου (5)","Επίπεδο ζεύξης (2)"], c:1,
+ e:"Το επίπεδο 4. Το επίπεδο 3 κάνει επικοινωνία από άκρο σε άκρο <b>μέσω πολλαπλών ενδιάμεσων κόμβων/υποδικτύων</b>, δηλαδή δρομολόγηση· το επίπεδο 4 προσθέτει τη λογική σύνδεση μεταξύ των τελικών <b>διεργασιών</b>."},
+{u:"basics", q:"Ένα πακέτο 1000 bits στέλνεται σε γραμμή 10 Mbps μήκους 300 km (ταχύτητα 2·10⁸ m/s). Ποια είναι η συνολική καθυστέρηση μετάδοσης + διάδοσης;",
+ o:["100 μs","1,5 ms","1,6 ms","0,1 ms"], c:2,
+ e:"D_T = 1000/10·10⁶ = 100 μs. D_P = 300000/2·10⁸ = 1,5 ms. Σύνολο = 1,6 ms. Παρατηρήστε ότι εδώ κυριαρχεί η διάδοση."},
+
+{u:"link", q:"Ποιος είναι ο κύριος λόγος που στο stop-and-wait πρέπει να αριθμούνται και οι <b>επιβεβαιώσεις</b>;",
+ o:["Για να ανιχνεύονται σφάλματα στο ACK",
+    "Για να γνωρίζει ο αποστολέας ποιο πλαίσιο επιβεβαιώνεται και ποιο να στείλει στη συνέχεια",
+    "Για να μπορεί ο παραλήπτης να απορρίπτει διπλότυπα",
+    "Για να υπολογίζεται σωστά το χρονόμετρο"], c:1,
+ e:"Χωρίς αρίθμηση των ACK, ένα καθυστερημένο ACK μπορεί να θεωρηθεί ότι αφορά το επόμενο πλαίσιο. Η αρίθμηση των <b>πλαισίων</b> λύνει το πρόβλημα των διπλοτύπων στον παραλήπτη· η αρίθμηση των <b>ACK</b> λύνει το αντίστοιχο πρόβλημα στον αποστολέα."},
+{u:"link", q:"Γραμμή 50 Mbps, D_P = 250 μs ανά κατεύθυνση, πλαίσια και ACK 125 bytes. Ποια είναι περίπου η αποδοτικότητα του stop-and-wait;",
+ o:["3,7 %","22,2 %","44,4 %","50 %"], c:0,
+ e:"D_TP = D_TA = 1000 bits / 50 Mbps = 20 μs. S = 20 + 250 + 20 + 250 = 540 μs. E = 20/540 ≈ 3,7 %. Ο ρυθμός αποστολής είναι 1000 bits/540 μs ≈ 1,85 Mbps — ελάχιστο κλάσμα των 50 Mbps."},
+{u:"link", q:"Με το ίδιο παράδειγμα (50 Mbps, D_P = 250 μs), πόσα πλαίσια θα «χωρούσαν» στον χρόνο αναμονής, δηλαδή ποιο είναι το ελάχιστο παράθυρο για πλήρη αξιοποίηση;",
+ o:["2","8","27","54"], c:2,
+ e:"n = S/D_TP = 540/20 = 27. Δηλαδή στο διάστημα αναμονής της επιβεβαίωσης θα μπορούσαν να σταλούν άλλα 26 πλαίσια."},
+{u:"link", q:"Σε Go-Back-N με μέγεθος παραθύρου αποστολής s, ποιο είναι το ελάχιστο εύρος αρίθμησης (MAX_SEQ+1);",
+ o:["s","s+1","2s","2s+1"], c:1,
+ e:"Στο GBN αρκεί MAX_SEQ ≥ s, δηλαδή εύρος τουλάχιστον s+1 αριθμών, ώστε ο παραλήπτης (παράθυρο 1) να μην συγχέει αναμετάδοση με νέο πλαίσιο. Στο Selective Repeat χρειάζεται εύρος τουλάχιστον 2s."},
+{u:"link", q:"Ασύρματος σύνδεσμος 128 kbps, πλαίσια 1024 bits, ACK 256 bits, D_P = 120 ms. Ποια η αποδοτικότητα του stop-and-wait (timeout = χρόνος μετάβασης μετ' επιστροφής);",
+ o:["≈ 3,2 %","≈ 25 %","≈ 8 %","≈ 50 %"], c:0,
+ e:"D_TP = 1024/128000 = 8 ms, D_TA = 256/128000 = 2 ms. S = 8 + 120 + 2 + 120 = 250 ms. E = 8/250 = 3,2 %. Με πιθανότητα σφάλματος p = 0,1 → E = 3,2 % · 0,9 = 2,88 %."},
+{u:"link", q:"Δίαυλος 40 kbps με D_P = 20 ms, stop-and-wait. Για ποια μήκη πλαισίου η αξιοποίηση ξεπερνά το 50 % (αγνοώντας τον χρόνο του ACK);",
+ o:["L > 400 bits","L > 800 bits","L > 1600 bits","L > 3200 bits"], c:2,
+ e:"E = (L/R)/(L/R + 2·D_P) > 0,5 ⇔ L/R > 2·D_P ⇔ L > R·2·D_P = 40000 · 0,04 = 1600 bits (200 bytes)."},
+
+{u:"routing", q:"Ποιο πρόβλημα χαρακτηρίζει τη δρομολόγηση με διανύσματα απόστασης;",
+ o:["Υπερβολική κατανάλωση μνήμης στους δρομολογητές",
+    "Το πρόβλημα της «καταμέτρησης ως το άπειρο» (count-to-infinity)",
+    "Αδυναμία υποστήριξης πολλαπλών μετρικών",
+    "Απαίτηση για κεντρικό ελεγκτή"], c:1,
+ e:"Οι «κακές ειδήσεις» (αύξηση κόστους ή αποτυχία συνδέσμου) διαδίδονται πολύ αργά, με σταδιακή αύξηση των εκτιμήσεων. Το LS δεν πάσχει από αυτό, γιατί κάθε κόμβος έχει πλήρη εικόνα της τοπολογίας."},
+{u:"routing", q:"Ο κόμβος C έχει μετρημένες αποστάσεις προς B, D, E ίσες με 6, 3, 5 και λαμβάνει διανύσματα με αποστάσεις προς τον A: από B → 5, από D → 16, από E → 7. Ποια εγγραφή θα βάλει ο C για τον A;",
+ o:["11 μέσω B","19 μέσω D","12 μέσω E","5 μέσω B"], c:0,
+ e:"Υπολογίζουμε: μέσω B = 6+5 = 11, μέσω D = 3+16 = 19, μέσω E = 5+7 = 12. Ελάχιστο: <b>11 μέσω B</b>. (Τυπική φροντιστηριακή άσκηση — προσοχή: πάντα προσθέτουμε το κόστος του συνδέσμου προς τον γείτονα.)"},
+{u:"routing", q:"Σε δίκτυο 50 δρομολογητών με distance vector, κόστη 8 bit, ανταλλαγή 2 φορές/sec και 4 γείτονες ανά κόμβο, πόσο εύρος ζώνης καταναλώνεται ανά γραμμή <b>ανά κατεύθυνση</b>;",
+ o:["400 bps","800 bps","1600 bps","200 bps"], c:1,
+ e:"Κάθε διάνυσμα έχει 50 εγγραφές × 8 bits = 400 bits. Στέλνεται 2 φορές/sec σε κάθε γείτονα → 800 bps ανά γραμμή ανά κατεύθυνση (και 1600 bps συνολικά για τη γραμμή διπλής κατεύθυνσης)."},
+{u:"routing", q:"Τι πετυχαίνει η προώθηση αντίστροφης διαδρομής (RPF) στη δρομολόγηση εκπομπής;",
+ o:["Δημιουργεί ρητά το δένδρο επικάλυψης και το αποθηκεύει σε κάθε κόμβο",
+    "Προσεγγίζει το δένδρο επικάλυψης χωρίς κάθε κόμβος να το γνωρίζει",
+    "Εγγυάται ότι κάθε κόμβος λαμβάνει το πακέτο ακριβώς μία φορά",
+    "Μειώνει τον αριθμό των προορισμών σε έναν"], c:1,
+ e:"Ο κόμβος προωθεί μόνο αν το πακέτο έφτασε από τη γραμμή που ο ίδιος θα χρησιμοποιούσε για να στείλει προς την πηγή. Είναι αποδοτικό και εύκολο, αλλά δεν είναι ακριβώς βέλτιστο και μπορεί να παράγει λίγα διπλότυπα."},
+{u:"routing", q:"Στο Chord, πού αποθηκεύεται ένα κλειδί k;",
+ o:["Στον κόμβο με το μικρότερο id","Σε όλους τους κόμβους του δακτυλίου",
+    "Στον successor(k), δηλαδή στον πρώτο κόμβο με id ≥ k στον δακτύλιο","Σε τυχαίο κόμβο"], c:2,
+ e:"Το Chord είναι κατανεμημένος πίνακας κατακερματισμού (DHT): κόμβοι και κλειδιά χαρτογραφούνται στον ίδιο κυκλικό χώρο 2^m και το κλειδί ανήκει στον successor του."},
+
+{u:"qos", q:"Υπολογιστής στέλνει ριπή με 6 Mbps· ο κουβάς κουπονιών γεμίζει με 1 Mbps και περιέχει αρχικά 8 Mbits. Για πόσο χρόνο μεταδίδει με πλήρη ταχύτητα;",
+ o:["1,33 s","1,60 s","8,00 s","0,80 s"], c:1,
+ e:"S = B/(M − ρ) = 8/(6 − 1) = 1,6 s. Ο όγκος της ριπής είναι 6 · 1,6 = 9,6 Mbits > B = 8 Mbits, γιατί κατά τη διάρκεια της ριπής παράγονται και νέα κουπόνια."},
+{u:"qos", q:"Υπολογιστής θέλει να στείλει 19,5 MB σε ριπή με 6 Mbps· ο κουβάς γεμίζει με 4 Mbps. Ποια είναι η ελάχιστη χωρητικότητα B ώστε να μη χαθούν δεδομένα;",
+ o:["19,5 MB","52 Mbits","6,5 MB","26 Mbits"], c:1,
+ e:"Διάρκεια ριπής T = 19,5 MB · 8 / 6 Mbps = 156/6 = 26 s. Ελάχιστο B = T · (M − ρ) = 26 · (6 − 4) = <b>52 Mbits</b> (= 6,5 MB). Προσοχή στις μονάδες: bytes ↔ bits."},
+{u:"qos", q:"Ρυθμός άφιξης δεδομένων 25 Mbps για 40 ms, ρυθμός κουπονιών 2 Mbps, B = 500 kbits, μέγιστος ρυθμός εξόδου 25 Mbps. Ποια η διάρκεια της μέγιστης ριπής;",
+ o:["20 ms","21,7 ms","40 ms","10,9 ms"], c:1,
+ e:"S = B/(M − ρ) = 500/(25000 − 2000) kbits/kbps = 500/23000 s ≈ 21,7 ms. Συνολικός όγκος = 25 Mbps · 40 ms = 1 Mbit· υπόλοιπο = 1000 − 25·21,7 ≈ 457,5 kbits, που εξέρχονται με 2 Mbps σε ≈ 228,8 ms."},
+{u:"qos", q:"Ποια από τα παρακάτω είναι η <b>κύρια</b> διαφορά IntServ και DiffServ;",
+ o:["Το IntServ λειτουργεί μόνο σε ATM","Το DiffServ απαιτεί RSVP",
+    "Το IntServ κρατά κατάσταση ανά ροή, ενώ το DiffServ ανά κλάση","Το DiffServ δεν παρέχει καμία προτεραιότητα"], c:2,
+ e:"Ακριβώς αυτό καθορίζει και την κλιμακωσιμότητα: το IntServ δεν κλιμακώνεται στον πυρήνα του Internet επειδή θα έπρεπε κάθε δρομολογητής να κρατά κατάσταση για εκατομμύρια ροές."},
+{u:"qos", q:"Σε ποια εφαρμογή είναι πιο κρίσιμο το jitter;",
+ o:["Μεταφορά αρχείου με FTP","Ηλεκτρονικό ταχυδρομείο","Τηλεφωνία μέσω Internet (VoIP)","Ανάκτηση σελίδας HTML"], c:2,
+ e:"Οι εφαρμογές πραγματικού χρόνου έχουν απαίτηση σταθερού ρυθμού αναπαραγωγής. Σε FTP ή e-mail ενδιαφέρει η διεκπεραίωση και η αξιοπιστία, όχι η μεταβλητότητα της καθυστέρησης."},
+{u:"qos", q:"Ποιος χρονοπρογραμματιστής δίνει σε κάθε ροή εγγυημένο μερίδιο εύρους ζώνης ανάλογο ενός βάρους;",
+ o:["FIFO","Priority queueing","Weighted Fair Queueing (WFQ)","Random Early Detection (RED)"], c:2,
+ e:"Το WFQ εξυπηρετεί τις ουρές εκ περιτροπής, σε επίπεδο bytes, με βάρη. Το RED δεν είναι χρονοπρογραμματιστής αλλά μηχανισμός <b>διαχείρισης ουράς</b> (προληπτική απόρριψη πριν γεμίσει)."},
+
+{u:"internet", q:"Πακέτο 1500 bytes (20 bytes κεφαλίδα IP) πρέπει να περάσει από δίκτυο με MTU 576 bytes. Πόσα θρύμματα θα προκύψουν;",
+ o:["2","3","4","5"], c:1,
+ e:"Ωφέλιμα δεδομένα = 1480 bytes. Ανά θρύμμα χωρούν 576 − 20 = 556 bytes, αλλά το offset μετριέται σε μονάδες 8 bytes, άρα στρογγυλοποιούμε προς τα κάτω σε πολλαπλάσιο του 8: 552 bytes. 1480 = 552 + 552 + 376 → <b>3 θρύμματα</b> (offsets 0, 69, 138)."},
+{u:"internet", q:"Ποιο από τα παρακάτω <b>δεν</b> ισχύει για το MPLS;",
+ o:["Η ετικέτα έχει τοπική σημασία και αλλάζει σε κάθε άλμα",
+    "Επιτρέπει traffic engineering και VPN",
+    "Αντικαθιστά πλήρως το IP στους δρομολογητές κορμού",
+    "Τοποθετείται μεταξύ επιπέδου 2 και επιπέδου 3"], c:2,
+ e:"Το MPLS <b>συνυπάρχει</b> με το IP: στην είσοδο του δικτύου MPLS ο δρομολογητής (LER) κατατάσσει το πακέτο IP σε FEC και του προσθέτει ετικέτα· στην έξοδο η ετικέτα αφαιρείται και η προώθηση συνεχίζεται κανονικά με IP."},
+{u:"internet", q:"Γιατί το BGP χαρακτηρίζεται ως πρωτόκολλο «διανύσματος διαδρομής» και όχι απλώς διανυσμάτων απόστασης;",
+ o:["Επειδή χρησιμοποιεί Dijkstra","Επειδή ανταλλάσσει ολόκληρο το AS-PATH αντί για μια αριθμητική απόσταση",
+    "Επειδή τρέχει πάνω από UDP","Επειδή κάθε AS έχει μόνο έναν δρομολογητή"], c:1,
+ e:"Η γνώση της πλήρους διαδρομής επιτρέπει (α) άμεση αποφυγή βρόχων (απόρριψη διαδρομών που περιέχουν το δικό μου AS) και (β) εφαρμογή εμπορικών/πολιτικών κριτηρίων επιλογής."},
+{u:"internet", q:"Ποιο είναι το κύριο πλεονέκτημα της ιεραρχίας περιοχών (areas) στο OSPF;",
+ o:["Εξαλείφει τους βρόχους δρομολόγησης","Μειώνει το εύρος της πλημμύρας LSP και το μέγεθος των βάσεων τοπολογίας",
+    "Επιτρέπει τη χρήση UDP","Καταργεί την ανάγκη για Dijkstra"], c:1,
+ e:"Τα LSP πλημμυρίζουν μόνο εντός της περιοχής· οι ABR συνοψίζουν προς τη ραχοκοκαλιά (area 0). Έτσι μειώνεται δραστικά ο υπολογιστικός φόρτος και η μνήμη σε μεγάλα AS."},
+{u:"internet", q:"Ποια αλλαγή του IPv6 στοχεύει κυρίως στην <b>ταχύτερη επεξεργασία</b> στους δρομολογητές;",
+ o:["Οι διευθύνσεις 128 bits","Η κατάργηση του checksum κεφαλίδας και του θρυμματισμού στους δρομολογητές",
+    "Το πεδίο Flow label","Η αυτόματη διαμόρφωση διευθύνσεων"], c:1,
+ e:"Χωρίς checksum δεν απαιτείται επανυπολογισμός σε κάθε άλμα (το TTL/hop limit αλλάζει κάθε φορά), και χωρίς θρυμματισμό εν κινήσει αποφεύγεται μια ακριβή λειτουργία. Η σταθερή κεφαλίδα 40 bytes βοηθά επίσης."},
+
+{u:"transport", q:"Ποια η σωστή σειρά κλήσεων σε TCP sockets;",
+ o:["Ο πελάτης: socket→bind→listen· ο εξυπηρετητής: socket→connect→accept",
+    "Ο εξυπηρετητής: socket→bind→listen→accept· ο πελάτης: socket→connect",
+    "Και οι δύο: socket→connect→listen→accept",
+    "Ο εξυπηρετητής: socket→accept→listen→bind· ο πελάτης: socket→connect"], c:1,
+ e:"Ο εξυπηρετητής δεσμεύει θύρα (bind), δηλώνει ότι δέχεται συνδέσεις (listen) και μπλοκάρει στην accept· ο πελάτης καλεί connect, που πυροδοτεί την τριπλή χειραψία. Η accept επιστρέφει <b>νέο</b> socket για τη συγκεκριμένη σύνδεση."},
+{u:"transport", q:"Σε UDP sockets, πώς υλοποιείται η αντίστοιχη λειτουργικότητα;",
+ o:["Με τις ίδιες ακριβώς κλήσεις",
+    "Δεν υπάρχουν connect/listen/accept — ο εξυπηρετητής κάνει bind και μετά recvfrom, ο πελάτης sendto με ρητή διεύθυνση/θύρα",
+    "Χρησιμοποιείται μόνο η accept","Απαιτείται πάντα τριπλή χειραψία"], c:1,
+ e:"Το UDP είναι ασυνδεσμικό: κάθε δεδομενόγραμμα φέρει τη διεύθυνση προορισμού. (Η connect σε UDP socket απλώς «κλειδώνει» τον προορισμό τοπικά, δεν στέλνει τίποτε στο δίκτυο.)"},
+{u:"transport", q:"Έχουν ήδη σταλεί 1000 bytes με ISN = 100. Στέλνονται τρία τμήματα: 500, 800, 200 bytes. Ποιοι είναι οι αριθμοί σειράς τους;",
+ o:["100, 600, 1400","1000, 1500, 2300","1100, 1600, 2400","1101, 1601, 2401"], c:2,
+ e:"Έχουν σταλεί τα bytes 100–1099, άρα το επόμενο byte είναι το 1100. SN₁ = 1100 (bytes 1100–1599), SN₂ = 1600 (1600–2399), SN₃ = 2400 (2400–2599)."},
+{u:"transport", q:"Στο ίδιο παράδειγμα, αν χαθεί το 2ο τμήμα αλλά φτάσουν το 1ο και το 3ο, τι ACK στέλνει ο παραλήπτης;",
+ o:["ACK = 2600","ACK = 1600","ACK = 2400","ACK = 1599"], c:1,
+ e:"Λόγω <b>αθροιστικής</b> επιβεβαίωσης, ο δέκτης έχει λάβει σωστά και στη σειρά έως το byte 1599 και ζητά το 1600 — ακόμη κι αν έχει ήδη λάβει το 3ο τμήμα."},
+{u:"transport", q:"Το TCP έχει cwnd = 32 KB και κατώφλι 64 KB όταν συμβεί timeout. Ποιες είναι οι νέες τιμές (TCP Tahoe);",
+ o:["cwnd = 16 KB, κατώφλι = 32 KB","cwnd = 1 MSS, κατώφλι = 16 KB",
+    "cwnd = 1 MSS, κατώφλι = 32 KB","cwnd = 32 KB, κατώφλι = 16 KB"], c:1,
+ e:"Το κατώφλι γίνεται το μισό του <b>τρέχοντος παραθύρου</b>: 32/2 = 16 KB. Το cwnd μηδενίζεται σε 1 MSS και ακολουθεί νέα φάση αργής εκκίνησης μέχρι τα 16 KB, οπότε αρχίζει η αποφυγή συμφόρησης. Η προηγούμενη τιμή του κατωφλίου (64 KB) δεν παίζει ρόλο."},
+{u:"transport", q:"Σύνδεση TCP με RTT = 100 ms και μέγιστο παράθυρο W = 1 MB. Ποιος είναι ο μέσος ρυθμός διεκπεραίωσης;",
+ o:["10 MB/s","7,5 MB/s","5 MB/s","1 MB/s"], c:1,
+ e:"Throughput ≈ 3W/(4·RTT) = 3·1 MB/(4·0,1 s) = 7,5 MB/s. (Ο μέγιστος στιγμιαίος θα ήταν W/RTT = 10 MB/s.)"},
+{u:"transport", q:"Ποιος είναι ο ρόλος της κατάστασης TIME_WAIT στο TCP;",
+ o:["Να περιμένει επιβεβαίωση δεδομένων","Να διασφαλίσει ότι θα σβήσουν από το δίκτυο τυχόν καθυστερημένα τμήματα της σύνδεσης",
+    "Να επιτρέψει την επαναχρησιμοποίηση του cwnd","Να μετρήσει το RTT"], c:1,
+ e:"Διαρκεί 2×MSL (μέγιστος χρόνος ζωής πακέτου). Έτσι αποφεύγεται να «μπερδευτούν» καθυστερημένα τμήματα μιας παλιάς σύνδεσης με μια νέα σύνδεση που χρησιμοποιεί την ίδια τετράδα."},
+{u:"transport", q:"Ποιος μηχανισμός αντιμετωπίζει το «σύνδρομο του ανόητου παραθύρου» από την πλευρά του <b>αποστολέα</b>;",
+ o:["Λύση Clark","Αλγόριθμος Nagle","Αλγόριθμος Jacobson","Κανόνας Karn"], c:1,
+ e:"Ο Nagle συσσωρεύει μικρά δεδομένα μέχρι να επιβεβαιωθούν τα προηγούμενα ή να συμπληρωθεί ένα πλήρες τμήμα. Η λύση Clark αφορά τον <b>δέκτη</b> (να μην ανακοινώνει μικροσκοπικά ανοίγματα παραθύρου)."},
+
+{u:"perf", q:"Σύνδεσμος 1 Gbps με RTT = 60 ms. Πόσο είναι το γινόμενο καθυστέρησης × εύρους ζώνης;",
+ o:["60 Mbits ≈ 7,5 MB","6 Mbits","600 Mbits","0,6 Mbits"], c:0,
+ e:"BDP = 10⁹ · 0,06 = 6·10⁷ bits = 60 Mbits ≈ 7,5 MB. Άρα για πλήρη αξιοποίηση χρειάζεται παράθυρο αυτής της τάξης — γι' αυτό υπάρχει η επιλογή window scale στο TCP (το βασικό πεδίο παραθύρου φτάνει μόνο 64 KB)."},
+
+{u:"app", q:"Ποιο πρωτόκολλο χρησιμοποιείται για την <b>αποστολή</b> e-mail προς τον εξυπηρετητή του παραλήπτη;",
+ o:["IMAP","POP3","SMTP","MIME"], c:2,
+ e:"Το SMTP (push, πάνω από TCP). Τα POP3/IMAP είναι για την τελική παράδοση στον χρήστη (pull), ενώ το MIME δεν είναι πρωτόκολλο μεταφοράς αλλά προδιαγραφή <b>μορφής</b> του μηνύματος."},
+{u:"app", q:"Ποια η σωστή σειρά βημάτων για μια πρώτη αίτηση HTTP σε ένα URL;",
+ o:["TCP handshake → DNS → HTTP GET → απόκριση","DNS → TCP handshake → HTTP GET → απόκριση → FIN",
+    "HTTP GET → DNS → TCP handshake","ARP → HTTP GET → DNS → TCP"], c:1,
+ e:"Πρέπει πρώτα να μάθουμε τη διεύθυνση IP (DNS/UDP:53), μετά να ανοίξει η σύνδεση TCP στη θύρα 80/443, μετά η αίτηση HTTP και τέλος ο τερματισμός με FIN/ACK. Ενδιάμεσα χρησιμοποιείται ARP για κάθε επόμενο άλμα επιπέδου 2, και NAT αν η διεύθυνση είναι ιδιωτική."},
+{u:"app", q:"Τι ακριβώς αλλάζει σε μια ιστοσελίδα όταν εντάσσεται σε CDN;",
+ o:["Το περιεχόμενο κρυπτογραφείται","Τα URL των υπερσυνδέσμων τροποποιούνται ώστε να δείχνουν στο domain του CDN",
+    "Η σελίδα μετατρέπεται σε XML","Ο πελάτης εγκαθιστά ειδικό λογισμικό"], c:1,
+ e:"Ο χρήστης διαβάζει κανονικά τη βασική σελίδα από τον πάροχο, αλλά τα βαριά αντικείμενα ζητούνται από το domain του CDN, όπου το DNS τον κατευθύνει στον καταλληλότερο πληρεξούσιο."},
+{u:"app", q:"Ποιο είναι το βασικό <b>οικονομικό</b> μοντέλο ενός CDN;",
+ o:["Χρεώνει τους τελικούς χρήστες","Χρεώνει τους παρόχους περιεχομένου για τη φιλοξενία/διανομή",
+    "Χρεώνει τους Tier-1 ISP","Λειτουργεί μόνο με διαφημίσεις"], c:1,
+ e:"Ο πάροχος περιεχομένου πληρώνει το CDN. Ωφελείται και ο ISP που φιλοξενεί κόμβους του CDN, γιατί βελτιώνεται ο χρόνος απόκρισης για τους χρήστες του και μειώνεται η transit κίνηση."},
+{u:"app", q:"Πού διαφέρει ουσιωδώς ένας πληρεξούσιος (proxy cache) από έναν κόμβο CDN;",
+ o:["Ο proxy είναι ταχύτερος","Ο κόμβος CDN έχει το περιεχόμενο εκ των προτέρων (push), ενώ ο proxy ενταμιεύει ό,τι ζητήθηκε (pull)",
+    "Ο proxy ανήκει πάντα στον πάροχο περιεχομένου","Ο κόμβος CDN δεν χρησιμοποιεί HTTP"], c:1,
+ e:"Ο proxy είναι αντιδραστικός και «μαθαίνει» από τη ζήτηση των χρηστών του· το CDN τοποθετεί προληπτικά το περιεχόμενο κοντά στους χρήστες με βάση συμφωνία με τον πάροχο."},
+{u:"app", q:"Ποια κεφαλίδα HTTP επιτρέπει στον πελάτη να ελέγξει αν η ενταμιευμένη του έκδοση είναι ακόμη έγκυρη;",
+ o:["Content-Length","If-Modified-Since","User-Agent","Location"], c:1,
+ e:"Ο server απαντά 200 με το νέο περιεχόμενο ή <b>304 Not Modified</b> χωρίς σώμα. Οι κεφαλίδες Expires και Cache-Control ρυθμίζουν πόσο μπορεί να θεωρείται «φρέσκο» ένα αντικείμενο χωρίς έλεγχο."}
+];
+const GAPS = [
+{u:"basics", t:"Η πολυπλεξία που μοιράζει τον σύνδεσμο κατ' απαίτηση, ανά πακέτο, ονομάζεται ___ πολυπλεξία.",
+ a:["στατιστικη","statistical"], e:"Στατιστική πολυπλεξία — δίνει τη βέλτιστη αξιοποίηση του εύρους ζώνης, με τίμημα την ανάγκη ενταμίευσης και πληροφορίας ελέγχου ανά πακέτο."},
+{u:"basics", t:"Στα δίκτυα μεταγωγής πακέτων, ο κόμβος λαμβάνει ένα πακέτο, το αποθηκεύει προσωρινά και το προωθεί — η τεχνική λέγεται ___ (αγγλικά).",
+ a:["store and forward","store-and-forward","storeandforward"], e:"Store-and-forward. Το πακέτο πρέπει να ληφθεί ολόκληρο (και να ελεγχθεί) πριν προωθηθεί."},
+{u:"basics", t:"Η μονάδα δεδομένων που ανταλλάσσουν οι ομότιμες οντότητες του επιπέδου N ονομάζεται N-___ (τριγράμματη συντομογραφία).",
+ a:["pdu"], e:"PDU = Protocol Data Unit. Το N-PDU ενθυλακώνεται στο (N−1)-PDU."},
+{u:"basics", t:"Το μοντέλο υπηρεσίας του Internet, χωρίς καμία εγγύηση ποιότητας, λέγεται ___ (δύο λέξεις στα αγγλικά).",
+ a:["best effort","best-effort"], e:"Best effort. Οι εγγυήσεις απαιτούν αίτηση πόρων, έλεγχο αποδοχής και αστυνόμευση."},
+
+{u:"link", t:"Αν BER = 10⁻⁶ και το πλαίσιο έχει 10⁴ bits, τότε PER ≈ ___ (γράψτε ως δεκαδικό, π.χ. 0,01).",
+ a:["0,01","0.01","1%","10^-2","10-2"], e:"PER ≈ N·BER = 10⁴ · 10⁻⁶ = 10⁻² = 0,01."},
+{u:"link", t:"Το πρωτόκολλο παύσης και αναμονής με αρίθμηση ενός bit λέγεται και πρωτόκολλο ___ bit.",
+ a:["εναλλασσομενου","alternating"], e:"Πρωτόκολλο εναλλασσόμενου bit (Alternating Bit Protocol — ABP), γνωστό και ως ARQ ή PAR."},
+{u:"link", t:"Στον τύπο της αποδοτικότητας του stop-and-wait, E = D_TP / S, ο παρονομαστής S περιλαμβάνει τον χρόνο μετάδοσης πλαισίου, τον χρόνο μετάδοσης ACK και ___ φορές τον χρόνο διάδοσης.",
+ a:["2","δυο","δύο","two"], e:"Δύο φορές — μία ανά κατεύθυνση (πλαίσιο προς τα εκεί, ACK προς τα πίσω)."},
+{u:"link", t:"Στο Selective Repeat, για MAX_SEQ+1 διαθέσιμους αριθμούς σειράς, το μέγιστο παράθυρο παραλήπτη είναι ___ (έκφραση με MAX_SEQ).",
+ a:["(max_seq+1)/2","(maxseq+1)/2","(max seq+1)/2"], e:"r ≤ (MAX_SEQ+1)/2, δηλαδή το μισό του εύρους αρίθμησης, ώστε το παλιό και το νέο παράθυρο να μην επικαλύπτονται."},
+{u:"link", t:"Η τεχνική κατά την οποία η επιβεβαίωση «ταξιδεύει» μέσα σε πλαίσιο δεδομένων της αντίθετης κατεύθυνσης λέγεται ___ (αγγλικά).",
+ a:["piggybacking","piggyback"], e:"Εμβόλιμη επιβεβαίωση (piggybacking) — μειώνει το πλήθος των πλαισίων."},
+{u:"link", t:"Στο Go-Back-N το μέγεθος του παραθύρου του ___ είναι πάντα ίσο με 1.",
+ a:["παραληπτη","δεκτη","receiver"], e:"Του παραλήπτη. Γι' αυτό απορρίπτονται όλα τα εκτός σειράς πλαίσια."},
+
+{u:"routing", t:"Η αρχή σύμφωνα με την οποία το σύνολο των βέλτιστων διαδρομών προς έναν προορισμό σχηματίζει δένδρο (sink tree) ονομάζεται αρχή της ___.",
+ a:["βελτιστοποιησης","optimality"], e:"Αρχή της βελτιστοποίησης. Συνέπεια: οι βέλτιστες διαδρομές δεν περιέχουν βρόχους."},
+{u:"routing", t:"Το γνωστό πρόβλημα των πρωτοκόλλων διανυσμάτων απόστασης λέγεται ___ (αγγλικά, τρεις λέξεις με παύλες).",
+ a:["count to infinity","count-to-infinity","counttoinfinity"], e:"Count-to-infinity: οι καλές ειδήσεις διαδίδονται γρήγορα, οι κακές αργά."},
+{u:"routing", t:"Ο αλγόριθμος που χρησιμοποιεί κάθε δρομολογητής κατάστασης συνδέσμων για να υπολογίσει τοπικά τις συντομότερες διαδρομές είναι ο αλγόριθμος του ___.",
+ a:["dijkstra","ντικστρα"], e:"Dijkstra, πάνω στον πλήρη χάρτη τοπολογίας που έχει σχηματιστεί από τα LSP."},
+{u:"routing", t:"Η μορφή δρομολόγησης που παραδίδει το πακέτο σε <b>έναν</b> από τους κόμβους μιας ομάδας, συνήθως τον πλησιέστερο, λέγεται ___.",
+ a:["πλησιοδιανομη","anycast"], e:"Πλησιοδιανομή (anycast) — προκύπτει σχεδόν δωρεάν από την κανονική δρομολόγηση, αν πολλοί κόμβοι διαφημίζουν την ίδια διεύθυνση."},
+{u:"routing", t:"Στο Chord, ο πίνακας που περιέχει m δείκτες προς successors σε αποστάσεις 2⁰, 2¹, … λέγεται ___ table.",
+ a:["finger"], e:"Finger table — μειώνει την αναζήτηση από O(n) σε O(log n)."},
+{u:"routing", t:"Στο κινητό IP, η προσωρινή διεύθυνση του κινητού κόμβου στο ξένο δίκτυο λέγεται ___ address (αγγλικά).",
+ a:["care of","care-of","careof"], e:"Care-of address. Ο home agent προωθεί εκεί τα πακέτα με tunneling."},
+
+{u:"qos", t:"Ο αλγόριθμος που επιβάλλει απολύτως σταθερό ρυθμό εξόδου και εξαφανίζει τις ριπές λέγεται ___ κουβάς.",
+ a:["τρυπιος","leaky"], e:"Τρύπιος κουβάς (leaky bucket). Αντίθετα, ο κουβάς κουπονιών επιτρέπει ριπές."},
+{u:"qos", t:"Στον κουβά κουπονιών με χωρητικότητα B, ρυθμό κουπονιών ρ και ρυθμό γραμμής M, η μέγιστη διάρκεια ριπής είναι S = ___.",
+ a:["b/(m-ρ)","b/(m-r)","β/(μ-ρ)","b/(m−ρ)","b/(m − ρ)"], e:"S = B/(M − ρ), από τη σχέση B + ρ·S = M·S."},
+{u:"qos", t:"Η μεταβλητότητα της καθυστέρησης άφιξης των πακέτων ονομάζεται παραμόρφωση χρονισμού ή ___ (αγγλικά).",
+ a:["jitter"], e:"Jitter. Αντιμετωπίζεται κυρίως με playout buffer στον δέκτη, με τίμημα επιπλέον αρχική καθυστέρηση."},
+{u:"qos", t:"Το πρωτόκολλο σηματοδοσίας για δέσμευση πόρων στις Ολοκληρωμένες Υπηρεσίες είναι το ___.",
+ a:["rsvp"], e:"RSVP — η δέσμευση ξεκινά από τον <b>παραλήπτη</b> (μηνύματα PATH από τον αποστολέα, RESV από τον παραλήπτη)."},
+{u:"qos", t:"Τα κελιά του ATM έχουν σταθερό μήκος ___ bytes.",
+ a:["53"], e:"53 bytes = 5 κεφαλίδα + 48 ωφέλιμο φορτίο."},
+
+{u:"internet", t:"Στο IPv4, το πεδίο μετατόπισης θρύμματος (fragment offset) μετριέται σε μονάδες ___ bytes.",
+ a:["8","οκτω","οκτώ"], e:"8 bytes — γι' αυτό κάθε θρύμμα (εκτός του τελευταίου) πρέπει να έχει μήκος δεδομένων πολλαπλάσιο του 8."},
+{u:"internet", t:"Η τεχνική με την οποία ένα πακέτο ενθυλακώνεται ολόκληρο σε πακέτο του ενδιάμεσου δικτύου ώστε να το διασχίσει ονομάζεται διοχέτευση σε ___.",
+ a:["σηραγγα","tunnel","tunneling"], e:"Διοχέτευση σε σήραγγα (tunneling). Χρησιμοποιείται σε IPv6-over-IPv4, VPN και κινητό IP."},
+{u:"internet", t:"Το πρωτόκολλο δρομολόγησης μεταξύ αυτόνομων συστημάτων στο Internet είναι το ___.",
+ a:["bgp","border gateway protocol"], e:"BGP — πρωτόκολλο διανύσματος διαδρομής, πάνω από TCP (θύρα 179)."},
+{u:"internet", t:"Η βασική κεφαλίδα του IPv6 έχει σταθερό μήκος ___ bytes.",
+ a:["40"], e:"40 bytes, με 8 πεδία (έναντι 13 στο IPv4) και χωρίς checksum κεφαλίδας."},
+{u:"internet", t:"Όταν ένα πακέτο IP φτάνει σε δρομολογητή, ο πίνακας δρομολόγησης αναζητείται με τον κανόνα του ___ προθέματος (μιας λέξης: μακρύτερου/συντομότερου).",
+ a:["μακρυτερου","longest"], e:"Ταίριασμα μακρύτερου προθέματος (longest prefix matching) — αν ταιριάζουν πολλές γραμμές, επιλέγεται εκείνη με τα περισσότερα bits προθέματος."},
+
+{u:"transport", t:"Το πρωτόκολλο εγκαθίδρυσης σύνδεσης που αποτρέπει τη δημιουργία σύνδεσης από καθυστερημένα διπλότυπα λέγεται πρωτόκολλο ___ χειραψίας.",
+ a:["τριπλης","three way","3 way"], e:"Τριπλής χειραψίας (three-way handshake) — κάθε πλευρά επιβεβαιώνει τον αρχικό αριθμό σειράς που επέλεξε η άλλη."},
+{u:"transport", t:"Η κεφαλίδα του UDP έχει μήκος ___ bytes.",
+ a:["8","οκτω","οκτώ"], e:"8 bytes: θύρα πηγής, θύρα προορισμού, μήκος, άθροισμα ελέγχου."},
+{u:"transport", t:"Η βασική κεφαλίδα του TCP (χωρίς επιλογές) έχει μήκος ___ bytes.",
+ a:["20"], e:"20 bytes· με επιλογές (MSS, window scale, SACK, timestamps) φτάνει έως 60 bytes."},
+{u:"transport", t:"Στο TCP, οι αριθμοί σειράς αριθμούν ___ (τι ακριβώς;) και όχι τμήματα.",
+ a:["bytes","byte","οκτάδες","οκταδες"], e:"Bytes. Ο αριθμός σειράς ενός τμήματος είναι ο αριθμός του πρώτου byte που μεταφέρει."},
+{u:"transport", t:"Το παράθυρο αποστολέα στο TCP ισούται με το ___ (πράξη) του παραθύρου παραλήπτη και του παραθύρου συμφόρησης.",
+ a:["ελαχιστο","min","minimum"], e:"min{rwnd, cwnd}. Το πρώτο αφορά έλεγχο ροής, το δεύτερο έλεγχο συμφόρησης."},
+{u:"transport", t:"Η συμπεριφορά «προσθετική αύξηση – πολλαπλασιαστική μείωση» του παραθύρου συμφόρησης συμβολίζεται ___ (αγγλικά, τέσσερα γράμματα).",
+ a:["aimd"], e:"AIMD — είναι αυτή που οδηγεί στη δίκαιη κατανομή του εύρους ζώνης (TCP fairness)."},
+{u:"transport", t:"Ο κανόνας που απαγορεύει τη χρήση μετρήσεων RTT από αναμεταδοθέντα τμήματα λέγεται κανόνας του ___.",
+ a:["karn","καρν"], e:"Κανόνας του Karn· αντ' αυτού εφαρμόζεται exponential backoff στο timeout."},
+{u:"transport", t:"Το χρονόμετρο που ελέγχει περιοδικά αν ο δέκτης άνοιξε πάλι το παράθυρό του λέγεται χρονόμετρο ___.",
+ a:["επιμονης","persistence","persist"], e:"Χρονόμετρο επιμονής — αποτρέπει αδιέξοδο αν χαθεί η ανακοίνωση ανοίγματος παραθύρου."},
+
+{u:"perf", t:"Το γινόμενο εύρους ζώνης × καθυστέρησης (RTT) καθορίζει το ελάχιστο απαιτούμενο μέγεθος ___ για πλήρη αξιοποίηση του συνδέσμου.",
+ a:["παραθυρου","window"], e:"Παραθύρου. Σε «μακρύ παχύ σωλήνα» απαιτούνται πολύ μεγάλα παράθυρα (εξ ου και η επιλογή window scale)."},
+
+{u:"app", t:"Η προδιαγραφή που επιτρέπει πολυμέσα και μη-ASCII κείμενο στο e-mail χωρίς αλλαγή του SMTP είναι το ___.",
+ a:["mime"], e:"MIME — προσθέτει κεφαλίδες (MIME-Version, Content-Type, Content-Transfer-Encoding) και κωδικοποιήσεις base64 / quoted-printable."},
+{u:"app", t:"Το πρωτόκολλο τελικής παράδοσης που αφήνει τα μηνύματα στον εξυπηρετητή και υποστηρίζει φακέλους και αναζήτηση είναι το ___.",
+ a:["imap"], e:"IMAP (θύρα 143). Το POP3 συνήθως κατεβάζει και διαγράφει."},
+{u:"app", t:"Ο κωδικός απόκρισης HTTP που σημαίνει «δεν τροποποιήθηκε» είναι ο ___.",
+ a:["304"], e:"304 Not Modified — απάντηση σε υπό όρους αίτηση με If-Modified-Since· δεν περιλαμβάνει σώμα."},
+{u:"app", t:"Τα μικρά αρχεία που θέτει ο εξυπηρετητής στον πελάτη για να δώσει κατάσταση σε ένα stateless πρωτόκολλο λέγονται ___.",
+ a:["cookies","cookie"], e:"Cookies: τίθενται με Set-Cookie και επιστρέφονται με Cookie. Πεδία: domain, path, content, expires, secure."},
+{u:"app", t:"Η επιλογή του καταλληλότερου εξυπηρετητή CDN για κάθε πελάτη γίνεται κυρίως μέσω του ___.",
+ a:["dns"], e:"DNS, με εγγραφές CNAME/NS προς το domain του CDN. Εναλλακτικά με ανακατεύθυνση HTTP (κεφαλίδα Location)."},
+{u:"app", t:"Το ερώτημα DNS στέλνεται τυπικά με το πρωτόκολλο μεταφοράς ___ στη θύρα 53.",
+ a:["udp"], e:"UDP — μικρό αίτημα/απάντηση, χωρίς κόστος εγκαθίδρυσης σύνδεσης. (Για μεγάλες απαντήσεις ή ζώνες χρησιμοποιείται TCP.)"}
+];
+const ESSAY = [
+{u:"transport", past:true, q:"<b>(α)</b> Τι είδους «διευθύνσεις» χρησιμοποιούνται στις συνδέσεις στο επίπεδο μεταφοράς και σε ποιες οντότητες αντιστοιχούν; <b>(β)</b> Να αναφέρετε περιληπτικά τους βασικούς τρόπους «ανακάλυψης» της διεύθυνσης ή/και της οντότητας με την οποία πρόκειται να ανοιχθεί μια σύνδεση.",
+ a:`<p><b>(α)</b> Χρησιμοποιούνται διευθύνσεις <b>TSAP</b> (Transport Service Access Point) — στο Internet <b>αριθμοί θυρών (ports)</b>, 16 bits. Αντιστοιχούν σε <b>διεργασίες</b> (ακριβέστερα: σε σημεία πρόσβασης υπηρεσίας μιας διεργασίας) και όχι σε μηχανήματα. Αυτή είναι η βασική διαφορά από τις διευθύνσεις του επιπέδου δικτύου (<b>NSAP</b> / διευθύνσεις IP), που προσδιορίζουν <b>κόμβο/διεπαφή</b>. Μια σύνδεση TCP προσδιορίζεται μονοσήμαντα από την <b>τετράδα</b> (IP πηγής, θύρα πηγής, IP προορισμού, θύρα προορισμού), γι' αυτό μπορούν να συνυπάρχουν πολλές συνδέσεις προς την ίδια θύρα εξυπηρετητή.</p>
+<p><b>(β)</b> Τρεις βασικοί τρόποι:</p>
+<ul>
+<li><b>Γνωστές (well-known) θύρες</b>: για καθιερωμένες υπηρεσίες η θύρα είναι εκ των προτέρων συμφωνημένη (HTTP 80, SMTP 25, DNS 53, HTTPS 443). Ο πελάτης δεν χρειάζεται να ρωτήσει κανέναν. Επαρκεί μόνο για περιορισμένο πλήθος υπηρεσιών.</li>
+<li><b>Εξυπηρετητής ονομάτων / καταλόγου</b> (name server, portmapper): κάθε υπηρεσία <b>δηλώνεται (register)</b> σε έναν γνωστό εξυπηρετητή μαζί με τη διεύθυνσή της· ο πελάτης ανοίγει πρώτα σύνδεση με τον εξυπηρετητή ονομάτων, ρωτά με το όνομα της υπηρεσίας, παίρνει τη διεύθυνση/θύρα και μετά συνδέεται με την ίδια την υπηρεσία.</li>
+<li><b>Εξυπηρετητής διεργασιών (process server / inetd)</b>: μία διεργασία ακούει ταυτόχρονα σε πολλές θύρες σπάνια χρησιμοποιούμενων υπηρεσιών· όταν φτάσει αίτηση, <b>ξεκινά</b> τον κατάλληλο εξυπηρετητή και του παραδίδει τη σύνδεση. Αποφεύγεται έτσι η μόνιμη ύπαρξη πολλών ανενεργών διεργασιών.</li>
+</ul>
+<p>Συμπληρωματικά, η αντιστοίχιση <b>ονόματος κόμβου → διεύθυνση IP</b> γίνεται μέσω <b>DNS</b> — δηλαδή για να ανοίξει η σύνδεση χρειάζονται και τα δύο βήματα: DNS για τον κόμβο, γνωστή θύρα ή name server για τη διεργασία.</p>`},
+
+{u:"transport", past:true, q:"Ένας κόμβος Α στέλνει ένα μεγάλο αρχείο σε έναν κόμβο Β μέσω σύνδεσης TCP. <b>(α)</b> Πώς θα ενεργήσει το TCP στον Α όταν συμβεί timeout; <b>(β)</b> Βάσει ποιων παραμέτρων και από ποιον τύπο καθορίζεται ο χρόνος αναμονής; <b>(γ)</b> Πώς προκύπτουν οι τιμές των παραμέτρων αυτών;",
+ a:`<p><b>(α) Ενέργειες σε timeout:</b></p>
+<ul>
+<li><b>Αναμετάδοση</b> του παλαιότερου μη επιβεβαιωμένου τμήματος (το TCP χρησιμοποιεί αθροιστικά ACK, οπότε ξεκινά από το πρώτο «κενό»).</li>
+<li>Το timeout ερμηνεύεται ως <b>ένδειξη συμφόρησης</b> (το IP δεν δίνει ρητή ένδειξη): <b>κατώφλι ← cwnd/2</b> και <b>cwnd ← 1 MSS</b>, με επιστροφή στη φάση <b>αργής εκκίνησης</b> (TCP Tahoe). Έτσι ο ρυθμός αποστολής μειώνεται δραστικά.</li>
+<li><b>Διπλασιασμός του χρόνου αναμονής</b> για την επόμενη αναμετάδοση (exponential backoff), και επανεκκίνηση του χρονομέτρου.</li>
+<li>Η μέτρηση RTT του αναμεταδοθέντος τμήματος <b>δεν</b> χρησιμοποιείται για την ενημέρωση της εκτίμησης (κανόνας του Karn), γιατί δεν είναι γνωστό αν το ACK αφορά την αρχική μετάδοση ή την αναμετάδοση.</li>
+</ul>
+<p><b>(β) Τύπος (αλγόριθμος Jacobson):</b></p>
+<div class="fx block">RTT  ← α·RTT + (1−α)·M          (M = νέα μέτρηση, τυπικά α = 7/8)
+D    ← α·D  + (1−α)·|RTT − M|    (εκτίμηση της απόκλισης)
+Timeout (RTO) = RTT + 4·D</div>
+<p>Δηλαδή οι παράμετροι είναι η <b>εξομαλυμένη εκτίμηση του RTT</b> και η <b>εκτίμηση της μεταβλητότητάς του D</b>. Το «+4·D» εξασφαλίζει περιθώριο ασφαλείας ώστε να μη γίνονται αναμεταδόσεις σε φυσιολογικές διακυμάνσεις.</p>
+<p><b>(γ) Προέλευση των τιμών:</b> Και οι δύο υπολογίζονται <b>δυναμικά από μετρήσεις</b> κατά τη διάρκεια της σύνδεσης: για κάθε τμήμα που επιβεβαιώνεται (χωρίς να έχει αναμεταδοθεί) μετράται ο χρόνος από την αποστολή έως τη λήψη του ACK· η μέτρηση αυτή εισάγεται στους παραπάνω εκθετικά σταθμισμένους κινητούς μέσους. Αρχικά χρησιμοποιείται μια συντηρητική προεπιλογή (π.χ. 1–3 s) μέχρι να συγκεντρωθούν μετρήσεις. Η δυναμική προσαρμογή είναι απαραίτητη γιατί, σε αντίθεση με το επίπεδο 2, το RTT στο επίπεδο μεταφοράς έχει <b>τεράστια διακύμανση</b> (διαφορετικές διαδρομές, ουρές, συμφόρηση).</p>`},
+
+{u:"transport", past:true, q:"<b>(α)</b> Στα TCP sockets χρησιμοποιούνται οι κλήσεις accept, connect, listen. Με ποια σειρά καλούνται και από ποιο μέρος της σύνδεσης η καθεμία; <b>(β)</b> Πώς υλοποιείται η αντίστοιχη λειτουργικότητα στα UDP sockets;",
+ a:`<p><b>(α) TCP (stream sockets):</b></p>
+<div class="fx block">Εξυπηρετητής: socket() → bind(θύρα) → listen(backlog) → accept()  [μπλοκάρει]
+Πελάτης:      socket() → connect(IP, θύρα)
+                          ↓ τριπλή χειραψία TCP
+Εξυπηρετητής: η accept() επιστρέφει ΝΕΟ socket για τη συγκεκριμένη σύνδεση
+Και οι δύο:   send()/recv() … → close()</div>
+<p>Δηλαδή η σειρά είναι <b>listen → connect → accept</b>: οι <b>listen</b> και <b>accept</b> καλούνται από τον <b>εξυπηρετητή</b> (η listen δηλώνει ότι το socket δέχεται εισερχόμενες συνδέσεις και ορίζει την ουρά αναμονής· η accept παραλαμβάνει την επόμενη ολοκληρωμένη σύνδεση), ενώ η <b>connect</b> καλείται από τον <b>πελάτη</b> και πυροδοτεί την τριπλή χειραψία. Σημαντικό: το socket ακρόασης παραμένει ανοικτό, ενώ κάθε σύνδεση εξυπηρετείται μέσω του νέου socket — τυπικά από χωριστό νήμα/διεργασία.</p>
+<p><b>(β) UDP (datagram sockets):</b> Δεν υπάρχουν listen/accept/connect, γιατί το UDP είναι <b>ασυνδεσμικό</b>: δεν υπάρχει σύνδεση προς «αποδοχή».</p>
+<div class="fx block">Εξυπηρετητής: socket() → bind(θύρα) → recvfrom(buf, &amp;addr) → sendto(buf, addr)
+Πελάτης:      socket() [→ προαιρετικό bind] → sendto(buf, IP, θύρα) → recvfrom(...)</div>
+<p>Η διεύθυνση/θύρα του παραλήπτη δίνεται <b>ρητά σε κάθε sendto</b>, ενώ η <b>recvfrom</b> επιστρέφει μαζί με τα δεδομένα και τη διεύθυνση του αποστολέα — έτσι ο εξυπηρετητής ξέρει πού να απαντήσει. Ένα μόνο socket εξυπηρετεί όλους τους πελάτες. (Η <code>connect()</code> μπορεί να κληθεί και σε UDP socket, αλλά απλώς «κλειδώνει» τοπικά τον προορισμό ώστε να χρησιμοποιούνται send/recv — <b>δεν</b> στέλνει τίποτε στο δίκτυο και δεν εγκαθιστά σύνδεση.) Οτιδήποτε χρειάζεται (αξιοπιστία, σειρά, έλεγχος ροής) πρέπει να υλοποιηθεί από την ίδια την εφαρμογή.</p>`},
+
+{u:"app", past:true, q:"Ποιο είναι το βασικό πρωτόκολλο που χρησιμοποιείται στο Internet για την αποστολή ηλεκτρονικού ταχυδρομείου; Για την επικοινωνία μεταξύ ποιων οντοτήτων επιπέδου εφαρμογής χρησιμοποιείται;",
+ a:`<p>Το <b>SMTP</b> (Simple Mail Transfer Protocol), πρωτόκολλο <b>ASCII</b> πάνω από <b>TCP</b> (θύρα 25, ή 587 για υποβολή από τον χρήστη), με μοντέλο <b>push</b>.</p>
+<p><b>Μεταξύ ποιων οντοτήτων:</b></p>
+<ul>
+<li>Από τον <b>πράκτορα χρήστη (UA)</b> ή τον πελάτη αποστολής προς τον <b>εξυπηρετητή/πράκτορα μεταφοράς μηνυμάτων (MTA)</b> του αποστολέα.</li>
+<li>Από τον <b>MTA του αποστολέα προς τον MTA του παραλήπτη</b> — αυτή είναι η κύρια χρήση: η μεταφορά γίνεται <b>από εξυπηρετητή σε εξυπηρετητή</b> (ενδεχομένως μέσω ενδιάμεσων relay). Η διεύθυνση του MTA προορισμού βρίσκεται από τις εγγραφές <b>MX</b> του DNS για το domain του παραλήπτη.</li>
+</ul>
+<p><b>Δεν</b> χρησιμοποιείται για την <b>τελική παράδοση</b> από το γραμματοκιβώτιο στον χρήστη — εκεί χρησιμοποιούνται <b>POP3</b> (θύρα 110) ή <b>IMAP</b> (θύρα 143), που είναι πρωτόκολλα <b>pull</b>, ή webmail μέσω HTTP. Ο λόγος είναι ότι ο υπολογιστής του παραλήπτη μπορεί να είναι κλειστός: το SMTP ωθεί το μήνυμα μέχρι τον πάντα-ενεργό εξυπηρετητή του, και ο χρήστης το τραβά όποτε θέλει.</p>
+<p>Κύριες εντολές SMTP: <code>HELO/EHLO, MAIL FROM, RCPT TO, DATA, QUIT</code>. Η δομή του μηνύματος (κεφαλίδες RFC 5322, σώμα με MIME) είναι ανεξάρτητη από το πρωτόκολλο μεταφοράς — γι' αυτό το MIME πρόσθεσε πολυμέσα <b>χωρίς</b> να αλλάξει το SMTP.</p>`},
+
+{u:"internet", past:true, q:"Τι είναι το πρωτόκολλο BGP; Μεταξύ ποιων συσκευών εκτελείται και τι πληροφορία ανταλλάσσουν οι συσκευές αυτές;",
+ a:`<p><b>Τι είναι:</b> Το <b>BGP</b> (Border Gateway Protocol, Πρωτόκολλο Συνοριακής Πύλης Δικτύου) είναι το <b>εξωτερικό</b> πρωτόκολλο δρομολόγησης του Internet: υλοποιεί τη δρομολόγηση <b>μεταξύ αυτόνομων συστημάτων (AS)</b>, δηλαδή μεταξύ των δικτύων διαφορετικών διοικητικών αρχών (ISP, πανεπιστήμια, εταιρείες). Είναι πρωτόκολλο <b>διανύσματος διαδρομής (path vector)</b> — παραλλαγή των διανυσμάτων απόστασης όπου αντί για αριθμητική απόσταση ανταλλάσσεται η <b>πλήρης διαδρομή</b>. Αποτελεί «τον συνεκτικό ιστό του Internet», και για να λειτουργήσει πρέπει να είναι κοινό/τυποποιημένο για όλα τα AS.</p>
+<p><b>Μεταξύ ποιων συσκευών:</b> Μεταξύ των <b>συνοριακών δρομολογητών (gateway routers)</b> των AS. Δύο παραλλαγές:</p>
+<ul>
+<li><b>eBGP</b>: μεταξύ συνοριακών δρομολογητών <b>διαφορετικών</b> AS.</li>
+<li><b>iBGP</b>: μεταξύ δρομολογητών του <b>ίδιου</b> AS, ώστε οι εσωτερικοί δρομολογητές να μάθουν τις εξωτερικές διαδρομές και να επιλεγεί η κατάλληλη πύλη εξόδου. Οι gateway routers τρέχουν <b>και τα δύο</b>.</li>
+</ul>
+<p>Οι συνεδρίες BGP στήνονται πάνω από <b>TCP</b> (θύρα 179), για αξιοπιστία.</p>
+<p><b>Τι πληροφορία ανταλλάσσουν:</b> Αναγγελίες προσβασιμότητας, όπου για κάθε <b>πρόθεμα (prefix)</b> διευθύνσεων δίνονται:</p>
+<ul>
+<li>το <b>AS-PATH</b>: η πλήρης ακολουθία των AS που πρέπει να διασχιστούν (π.χ. C, AS1, AS2, AS3),</li>
+<li>το <b>NEXT HOP</b>: η διεύθυνση IP του δρομολογητή του επόμενου άλματος προς τον οποίο πρέπει να σταλούν τα πακέτα,</li>
+<li>και διάφορα attributes πολιτικής (local preference, MED κ.λπ.).</li>
+</ul>
+<p><b>Γιατί πλήρεις διαδρομές:</b> (α) Ο έλεγχος βρόχων είναι τετριμμένος — ένα AS απορρίπτει κάθε διαδρομή που περιέχει το δικό του αναγνωριστικό. (β) Επιτρέπεται η εφαρμογή <b>πολιτικών</b> με εμπορικά κριτήρια: αποφυγή διέλευσης από ή προς ορισμένα δίκτυα, προτίμηση διαδρομών μέσω πελατών αντί μέσω παρόχων (transit που κοστίζει), κ.ο.κ. Κάθε AS <b>βαθμολογεί</b> τις διαδρομές και επιλέγει μία ανά προορισμό. Η προώθηση ενός πακέτου γίνεται με <b>ταίριασμα μακρύτερου προθέματος</b>.</p>
+<p>Μηνύματα: <b>OPEN</b> (εκκίνηση συνεδρίας), <b>UPDATE</b> (αναγγελία ή απόσυρση διαδρομής), <b>KEEPALIVE</b>, <b>NOTIFICATION</b> (σφάλμα).</p>`},
+
+{u:"qos", past:true, q:"<b>(α)</b> Τι είναι η παραμόρφωση χρονισμού (jitter); Ποιες εφαρμογές είναι ευαίσθητες σε αυτήν; <b>(β)</b> Να περιγράψετε περιληπτικά πώς μπορεί να επιτευχθεί βελτίωση στην παραμόρφωση χρονισμού.",
+ a:`<p><b>(α)</b> Jitter είναι η <b>μεταβλητότητα (διακύμανση) της καθυστέρησης</b> άφιξης διαδοχικών πακέτων μιας ροής — όχι η ίδια η καθυστέρηση. Πακέτα που στάλθηκαν με σταθερό ρυθμό φτάνουν με άνισα χρονικά διαστήματα, κυρίως επειδή η αναμονή στις ουρές των δρομολογητών μεταβάλλεται (και, στα datagram δίκτυα, επειδή μπορεί να ακολουθήσουν διαφορετικές διαδρομές).</p>
+<p><b>Ευαίσθητες εφαρμογές:</b> όσες έχουν απαίτηση <b>σταθερού ρυθμού αναπαραγωγής (πραγματικού χρόνου)</b>: τηλεφωνία μέσω Internet / VoIP, τηλεδιάσκεψη, ροή βίντεο και ήχου, δικτυακά παιχνίδια πραγματικού χρόνου. Αντίθετα, e-mail, μεταφορά αρχείων και απλή περιήγηση είναι ουσιαστικά αδιάφορες στο jitter (ενδιαφέρονται για διεκπεραίωση και αξιοπιστία).</p>
+<p><b>(β) Τρόποι βελτίωσης:</b></p>
+<ul>
+<li><b>Ενταμίευση στον δέκτη (playout buffer)</b> — ο κύριος μηχανισμός: τα πακέτα δεν αναπαράγονται αμέσως αλλά αποθηκεύονται, και η αναπαραγωγή ξεκινά μετά από σταθερή αρχική καθυστέρηση, με ομοιόμορφο ρυθμό. Έτσι απορροφάται η διακύμανση. <b>Κόστος:</b> επιπλέον καθυστέρηση από άκρο σε άκρο — γι' αυτό σε διαδραστικές εφαρμογές ο buffer δεν μπορεί να είναι μεγάλος (όριο ~150 ms συνολικής καθυστέρησης για άνετη συνομιλία). Απαιτούνται <b>χρονοσημάνσεις</b> στα πακέτα (πεδίο timestamp του <b>RTP</b>), ώστε ο δέκτης να ξέρει πότε πρέπει να αναπαραχθεί το καθένα.</li>
+<li><b>Ρύθμιση/χρονοπρογραμματισμός στους δρομολογητές</b>: δέσμευση πόρων και <b>προτεραιότητα</b> στην κίνηση πραγματικού χρόνου (priority queueing, WFQ, DiffServ/Expedited Forwarding), ώστε τα πακέτα να μην περιμένουν πίσω από ριπές δεδομένων.</li>
+<li><b>Μορφοποίηση της κίνησης</b> στην είσοδο (κουβάς κουπονιών) και <b>έλεγχος αποδοχής</b>, ώστε να μη δημιουργούνται συνθήκες συμφόρησης που προκαλούν μεταβλητές ουρές.</li>
+<li><b>Μικρότερα πακέτα</b> σε αργούς συνδέσμους, ώστε ένα μεγάλο πακέτο δεδομένων να μη «μπλοκάρει» τη γραμμή (μείωση της καθυστέρησης σειριοποίησης).</li>
+<li><b>Υπερδιαστασιολόγηση</b> των συνδέσμων: αν οι ουρές είναι σχεδόν πάντα άδειες, η καθυστέρηση είναι σχεδόν σταθερή.</li>
+<li>Σε δίκτυα <b>εικονικών κυκλωμάτων</b> (π.χ. ATM/CBR ή MPLS), η ίδια διαδρομή για όλα τα πακέτα μειώνει επίσης τη διακύμανση.</li>
+</ul>`},
+
+{u:"link", q:"Συγκρίνετε τα πρωτόκολλα Go-Back-N και Selective Repeat: λειτουργία, μέγεθος παραθύρων, συνθήκες αρίθμησης, πλεονεκτήματα/μειονεκτήματα και πότε προτιμάται το καθένα.",
+ a:`<p><b>Κοινό σημείο:</b> και τα δύο είναι πρωτόκολλα <b>κυλιόμενου παραθύρου</b> που επιτρέπουν την αποστολή s πλαισίων χωρίς αναμονή επιβεβαίωσης, βελτιώνοντας δραστικά την αξιοποίηση σε σχέση με το stop-and-wait (το οποίο είναι η ειδική περίπτωση s = 1). Για πλήρη αξιοποίηση χρειάζεται s ≥ ⌈S/D_TP⌉, δηλαδή τόσα πλαίσια όσα «χωρούν» σε έναν κύκλο.</p>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Go-Back-N</th><th>Selective Repeat</th></tr>
+<tr><td>Παράθυρο παραλήπτη r</td><td><b>1</b></td><td><b>&gt; 1</b> (ενταμιεύει εκτός σειράς)</td></tr>
+<tr><td>Πλαίσια εκτός σειράς</td><td>Απορρίπτονται</td><td>Αποθηκεύονται και παραδίδονται όταν συμπληρωθεί το κενό</td></tr>
+<tr><td>Ενέργεια σε timeout</td><td>Αναμετάδοση του πλαισίου <b>και όλων των επομένων</b></td><td>Αναμετάδοση <b>μόνο</b> του συγκεκριμένου (ή μετά από NAK)</td></tr>
+<tr><td>Εύρος αρίθμησης</td><td>MAX_SEQ + 1 ≥ s + 1</td><td>MAX_SEQ + 1 ≥ 2s· τυπικά r = s = (MAX_SEQ+1)/2</td></tr>
+<tr><td>Απαιτήσεις μνήμης δέκτη</td><td>Ελάχιστες</td><td>Σημαντικές (buffer r πλαισίων)</td></tr>
+<tr><td>Σπατάλη εύρους ζώνης</td><td>Μεγάλη σε υψηλό ρυθμό σφαλμάτων</td><td>Μικρή</td></tr>
+</table></div>
+<p><b>Γιατί το SR χρειάζεται διπλάσιο εύρος αρίθμησης:</b> αν το παράθυρο ήταν μεγαλύτερο από το μισό, το «νέο» παράθυρο του δέκτη θα επικαλυπτόταν με το παλιό και ο δέκτης δεν θα μπορούσε να ξεχωρίσει μια <b>αναμετάδοση</b> παλαιού πλαισίου από ένα <b>νέο</b> πλαίσιο με τον ίδιο αριθμό σειράς. Στο GBN αυτό δεν συμβαίνει επειδή r = 1.</p>
+<p><b>Πότε το καθένα:</b> Το <b>GBN</b> προτιμάται όταν το ποσοστό σφαλμάτων είναι χαμηλό και η μνήμη του δέκτη περιορισμένη — τότε οι αναμεταδόσεις είναι σπάνιες και η σπατάλη αμελητέα, ενώ η υλοποίηση είναι πολύ απλούστερη. Το <b>SR</b> προτιμάται σε συνδέσμους με σημαντικές απώλειες ή με μεγάλο γινόμενο καθυστέρησης × εύρους ζώνης (π.χ. δορυφορικές ή ασύρματες ζεύξεις), όπου η αναμετάδοση ολόκληρου παραθύρου θα ήταν εξαιρετικά δαπανηρή. Το TCP χρησιμοποιεί υβριδική προσέγγιση: αθροιστικά ACK (όπως GBN) αλλά με ενταμίευση εκτός σειράς και προαιρετικά SACK (όπως SR).</p>`},
+
+{u:"routing", q:"Συγκρίνετε τη δρομολόγηση με διανύσματα απόστασης και τη δρομολόγηση με κατάσταση συνδέσμων. Περιγράψτε τα βήματα του αλγορίθμου κατάστασης συνδέσμων.",
+ a:`<div class="tbl-wrap"><table>
+<tr><th></th><th>Διανύσματα απόστασης (DV)</th><th>Κατάσταση συνδέσμων (LS)</th></tr>
+<tr><td>Τι ξέρει ο κόμβος</td><td>Μόνο εκτιμήσεις αποστάσεων προς κάθε προορισμό</td><td><b>Πλήρη τοπολογία</b> του δικτύου</td></tr>
+<tr><td>Τι ανταλλάσσει</td><td>Ολόκληρο το διάνυσμα αποστάσεων, <b>μόνο με τους γείτονες</b></td><td>Την κατάσταση των <b>δικών του συνδέσμων</b>, με <b>όλο το δίκτυο</b> (πλημμύρα)</td></tr>
+<tr><td>Υπολογισμός</td><td>Κατανεμημένος, επαναληπτικός (Bellman-Ford)</td><td><b>Τοπικός</b> (Dijkstra) στον πλήρη χάρτη</td></tr>
+<tr><td>Σύγκλιση</td><td>Αργή· <b>count-to-infinity</b></td><td>Γρήγορη· δεν πάσχει από count-to-infinity</td></tr>
+<tr><td>Κόστος</td><td>Μεγάλα μηνύματα, λίγοι παραλήπτες</td><td>Μικρά μηνύματα, πολλοί παραλήπτες· περισσότερη μνήμη/CPU</td></tr>
+<tr><td>Παραδείγματα</td><td>RIP, (παλιό ARPANET), BGP ως path vector</td><td><b>OSPF, IS-IS</b></td></tr>
+</table></div>
+<p><b>Βήματα του αλγορίθμου κατάστασης συνδέσμων:</b></p>
+<ol>
+<li><b>Ανακάλυψη γειτόνων</b>: μηνύματα HELLO σε κάθε διεπαφή· κάθε γείτονας απαντά με το αναγνωριστικό του. Σε δίκτυο πολλαπλής πρόσβασης (LAN) εισάγεται εικονικός κόμβος / designated router.</li>
+<li><b>Μέτρηση κόστους κάθε συνδέσμου</b>: π.χ. με πακέτα ECHO και μέτρηση του χρόνου μετ' επιστροφής, ή αντιστρόφως ανάλογα του εύρους ζώνης. (Αν στο κόστος συνυπολογίζεται και το φορτίο, μπορεί να προκύψουν ταλαντώσεις.)</li>
+<li><b>Κατασκευή πακέτου κατάστασης συνδέσμων (LSP)</b>: περιέχει την ταυτότητα του αποστολέα, <b>αριθμό σειράς</b>, <b>ηλικία (age)</b> και τη λίστα (γείτονας, κόστος).</li>
+<li><b>Διανομή του LSP με πλημμύρα</b> σε όλο το δίκτυο. Ο αριθμός σειράς επιτρέπει την απόρριψη διπλότυπων και παλαιότερων εκδόσεων· το πεδίο ηλικίας εμποδίζει την αιώνια επιβίωση λανθασμένης πληροφορίας (μειώνεται περιοδικά και το LSP απορρίπτεται στο μηδέν).</li>
+<li><b>Υπολογισμός των νέων διαδρομών</b>: κάθε δρομολογητής έχει πλέον τον πλήρη γράφο και εκτελεί <b>τοπικά</b> τον αλγόριθμο του Dijkstra για να βρει τη συντομότερη διαδρομή προς κάθε προορισμό, κατασκευάζοντας τον πίνακα προώθησης.</li>
+</ol>
+<p><b>Σχετικά με το count-to-infinity:</b> στο DV, όταν ένας σύνδεσμος αποτύχει, οι κόμβοι ανταλλάσσουν αμοιβαία «αισιόδοξες» εκτιμήσεις που βασίζονται η μία στην άλλη, και το κόστος ανεβαίνει σταδιακά μέχρι το «άπειρο». Το LS δεν έχει αυτό το πρόβλημα ακριβώς επειδή κάθε κόμβος αποφασίζει με βάση τη <b>δική του πλήρη εικόνα</b> και όχι με βάση τις εκτιμήσεις των γειτόνων.</p>`},
+
+{u:"qos", q:"Περιγράψτε τους αλγορίθμους του τρύπιου κουβά και του κουβά κουπονιών. Πού διαφέρουν, τι συμβαίνει όταν γεμίσει ο καθένας, και πώς υπολογίζεται η μέγιστη ριπή;",
+ a:`<p><b>Τρύπιος κουβάς (leaky bucket):</b> Η εισερχόμενη κίνηση μπαίνει σε ουρά πεπερασμένου μεγέθους και <b>εξέρχεται με σταθερό ρυθμό</b> (όπως νερό από τρύπα). Αποτέλεσμα: η έξοδος είναι απολύτως ομαλή — <b>καταργεί τις ριπές</b>. Αν ο κουβάς γεμίσει, <b>χάνονται δεδομένα (πακέτα)</b>. Η προσέγγιση είναι αυστηρή και ακατάλληλη για εφαρμογές που έχουν εγγενώς εκρηκτική συμπεριφορά.</p>
+<p><b>Κουβάς κουπονιών (token bucket):</b> Κουπόνια παράγονται με <b>σταθερό ρυθμό ρ</b> και συσσωρεύονται σε κουβά χωρητικότητας <b>B</b>. Για να μεταδοθεί μια ποσότητα κίνησης πρέπει να «καταναλωθεί» αντίστοιχη ποσότητα κουπονιών. Έτσι:</p>
+<ul>
+<li>Όσο υπάρχουν κουπόνια, η κίνηση μπορεί να εξέλθει με τον <b>μέγιστο ρυθμό M</b> της γραμμής → <b>επιτρέπονται ριπές</b>.</li>
+<li>Όταν ο κουβάς <b>αδειάσει</b>, ο ρυθμός εξόδου πέφτει στο ρ (η κίνηση εξέρχεται καταναλώνοντας τα κουπόνια καθώς παράγονται).</li>
+<li>Όταν ο κουβάς <b>γεμίσει</b>, χάνονται <b>κουπόνια, όχι δεδομένα</b> — δηλαδή απλώς δεν συσσωρεύεται περισσότερο «δικαίωμα» μετάδοσης ριπής.</li>
+</ul>
+<p><b>Μέγιστη ριπή:</b> Δεν ισχύει S = B/M, γιατί κατά τη διάρκεια της ριπής <b>παράγονται και νέα κουπόνια</b>. Ισοζύγιο κουπονιών:</p>
+<div class="fx block">B + ρ·S = M·S   ⇒   S = B / (M − ρ)
+Όγκος μέγιστης ριπής = M·S = B·M/(M − ρ) > B
+Ελάχιστο B ώστε ριπή διάρκειας T με ρυθμό M να περάσει ανέπαφη: B = T·(M − ρ)</div>
+<p><b>Παράδειγμα (από τις διαφάνειες):</b> B = 250 KB, ρ = 2 MB/s, M = 25 MB/s → S = 250/23 ≈ 10,87 ms, με όγκο 271,74 KB. Αν η αρχική ριπή είναι 1000 KB, τα υπόλοιπα 728,26 KB βγαίνουν με 2 MB/s σε 364,13 ms, άρα συνολικά 375 ms.</p>
+<p><b>Σύγκριση/συνδυασμός:</b> Ο τρύπιος κουβάς περιορίζει τον <b>στιγμιαίο ρυθμό</b>, ο κουβάς κουπονιών οριοθετεί το <b>μέγεθος της ριπής</b> και, μακροπρόθεσμα, τον <b>διατηρήσιμο (μέσο) ρυθμό</b>. Στην πράξη συνδυάζονται: κουβάς κουπονιών με παραμέτρους (ρ, B) ακολουθούμενος από τρύπιο κουβά που περιορίζει τη μέγιστη ταχύτητα εξόδου. Και οι δύο υλοποιούνται με μετρητές και ρολόγια· στο ATM η μονάδα είναι το κελί, στο Internet το byte (γιατί τα πακέτα IP έχουν μεταβλητό μέγεθος).</p>`},
+
+{u:"app", q:"Περιγράψτε αναλυτικά όλα τα βήματα και τη συνεργασία των πρωτοκόλλων όλων των επιπέδων, από τη στιγμή που ένας χρήστης πληκτρολογεί ένα URL μέχρι να εμφανιστεί η σελίδα.",
+ a:`<p>Έστω ο χρήστης ζητά <code>http://www.example.gr/index.html</code>.</p>
+<p><b>0. Προϋποθέσεις (αν ο υπολογιστής μόλις συνδέθηκε):</b> Μέσω <b>DHCP</b> (UDP, θύρες 67/68) ο υπολογιστής παίρνει διεύθυνση IP, μάσκα υποδικτύου, διεύθυνση προεπιλεγμένης πύλης και διεύθυνση DNS server.</p>
+<p><b>1. Ανάλυση ονόματος — DNS:</b> Ο φυλλομετρητής ζητά από το λειτουργικό τη διεύθυνση IP του <code>www.example.gr</code>. Στέλνεται ερώτημα DNS με <b>UDP</b> προς τη <b>θύρα 53</b> του DNS server (η θύρα πηγής επιλέγεται αυθαίρετα, αρκεί να μην είναι δεσμευμένη ή ήδη σε χρήση). Αν ο server δεν είναι αυθεντικός, απαντά παραπέμποντας σε άλλον DNS server και η διαδικασία επαναλαμβάνεται (επαναληπτικά/αναδρομικά ερωτήματα). Για να φύγει αυτό το ίδιο το πακέτο UDP, εκτελούνται τα βήματα 2β–2δ παρακάτω.</p>
+<p><b>2. Αποστολή κάθε πακέτου IP (επίπεδα 3 και 2):</b></p>
+<ol type="a">
+<li>Το τμήμα (UDP ή TCP) ενθυλακώνεται σε πακέτο IP με διεύθυνση πηγής τη δική μας και προορισμού την IP του παραλήπτη.</li>
+<li>Με τη <b>μάσκα υποδικτύου</b> ελέγχεται αν ο προορισμός είναι στο ίδιο υποδίκτυο. Αν <b>ναι</b>, το επόμενο άλμα είναι ο ίδιος ο προορισμός· αν <b>όχι</b>, είναι ο <b>δρομολογητής-πύλη</b>. <b>Η διεύθυνση IP προορισμού δεν αλλάζει σε καμία περίπτωση.</b></li>
+<li>Χρειάζεται η <b>διεύθυνση επιπέδου 2 (MAC)</b> του επόμενου άλματος: αναζητείται στην cache του <b>ARP</b>· αν λείπει, στέλνεται αίτηση ARP με <b>εκπομπή</b> στο LAN και ο κάτοχος της IP απαντά.</li>
+<li>Το πακέτο ενθυλακώνεται σε πλαίσιο (π.χ. Ethernet) και στέλνεται. Ο μεταγωγέας το προωθεί με βάση τη MAC.</li>
+<li>Σε <b>κάθε δρομολογητή</b>: αποθυλάκωση, αναζήτηση στον πίνακα με <b>ταίριασμα μακρύτερου προθέματος</b>, μείωση του <b>TTL</b>, επανυπολογισμός του checksum κεφαλίδας, νέα ARP αν χρειάζεται και <b>νέο πλαίσιο</b> με νέες MAC διευθύνσεις για το επόμενο άλμα. Αν χρειαστεί, γίνεται <b>θρυμματισμός</b> (επανασυναρμολόγηση μόνο στον τελικό προορισμό).</li>
+<li>Αν υπάρχει <b>NAT</b>, ο δρομολογητής αντικαθιστά την ιδιωτική IP και τη θύρα πηγής με τη δημόσια IP του και μια αχρησιμοποίητη θύρα, κρατώντας αντιστοίχιση για την αντίστροφη κατεύθυνση.</li>
+</ol>
+<p><b>3. Εγκαθίδρυση σύνδεσης TCP:</b> Ο πελάτης ανοίγει σύνδεση προς τη <b>θύρα 80</b> (ή 443) της IP του web server, με αυθαίρετη θύρα πηγής. <b>Τριπλή χειραψία</b>: SYN(seq=x) → SYN+ACK(seq=y, ack=x+1) → ACK(ack=y+1). Ο server μαθαίνει τη θύρα και τη διεύθυνση του πελάτη από τις κεφαλίδες του ληφθέντος SYN.</p>
+<p><b>4. Αίτηση HTTP:</b> Μαζί με το τρίτο τμήμα της χειραψίας (ή αμέσως μετά) στέλνεται το μήνυμα εφαρμογής <code>GET /index.html HTTP/1.1</code> με κεφαλίδες <code>Host:</code>, <code>User-Agent:</code>, ενδεχομένως <code>Cookie:</code> και <code>If-Modified-Since:</code>.</p>
+<p><b>5. Απόκριση HTTP:</b> Ο server επεξεργάζεται την αίτηση (ανάλυση, έλεγχος πρόσβασης, ανάγνωση αρχείου ή δυναμική παραγωγή, καθορισμός τύπου MIME) και απαντά με γραμμή κατάστασης (π.χ. <code>200 OK</code> ή <code>304 Not Modified</code>), κεφαλίδες και το σώμα. Αν το αρχείο είναι μεγάλο, στέλνεται σε <b>πολλά τμήματα TCP</b>, με ρυθμό που καθορίζεται από τα παράθυρα <b>ελέγχου ροής</b> και <b>ελέγχου συμφόρησης</b>. Το TCP στον πελάτη επιβεβαιώνει, αναμεταδίδει ό,τι χαθεί και παραδίδει στην εφαρμογή τα bytes <b>στη σωστή σειρά</b>.</p>
+<p><b>6. Ενσωματωμένα αντικείμενα:</b> Ο φυλλομετρητής αναλύει την HTML και ζητά εικόνες/CSS/JS — στο HTTP/1.1 πάνω από την <b>ίδια επίμονη σύνδεση</b> (και με pipelining), ή/και παράλληλες συνδέσεις. Αν τα URL δείχνουν σε <b>CDN</b>, γίνεται νέα ανάλυση DNS που κατευθύνει τον πελάτη σε κοντινό εξυπηρετητή του CDN.</p>
+<p><b>7. Τερματισμός:</b> Η σύνδεση TCP κλείνει με <b>FIN/ACK</b> ανά κατεύθυνση· η πλευρά που έκλεισε πρώτη παραμένει σε <b>TIME_WAIT</b> για 2×MSL.</p>`},
+
+{u:"transport", q:"Περιγράψτε τον έλεγχο συμφόρησης του TCP: πώς ανιχνεύεται η συμφόρηση, ποιες είναι οι φάσεις και γιατί ο μηχανισμός οδηγεί σε δίκαιη κατανομή του εύρους ζώνης.",
+ a:`<p><b>Ανίχνευση:</b> Το IP δεν παρέχει ρητή ένδειξη συμφόρησης, οπότε το TCP τη συμπεραίνει έμμεσα:</p>
+<ul>
+<li><b>Λήξη χρονομέτρου αναμετάδοσης (ή τριπλό διπλό ACK)</b> → ένδειξη απώλειας, που ερμηνεύεται ως συμφόρηση.</li>
+<li><b>Λήψη νέων επιβεβαιώσεων</b> → ένδειξη ότι το δίκτυο «αντέχει».</li>
+</ul>
+<p>Η υπόθεση «απώλεια = συμφόρηση» μπορεί να είναι <b>λανθασμένη</b>: σε ασύρματες ζεύξεις οι απώλειες οφείλονται σε σφάλματα μετάδοσης, ενώ ένα timeout μπορεί να οφείλεται και σε καθυστέρηση του ACK. Γι' αυτό προτάθηκε το <b>ECN</b> (ρητή σήμανση από τους δρομολογητές) και οι λύσεις ασύρματου TCP.</p>
+<p><b>Παράμετροι:</b> Ο αποστολέας διατηρεί το <b>παράθυρο συμφόρησης (cwnd)</b> — υπολογίζεται <b>τοπικά</b> — και το <b>κατώφλι (threshold)</b>, αρχικά 64 KB. Ο πραγματικός ρυθμός περιορίζεται από <b>min{rwnd, cwnd}</b>, όπου rwnd είναι το παράθυρο ελέγχου ροής που ανακοινώνει ο δέκτης.</p>
+<p><b>Φάσεις:</b></p>
+<ol>
+<li><b>Αργή εκκίνηση (slow start)</b>: cwnd = 1 MSS· <b>+1 MSS ανά νέα επιβεβαίωση</b> → σε κάθε γύρο (RTT) το παράθυρο περίπου <b>διπλασιάζεται</b>, δηλαδή <b>εκθετική</b> αύξηση. Διαρκεί μέχρι το cwnd να ξεπεράσει το κατώφλι.</li>
+<li><b>Αποφυγή συμφόρησης (congestion avoidance)</b>: <b>+1/W MSS ανά επιβεβαίωση</b>, όπου W το τρέχον παράθυρο σε MSS → περίπου <b>+1 MSS ανά RTT</b>, δηλαδή <b>γραμμική</b> αύξηση. (Π.χ. W = 2 → 2 + 1/2 = 2,5 → 2,5 + 1/2,5 ≈ 2,9 ≈ 3.)</li>
+<li><b>Ένδειξη συμφόρησης (TCP Tahoe)</b>: <b>κατώφλι ← cwnd/2</b>, <b>cwnd ← 1 MSS</b>, επιστροφή στην αργή εκκίνηση. (TCP Reno: με τρία διπλά ACK γίνεται <b>fast retransmit / fast recovery</b> — το cwnd πέφτει στο μισό αλλά δεν μηδενίζεται, γιατί τα διπλά ACK δείχνουν ότι το δίκτυο εξακολουθεί να παραδίδει πακέτα.)</li>
+</ol>
+<p><b>AIMD και δικαιοσύνη:</b> Αν αγνοηθεί η σύντομη φάση αργής εκκίνησης, ο μηχανισμός είναι <b>προσθετική αύξηση – πολλαπλασιαστική μείωση (AIMD)</b>. Έστω δύο συνδέσεις που μοιράζονται τον ίδιο σύνδεσμο με πολύ άνισα αρχικά παράθυρα W₁, W₂:</p>
+<ul>
+<li>Στη φάση αύξησης και οι δύο κερδίζουν <b>το ίδιο</b> ποσό (+1 ανά RTT) → η <b>διαφορά</b> W₂ − W₁ παραμένει σταθερή, αλλά ο <b>λόγος</b> τους πλησιάζει τη μονάδα.</li>
+<li>Στη μείωση και οι δύο υποδιπλασιάζονται → η <b>διαφορά υποδιπλασιάζεται</b>.</li>
+</ul>
+<p>Επαναλαμβάνοντας, η διαφορά τείνει στο μηδέν: αυτό είναι η <b>δικαιοσύνη του TCP (TCP fairness)</b>. Με προσθετική αύξηση–προσθετική μείωση η διαφορά θα διατηρούνταν, ενώ με πολλαπλασιαστική αύξηση θα διευρυνόταν. Αριθμητικό παράδειγμα (συνθήκη συμφόρησης W₁+W₂ &gt; 20): από (2, 17) καταλήγουμε μετά από λίγους κύκλους σε τιμές κοντά (≈4,6 και 5,5).</p>
+<p><b>Ρυθμός διεκπεραίωσης:</b> στη φάση αποφυγής το παράθυρο κινείται γραμμικά μεταξύ W/2 και W, άρα μέση τιμή 3W/4 και <b>throughput ≈ 3W/(4·RTT)</b>. Παρατηρήστε την εξάρτηση από το RTT: συνδέσεις με μεγάλο RTT αδικούνται.</p>`},
+
+{u:"internet", q:"Τι είναι ο θρυμματισμός; Γιατί χρειάζεται, ποια πεδία του IP τον υποστηρίζουν, πού γίνεται η επανασυναρμολόγηση και πώς αποφεύγεται;",
+ a:`<p><b>Γιατί χρειάζεται:</b> Κάθε δικτυακή τεχνολογία επιβάλλει δικό της <b>μέγιστο μέγεθος πλαισίου (MTU)</b> — π.χ. Ethernet 1500 bytes, ενώ άλλα δίκτυα λιγότερο. Όταν ένα πακέτο IP πρέπει να διασχίσει δίκτυο με μικρότερο MTU από το μέγεθός του, πρέπει να <b>θρυμματιστεί</b> σε μικρότερα πακέτα.</p>
+<p><b>Δύο προσεγγίσεις:</b></p>
+<ul>
+<li><b>Διαφανής θρυμματισμός</b>: η πύλη εξόδου του «μικρού» δικτύου <b>επανασυναρμολογεί</b> τα θρύμματα, ώστε τα επόμενα δίκτυα να μη γνωρίζουν τίποτε. Απαιτεί όμως όλα τα θρύμματα να περάσουν από την <b>ίδια</b> πύλη (δηλαδή εικονικά κυκλώματα) και επιβαρύνει τις ενδιάμεσες πύλες.</li>
+<li><b>Μη διαφανής θρυμματισμός</b> — αυτό κάνει το <b>IP</b>: τα θρύμματα ταξιδεύουν ανεξάρτητα ως κανονικά πακέτα και η <b>επανασυναρμολόγηση γίνεται μόνο στον τελικό προορισμό</b>. Μειονεκτήματα: επιπλέον overhead κεφαλίδας σε κάθε θρύμμα, και <b>αν χαθεί έστω ένα θρύμμα χάνεται όλο το πακέτο</b>.</li>
+</ul>
+<p><b>Πεδία της κεφαλίδας IPv4:</b></p>
+<ul>
+<li><b>Identification</b> (16 bits): ίδιο σε όλα τα θρύμματα του αρχικού πακέτου — έτσι ο προορισμός ξέρει ποια ανήκουν μαζί (μαζί με τις διευθύνσεις πηγής/προορισμού και το πρωτόκολλο).</li>
+<li><b>Fragment offset</b> (13 bits): η θέση των δεδομένων του θρύμματος μέσα στο αρχικό πακέτο, μετρημένη σε μονάδες <b>8 bytes</b>. Γι' αυτό κάθε θρύμμα εκτός του τελευταίου πρέπει να έχει μήκος δεδομένων πολλαπλάσιο του 8.</li>
+<li><b>MF (More Fragments)</b>: 1 σε όλα εκτός από το τελευταίο — έτσι φαίνεται πού τελειώνει το πακέτο.</li>
+<li><b>DF (Don't Fragment)</b>: απαγορεύει τον θρυμματισμό· ο δρομολογητής τότε απορρίπτει το πακέτο και επιστρέφει μήνυμα ICMP.</li>
+<li><b>Total length</b>: ενημερώνεται σε κάθε θρύμμα.</li>
+</ul>
+<p><b>Παράδειγμα:</b> πακέτο 1500 bytes (20 κεφαλίδα, 1480 δεδομένα) σε δίκτυο με MTU 576: ανά θρύμμα χωρούν 556 bytes δεδομένων, αλλά στρογγυλοποιούμε προς τα κάτω σε πολλαπλάσιο του 8 → 552. Προκύπτουν <b>3 θρύμματα</b> με δεδομένα 552, 552, 376 και offsets 0, 69, 138 (69 = 552/8).</p>
+<p><b>Αποφυγή:</b> <b>Path MTU Discovery</b> — ο αποστολέας στέλνει με DF = 1 και, αν λάβει ICMP «απαιτείται θρυμματισμός», μειώνει το μέγεθος, ώσπου να βρει το ελάχιστο MTU της διαδρομής. Το <b>IPv6 το επιβάλλει</b>: <b>δεν επιτρέπεται θρυμματισμός από ενδιάμεσο δρομολογητή</b> — μόνο από τον αποστολέα, με κεφαλίδα επέκτασης Fragment. Έτσι επιταχύνεται η προώθηση στους δρομολογητές.</p>`},
+
+{u:"internet", q:"Τι είναι το MPLS, πώς λειτουργεί η προώθηση με ετικέτες και ποια πλεονεκτήματα προσφέρει σε σχέση με την κλασική προώθηση IP;",
+ a:`<p><b>Τι είναι:</b> Το <b>MPLS</b> (Multi-Protocol Label Switching) είναι τεχνική <b>μεταγωγής βάσει ετικέτας</b> — ουσιαστικά εισάγει εικονικά κυκλώματα μέσα σε ένα ασυνδεσμικό δίκτυο IP. Η ετικέτα μπαίνει σε «shim header» 32 bits <b>μεταξύ της κεφαλίδας επιπέδου 2 και της κεφαλίδας IP</b> — γι' αυτό λέγεται και «επίπεδο 2,5».</p>
+<p><b>Λειτουργία:</b></p>
+<ol>
+<li>Στην <b>είσοδο</b> του δικτύου MPLS, ο συνοριακός δρομολογητής (LER / ingress) κατατάσσει το πακέτο σε μια <b>κλάση ισοδύναμης προώθησης (FEC)</b>, με βάση τη διεύθυνση προορισμού, την κλάση υπηρεσίας κ.λπ., και του προσθέτει την αντίστοιχη <b>ετικέτα</b>.</li>
+<li>Στο <b>εσωτερικό</b>, κάθε δρομολογητής (LSR) κάνει απλή αναζήτηση της ετικέτας σε πίνακα — <b>σταθερού μήκους κλειδί, ουσιαστικά ευρετήριο πίνακα</b> — βρίσκει τη θύρα εξόδου και την <b>αντικαθιστά με νέα ετικέτα (label swapping)</b>. Η ετικέτα έχει <b>τοπική</b> σημασία μόνο.</li>
+<li>Στην <b>έξοδο</b>, ο egress LER αφαιρεί την ετικέτα και το πακέτο συνεχίζει ως κανονικό IP.</li>
+<li>Υποστηρίζεται <b>στοίβα ετικετών</b> (nesting), χρήσιμη για VPN και για σήραγγες μέσα σε σήραγγες.</li>
+</ol>
+<p><b>Πλεονεκτήματα έναντι της προώθησης IP:</b></p>
+<ul>
+<li><b>Ταχύτητα</b>: αντί για <b>ταίριασμα μακρύτερου προθέματος</b> (σύνθετη αναζήτηση μεταβλητού μήκους σε τεράστιους πίνακες), γίνεται απλή αναζήτηση σταθερού μήκους — εύκολα υλοποιήσιμη σε υλικό.</li>
+<li><b>Traffic engineering</b>: η διαδρομή (LSP) μπορεί να επιλεγεί ρητά, ώστε η κίνηση να κατανεμηθεί στο δίκτυο και να μη συμφορούνται οι «συντομότερες» διαδρομές, κάτι που η κλασική δρομολόγηση IP δεν επιτρέπει.</li>
+<li><b>Ποιότητα υπηρεσίας</b>: διαφορετικά LSP με διαφορετική μεταχείριση και δέσμευση πόρων ανά κλάση.</li>
+<li><b>VPN</b> επιπέδου 2 και 3, διαφανή για τον πελάτη.</li>
+<li>Δυνατότητα μεταφοράς <b>πολλαπλών</b> πρωτοκόλλων (εξ ου και το «Multi-Protocol»), και γρήγορη αποκατάσταση με εφεδρικά LSP.</li>
+</ul>
+<p><b>Κόστος:</b> απαιτείται πρωτόκολλο διανομής ετικετών και διατήρηση <b>κατάστασης</b> ανά LSP στους δρομολογητές — δηλαδή θυσιάζεται μέρος της απλότητας του ασυνδεσμικού μοντέλου.</p>`},
+
+{u:"app", q:"Τι είναι ένα δίκτυο διανομής περιεχομένου (CDN); Πώς λειτουργεί, πώς επιλέγεται ο εξυπηρετητής και σε τι διαφέρει από έναν πληρεξούσιο με κρυφή μνήμη;",
+ a:`<p><b>Τι είναι:</b> Ένα <b>CDN</b> είναι ιδιωτικό δίκτυο πληρεξούσιων εξυπηρετητών, κατανεμημένων γεωγραφικά και μέσα σε πολλούς ISP, που κρατούν <b>προ-ενταμιευμένο</b> το περιεχόμενο των πελατών τους. Αποτελεί <b>νέο επιχειρηματικό ρόλο</b> στο Internet: το CDN <b>χρεώνει τους παρόχους περιεχομένου</b> για τη φιλοξενία και διανομή, ενώ ένας εξυπηρετητής του μπορεί να εξυπηρετεί πολλούς παρόχους.</p>
+<p><b>Οφέλη:</b> για τον χρήστη μικρότερη καθυστέρηση· για τον πάροχο περιεχομένου μικρότερος φόρτος και ανθεκτικότητα σε αιχμές· για τον <b>ISP</b> καλύτερος χρόνος απόκρισης για τους συνδρομητές του και λιγότερη (ακριβή) transit κίνηση προς τα έξω.</p>
+<p><b>Λειτουργία:</b></p>
+<ol>
+<li>Το περιεχόμενο <b>ωθείται (push)</b> από τον διακομιστή προέλευσης του CDN σε κατάλληλα επιλεγμένους κόμβους, ώστε να βρίσκεται εξαρχής κοντά στους τελικούς χρήστες.</li>
+<li>Οι σελίδες του παρόχου <b>μετασχηματίζονται</b>: τα URL των υπερσυνδέσμων/αντικειμένων τροποποιούνται ώστε να δείχνουν στο domain του CDN. Ο χρήστης διαβάζει τη βασική σελίδα κανονικά, αλλά τα βαριά αντικείμενα τα ζητά από το CDN.</li>
+<li><b>Επιλογή εξυπηρετητή — κυρίως μέσω DNS</b>: η ανάλυση του ονόματος του CDN καταλήγει στον authoritative DNS server του CDN, ο οποίος απαντά με εγγραφή <b>CNAME</b> και <b>A</b> του καταλληλότερου μηχανήματος για τον συγκεκριμένο πελάτη. Κριτήρια: ποιοι εξυπηρετητές <b>έχουν</b> το περιεχόμενο, ποιοι είναι <b>εγγύτεροι</b> στη διεύθυνση IP του πελάτη (ή στον ίδιο ISP) και ποιος είναι ο <b>φόρτος</b> τους και των συνδέσμων. Εναλλακτικά χρησιμοποιείται <b>ανακατεύθυνση HTTP</b> με την κεφαλίδα <code>Location</code>.</li>
+<li>Απλοποίηση: ο πάροχος μπορεί να δηλώσει στο DNS ως δικό του name server (εγγραφή NS) τον name server του CDN, οπότε όλες οι αιτήσεις εξυπηρετούνται από το CDN.</li>
+</ol>
+<p><b>Διαφορά από τον proxy cache:</b></p>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Proxy με κρυφή μνήμη</th><th>CDN</th></tr>
+<tr><td>Τοποθέτηση περιεχομένου</td><td><b>Pull</b> — ενταμιεύει ό,τι ζήτησαν οι χρήστες του</td><td><b>Push</b> — εκ των προτέρων, με συμφωνία</td></tr>
+<tr><td>Ποιος τον λειτουργεί</td><td>Ο οργανισμός ή ο ISP του χρήστη</td><td>Ανεξάρτητη εταιρεία, επί πληρωμή από τον πάροχο περιεχομένου</td></tr>
+<tr><td>Ποιος ωφελείται πρωτίστως</td><td>Οι χρήστες του οργανισμού/ISP</td><td>Ο πάροχος περιεχομένου (και οι χρήστες του)</td></tr>
+<tr><td>Πρώτη πρόσβαση</td><td>Πάντα αστοχία (cache miss)</td><td>Το περιεχόμενο είναι ήδη εκεί</td></tr>
+<tr><td>Έλεγχος φρεσκάδας</td><td>Expires / If-Modified-Since → 304</td><td>Ελεγχόμενη διανομή/ακύρωση από τον πάροχο</td></tr>
+</table></div>`},
+
+{u:"basics", q:"Συγκρίνετε τη συνδεσμική (εικονικά κυκλώματα) με την ασυνδεσμική (αυτοδύναμα πακέτα) υπηρεσία στο επίπεδο δικτύου. Ποια επέλεξε το Internet και γιατί;",
+ a:`<div class="tbl-wrap"><table>
+<tr><th>Ζήτημα</th><th>Εικονικά κυκλώματα</th><th>Αυτοδύναμα πακέτα</th></tr>
+<tr><td>Εγκαθίδρυση</td><td>Απαιτείται πριν τη μεταφορά</td><td>Καμία</td></tr>
+<tr><td>Διευθυνσιοδότηση</td><td>Σύντομη <b>ετικέτα (VCI)</b> τοπικής σημασίας</td><td><b>Πλήρης</b> διεύθυνση προορισμού σε κάθε πακέτο</td></tr>
+<tr><td>Κατάσταση στους δρομολογητές</td><td>Ναι, ανά σύνδεση</td><td>Όχι</td></tr>
+<tr><td>Διαδρομή</td><td>Μία, σταθερή για όλη τη ροή</td><td>Ανεξάρτητη ανά πακέτο</td></tr>
+<tr><td>Σειρά παράδοσης</td><td>Διατηρείται</td><td>Δεν είναι εγγυημένη</td></tr>
+<tr><td>Βλάβη ενδιάμεσου κόμβου</td><td>Καταστρέφει όλα τα VC που περνούν από αυτόν</td><td>Απλή επαναδρομολόγηση</td></tr>
+<tr><td>QoS / δέσμευση πόρων</td><td>Εύκολη (γνωστή διαδρομή και ροή)</td><td>Δύσκολη</td></tr>
+<tr><td>Συμφόρηση</td><td>Ελέγχεται με έλεγχο αποδοχής κατά την εγκαθίδρυση</td><td>Δύσκολος έλεγχος — απαιτεί μηχανισμούς στα άκρα</td></tr>
+<tr><td>Πολυπλοκότητα</td><td>Στον <b>πυρήνα</b></td><td>Στα <b>άκρα</b></td></tr>
+</table></div>
+<p><b>Επιλογή του Internet:</b> ασυνδεσμική υπηρεσία (datagrams) με μοντέλο <b>best effort</b>. Λόγοι:</p>
+<ul>
+<li><b>Απλότητα του πυρήνα</b>: ο δρομολογητής δεν κρατά κατάσταση ανά ροή, άρα κλιμακώνεται σε εκατομμύρια ταυτόχρονες ροές.</li>
+<li><b>Ευρωστία</b>: αρχική απαίτηση σχεδίασης ήταν η επιβίωση σε βλάβες — χωρίς κατάσταση, δεν υπάρχει τίποτε να «χαθεί» όταν πέσει ένας δρομολογητής.</li>
+<li><b>Ευελιξία και ετερογένεια</b>: το μοντέλο της «κλεψύδρας» επιτρέπει σε οποιαδήποτε τεχνολογία επιπέδου 2 και σε οποιαδήποτε εφαρμογή να συνυπάρξουν πάνω από ένα απλό IP.</li>
+<li><b>Αρχή end-to-end</b>: ό,τι μπορεί να γίνει στα άκρα (αξιοπιστία, σειρά, έλεγχος ροής/συμφόρησης — δηλαδή το TCP) γίνεται εκεί, ώστε το δίκτυο να μένει απλό και γρήγορο.</li>
+</ul>
+<p><b>Το τίμημα</b> είναι η δυσκολία παροχής εγγυήσεων QoS, που οδήγησε στις μεταγενέστερες προσεγγίσεις IntServ, DiffServ και MPLS.</p>`},
+
+{u:"transport", q:"Συγκρίνετε τα πρωτόκολλα επιπέδου 2 και επιπέδου 4. Γιατί η εγκαθίδρυση σύνδεσης είναι πολύ δυσκολότερη στο επίπεδο μεταφοράς;",
+ a:`<p><b>Ομοιότητες:</b> και τα δύο ασχολούνται με έλεγχο σφαλμάτων, αρίθμηση, επιβεβαιώσεις, αναμεταδόσεις, έλεγχο ροής και κυλιόμενα παράθυρα. Οι αλγόριθμοι μοιάζουν πολύ.</p>
+<p><b>Βασικές διαφορές:</b></p>
+<ol>
+<li><b>Διευθυνσιοδότηση</b>: στο επίπεδο 2 ο παραλήπτης υπονοείται από τη γραμμή — δεν χρειάζεται να δηλωθεί «με ποιον» μιλάμε. Στο επίπεδο 4 υπάρχουν πολλοί δυνατοί προορισμοί, οπότε απαιτείται <b>ρητή διευθυνσιοδότηση</b> (TSAP/θύρα) και μηχανισμός ανακάλυψης.</li>
+<li><b>Εγκαθίδρυση</b>: εκεί βρίσκεται η μεγάλη δυσκολία (βλ. παρακάτω).</li>
+<li><b>Επιβίωση πακέτων</b>: σε μια φυσική γραμμή, ένα πλαίσιο που δεν έφτασε <b>χάθηκε οριστικά</b>. Στο υποδίκτυο, ένα πακέτο μπορεί να «κοιμηθεί» σε ουρές ή να ακολουθήσει μεγάλη διαδρομή και να εμφανιστεί <b>πολύ αργότερα</b> ως καθυστερημένο διπλότυπο.</li>
+<li><b>Μεταβλητότητα καθυστέρησης</b>: στο επίπεδο 2 το RTT είναι σχεδόν σταθερό, άρα το timeout ρυθμίζεται εύκολα. Στο επίπεδο 4 η καθυστέρηση έχει τεράστια διακύμανση → απαιτείται <b>δυναμική εκτίμηση</b> (Jacobson, Karn).</li>
+<li><b>Ενταμίευση</b>: στο επίπεδο 2 οι συνδέσεις είναι λίγες και σταθερές, οπότε δεσμεύονται σταθεροί ενταμιευτές. Στο επίπεδο 4 μπορεί να υπάρχουν χιλιάδες συνδέσεις με πολύ διαφορετικές ανάγκες → <b>δυναμική</b> κατανομή και παράθυρο μεταβλητού μεγέθους (credit).</li>
+<li><b>Έλεγχος συμφόρησης</b>: υπάρχει μόνο στο επίπεδο 4 (ή 3), όχι στο 2.</li>
+</ol>
+<p><b>Γιατί είναι δύσκολη η εγκαθίδρυση:</b> Το πρόβλημα είναι τα <b>καθυστερημένα διπλότυπα</b>. Αν ένα παλιό αντίγραφο αίτησης σύνδεσης εμφανιστεί αργότερα, ο εξυπηρετητής μπορεί να δημιουργήσει <b>πλαστή σύνδεση</b>· χειρότερα, αν εμφανιστούν και καθυστερημένα διπλότυπα <b>δεδομένων</b>, μπορεί να εκτελεστεί δύο φορές μια συναλλαγή. Η απλή χειραψία δύο φάσεων δεν αρκεί.</p>
+<p><b>Λύσεις:</b></p>
+<ul>
+<li><b>Περιορισμός του χρόνου ζωής</b> των πακέτων (πεδίο TTL/hop count, χρονοσφραγίδες) ώστε να είναι βέβαιο ότι μετά από χρόνο T κανένα παλιό πακέτο δεν επιβιώνει.</li>
+<li><b>Τριπλή χειραψία (Tomlinson)</b> με αρχικούς αριθμούς σειράς που παράγονται από ρολόι: κάθε πλευρά επιλέγει αριθμό και <b>η άλλη πρέπει να τον επιβεβαιώσει</b>. Ένα καθυστερημένο διπλότυπο CR θα προκαλέσει απάντηση με αριθμό που ο υποτιθέμενος πελάτης δεν αναγνωρίζει, οπότε η σύνδεση απορρίπτεται (μήνυμα REJECT) και δεν δημιουργείται.</li>
+</ul>
+<p>Αντίστοιχη δυσκολία υπάρχει και στην <b>αποδέσμευση</b> (πρόβλημα των δύο στρατών): θεωρητικά δεν λύνεται, πρακτικά αντιμετωπίζεται με FIN/ACK και χρονόμετρα.</p>`},
+
+{u:"perf", q:"Τι είναι το γινόμενο καθυστέρησης × εύρους ζώνης και γιατί είναι κρίσιμο για τη σχεδίαση πρωτοκόλλων; Δώστε παραδείγματα.",
+ a:`<p><b>Ορισμός:</b> <span class="fx">BDP = Εύρος ζώνης × Καθυστέρηση (τυπικά RTT)</span>. Εκφράζει πόσα bits «χωράνε» στον σωλήνα — δηλαδή πόσα δεδομένα βρίσκονται εν πτήσει τη στιγμή που ο αποστολέας περιμένει την πρώτη επιβεβαίωση.</p>
+<p><b>Γιατί είναι κρίσιμο:</b> Για να μείνει η γραμμή <b>συνεχώς απασχολημένη</b>, ο αποστολέας πρέπει να μπορεί να έχει ανά πάσα στιγμή τουλάχιστον BDP bits ανεπιβεβαίωτα. Άρα:</p>
+<div class="fx block">Απαιτούμενο παράθυρο ≥ BDP
+Πραγματικός ρυθμός ≈ min{ R, W / RTT }</div>
+<p>Αν W &lt; BDP, ο σύνδεσμος μένει αδρανής για ένα μέρος κάθε κύκλου και ο ρυθμός περιορίζεται από το W/RTT, ανεξάρτητα από το πόσο «γρήγορη» είναι η γραμμή.</p>
+<p><b>Παραδείγματα:</b></p>
+<ul>
+<li><b>LAN</b>: 100 Mbps, RTT 1 ms → BDP = 100 kbits ≈ 12,5 KB. Ένα συνηθισμένο παράθυρο επαρκεί άνετα.</li>
+<li><b>Διηπειρωτική ζεύξη</b>: 1 Gbps, RTT 60 ms → BDP = 60 Mbits ≈ 7,5 MB. Το βασικό πεδίο παραθύρου του TCP (16 bits → 64 KB) είναι <b>εντελώς ανεπαρκές</b> — γι' αυτό υπάρχει η επιλογή <b>window scale</b>.</li>
+<li><b>Δορυφορική ζεύξη</b>: μεγάλη καθυστέρηση διάδοσης (~270 ms ανά κατεύθυνση) → τεράστιο BDP· το stop-and-wait είναι πρακτικά άχρηστο και ακόμη και το GBN με μικρό παράθυρο υποαπασχολεί τη γραμμή.</li>
+<li><b>Παράδειγμα των διαφανειών (επίπεδο 2)</b>: 50 Mbps με D_P = 250 μs δίνει S = 540 μs και n = S/D_TP = 27 — δηλαδή χρειάζεται παράθυρο 27 πλαισίων για πλήρη αξιοποίηση.</li>
+</ul>
+<p><b>Συνέπειες σχεδίασης:</b> (α) μεγαλύτερα παράθυρα και μεγαλύτεροι ενταμιευτές σε «μακρείς παχείς σωλήνες»· (β) επαρκές εύρος αρίθμησης (MAX_SEQ) ώστε να καλύπτει το παράθυρο· (γ) για <b>μικρά αρχεία</b> ο χρόνος κυριαρχείται από το RTT (χειραψίες, αργή εκκίνηση), οπότε η αύξηση της χωρητικότητας δεν βοηθά — βοηθούν οι επίμονες συνδέσεις, το pipelining και οι CDN που μειώνουν το RTT.</p>`},
+
+{u:"qos", q:"Περιγράψτε τις αρχές του ελέγχου συμφόρησης. Ποια η διαφορά του από τον έλεγχο ροής και ποιες κατηγορίες λύσεων υπάρχουν;",
+ a:`<p><b>Ορισμός:</b> Συμφόρηση υπάρχει όταν ο <b>προσφερόμενος φόρτος υπερβαίνει τη διεκπεραιωτική ικανότητα</b> του δικτύου. Καθώς αυξάνεται ο φόρτος, ο πραγματικά παραδιδόμενος όγκος αρχικά ακολουθεί, μετά κορεσμένεται και τελικά <b>καταρρέει</b> (congestion collapse), γιατί οι απώλειες προκαλούν αναμεταδόσεις που επιδεινώνουν τη συμφόρηση.</p>
+<p><b>Αιτίες:</b> πολλές ροές συγκλίνουν στην ίδια γραμμή εξόδου, αργοί σύνδεσμοι ή επεξεργαστές, ανεπαρκής μνήμη. Σημείωση: η <b>προσθήκη άπειρης μνήμης δεν λύνει το πρόβλημα</b> — τα πακέτα καθυστερούν τόσο ώστε έχουν ήδη αναμεταδοθεί, οπότε το χρήσιμο έργο μειώνεται.</p>
+<p><b>Διαφορά από τον έλεγχο ροής:</b></p>
+<div class="tbl-wrap"><table>
+<tr><th></th><th>Έλεγχος ροής</th><th>Έλεγχος συμφόρησης</th></tr>
+<tr><td>Αφορά</td><td>Ένα ζεύγος αποστολέα–παραλήπτη</td><td>Όλο το δίκτυο (καθολικό ζήτημα)</td></tr>
+<tr><td>Πρόβλημα που λύνει</td><td>Ο δέκτης να μην «πνιγεί»</td><td>Το δίκτυο να μην υπερφορτωθεί</td></tr>
+<tr><td>Παράδειγμα</td><td>Υπερυπολογιστής στέλνει σε παλιό PC μέσω άδειου δικτύου</td><td>1000 υπολογιστές στέλνουν ταυτόχρονα μέσα από ένα φορτωμένο δίκτυο</td></tr>
+</table></div>
+<p>Στο TCP τα δύο συνυπάρχουν: παράθυρο αποστολέα = min{rwnd, cwnd}.</p>
+<p><b>Κατηγορίες λύσεων:</b></p>
+<ul>
+<li><b>Βρόχος ανοικτού τύπου (πρόληψη)</b>: η συμφόρηση αποφεύγεται εξ αρχής με καλή σχεδίαση και πολιτικές, χωρίς ανάδραση — πολιτικές αναμετάδοσης και ενταμίευσης, απόρριψης, χρονοπρογραμματισμού, <b>έλεγχος αποδοχής</b>, <b>μορφοποίηση και αστυνόμευση</b> της κίνησης, δέσμευση πόρων.</li>
+<li><b>Βρόχος κλειστού τύπου (ανάδραση)</b> σε τρία βήματα: (1) <b>παρακολούθηση</b> του δικτύου (μήκη ουρών, αξιοποίηση γραμμών, απώλειες, καθυστερήσεις), (2) <b>μεταφορά της πληροφορίας</b> εκεί όπου μπορεί να γίνει κάτι — ρητά (<b>choke packets</b>, <b>ECN</b>) ή σιωπηρά (απώλεια πακέτου ως σήμα), (3) <b>προσαρμογή</b> της συμπεριφοράς (μείωση παραθύρου/ρυθμού).</li>
+<li><b>Κατά άλματα (hop-by-hop / backpressure)</b>: η ανάδραση επενεργεί σε κάθε σύνδεσμο ανάντη — δρα ταχύτερα αλλά «πιέζει» πίσω και ροές που δεν ευθύνονται.</li>
+<li><b>Προληπτική απόρριψη</b>: <b>RED</b> — ο δρομολογητής απορρίπτει τυχαία πακέτα <i>πριν</i> γεμίσει η ουρά, ώστε οι πηγές TCP να επιβραδύνουν νωρίς και να αποφευχθεί ο συγχρονισμός τους.</li>
+<li><b>Απόρριψη φορτίου (load shedding)</b>, ως έσχατη λύση, με πολιτική ανάλογα με το είδος της κίνησης («wine» — για δεδομένα το παλιό είναι πιο πολύτιμο· «milk» — για πολυμέσα το νέο).</li>
+</ul>
+<p><b>Διαφορές ανά τύπο δικτύου:</b> σε δίκτυα <b>εικονικών κυκλωμάτων</b> η συμφόρηση προλαμβάνεται με <b>έλεγχο αποδοχής</b> κατά την εγκαθίδρυση ή με επιλογή διαδρομής που αποφεύγει τις συμφορημένες περιοχές· σε δίκτυα <b>αυτοδύναμων πακέτων</b> (Internet) βασιζόμαστε κυρίως στην ανάδραση προς τα άκρα και στον αλγόριθμο του TCP.</p>`}
+];
+const EXERCISES = [
+{u:"link", past:true, q:`<b>(Θέμα εξετάσεων Σεπτ. 2009)</b> Δύο κόμβοι Α και Β συνδέονται με οπτική ίνα χωρητικότητας C = 150 Mbps. Η καθυστέρηση διάδοσης είναι 320 μs ανά κατεύθυνση. Ο Α στέλνει πλαίσια 9000 bytes (εκ των οποίων 300 bytes overhead) και ο Β απαντά με ACK 750 bytes. Ο χρόνος επεξεργασίας κάθε πλαισίου και κάθε ACK είναι 20 μs. Εφαρμόζεται «Παύση και Αναμονή», χωρίς σφάλματα.<br>
+<b>(α)</b> Υπολογίστε την αποδοτικότητα (αξιοποίηση γραμμής) και τον μέσο ρυθμό μετάδοσης πληροφορίας Α→Β.<br>
+<b>(β)</b> Τροποποιούμε το πρωτόκολλο: κάθε πλαίσιο στέλνεται <b>δύο φορές</b> (το δεύτερο αντίγραφο αμέσως μετά το πρώτο) και ο Β απαντά με <b>ένα</b> ACK 750 bytes που αφορά και τα δύο αντίγραφα. Υπολογίστε ξανά τα ίδια μεγέθη.`,
+ a:`<p><b>(α) Βασικοί χρόνοι</b></p>
+<div class="fx block">D_TP = 9000·8 / 150·10⁶ = 72000 / 1,5·10⁸ = 480 μs   (μετάδοση πλαισίου)
+D_TA =  750·8 / 150·10⁶ =  6000 / 1,5·10⁸ =  40 μs   (μετάδοση ACK)
+D_P  = 320 μs ανά κατεύθυνση,  T_proc = 20 μs ανά πλαίσιο και ανά ACK</div>
+<p>Ο πλήρης κύκλος (από την έναρξη μετάδοσης ενός πλαισίου έως την ετοιμότητα για το επόμενο) είναι:</p>
+<div class="fx block">S = D_TP + D_P + T_proc(πλαισίου) + D_TA + D_P + T_proc(ACK)
+S = 480 + 320 + 20 + 40 + 320 + 20 = <b>1200 μs</b></div>
+<p><b>Αποδοτικότητα (αξιοποίηση γραμμής):</b></p>
+<div class="fx block">E = D_TP / S = 480 / 1200 = <b>0,40 = 40 %</b></div>
+<p><b>Μέσος ρυθμός μετάδοσης πληροφορίας:</b> ωφέλιμα δεδομένα ανά πλαίσιο = 9000 − 300 = 8700 bytes = 69 600 bits.</p>
+<div class="fx block">R_info = 69 600 bits / 1200 μs = 69 600 / 1,2·10⁻³ = <b>58 Mbps</b></div>
+<p class="muted">Σχόλιο: εδώ η αποδοτικότητα είναι σχετικά καλή (40 %) επειδή ο σύνδεσμος είναι <b>σύντομος</b> σε σχέση με το μέγεθος του πλαισίου — το 2·D_P = 640 μs είναι της ίδιας τάξης με το D_TP = 480 μs.</p>
+<hr>
+<p><b>(β) Με διπλή αποστολή κάθε πλαισίου</b></p>
+<p>Ο νέος κύκλος περιλαμβάνει <b>δύο</b> χρόνους μετάδοσης πλαισίου. Θεωρούμε ότι η επεξεργασία του πρώτου αντιγράφου επικαλύπτεται με τη μετάδοση του δεύτερου, οπότε μετά την άφιξη του δεύτερου αντιγράφου μεσολαβούν 20 μs μέχρι την αποστολή του ACK:</p>
+<div class="fx block">S′ = 2·D_TP + D_P + T_proc + D_TA + D_P + T_proc
+S′ = 960 + 320 + 20 + 40 + 320 + 20 = <b>1680 μs</b></div>
+<div class="fx block">E′ = D_TP / S′ = 480 / 1680 = <b>0,2857 ≈ 28,6 %</b>
+R′_info = 69 600 bits / 1680 μs = <b>41,43 Mbps</b></div>
+<p><b>Σχολιασμός:</b> η γραμμή είναι πλέον απασχολημένη 960/1680 = 57,1 % του χρόνου (περισσότερο από πριν), αλλά <b>η μισή αυτή δραστηριότητα είναι άχρηστη</b>, αφού το δεύτερο αντίγραφο δεν μεταφέρει νέα πληροφορία. Έτσι η <b>χρήσιμη</b> αποδοτικότητα πέφτει από 40 % σε 28,6 % και ο ρυθμός πληροφορίας από 58 σε 41,4 Mbps. Η τροποποίηση θα είχε νόημα <b>μόνο</b> αν υπήρχε σημαντική πιθανότητα απώλειας/σφάλματος p: τότε η πιθανότητα να χαθούν και τα δύο αντίγραφα θα ήταν p² και θα εξοικονομούνταν ολόκληροι κύκλοι αναμετάδοσης. Ποσοτικά, με πιθανότητα σφάλματος p ανά πλαίσιο, η αναμενόμενη αποδοτικότητα γίνεται E·(1−p) στην αρχική περίπτωση και E′·(1−p²) στη δεύτερη — η δεύτερη υπερτερεί όταν 480/1200·(1−p) &lt; 480/1680·(1−p²), δηλαδή όταν 1,4·(1−p) &lt; 1−p², που ισχύει για p &gt; 0,4 περίπου.</p>
+<p class="muted">Εναλλακτική παραδοχή: αν θεωρήσουμε ότι ο παραλήπτης χρειάζεται 20 μs για <b>καθένα</b> από τα δύο αντίγραφα (χωρίς επικάλυψη), τότε S′ = 1700 μs, E′ = 28,2 % και R′ = 40,9 Mbps. Αναφέρετε ρητά την παραδοχή σας στο γραπτό.</p>`},
+
+{u:"link", q:"Ασύρματος σύνδεσμος 128 kbps μεταδίδει πλαίσια 1024 bits με stop-and-wait. Η καθυστέρηση διάδοσης είναι 120 ms και τα ACK είναι 256 bits. <b>(α)</b> Υπολογίστε την απόδοση με χρόνο προθεσμίας ίσο με τον χρόνο μετάβασης μετ' επιστροφής. <b>(β)</b> Υπολογίστε την απόδοση παρουσία σφαλμάτων με πιθανότητα p = 0,1.",
+ a:`<p><b>(α)</b></p>
+<div class="fx block">D_TP = 1024 / 128 000 = 8 ms
+D_TA =  256 / 128 000 = 2 ms
+S = D_TP + D_P + D_TA + D_P = 8 + 120 + 2 + 120 = <b>250 ms</b>
+E = D_TP / S = 8 / 250 = <b>0,032 = 3,2 %</b></div>
+<p>Ο ρυθμός μετάδοσης πληροφορίας είναι 1024 bits / 250 ms ≈ 4,1 kbps — ελάχιστο κλάσμα των 128 kbps. Η αιτία είναι το πολύ μεγάλο γινόμενο καθυστέρησης × εύρους ζώνης σε σχέση με το μέγεθος του πλαισίου.</p>
+<p><b>(β)</b> Με πιθανότητα σφάλματος p ανά πλαίσιο και timeout ίσο με τον κύκλο, ο αριθμός μεταδόσεων ανά επιτυχημένη παράδοση είναι γεωμετρική μεταβλητή με μέση τιμή 1/(1−p):</p>
+<div class="fx block">E_p = E · (1 − p) = 0,032 · 0,9 = <b>0,0288 = 2,88 %</b></div>
+<p>Ισοδύναμα: ο μέσος χρόνος ανά επιτυχώς παραδοθέν πλαίσιο είναι S/(1−p) = 250/0,9 ≈ 277,8 ms, άρα E = 8/277,8 = 2,88 %.</p>
+<p class="muted">Προσοχή: αν η εκφώνηση έδινε πιθανότητα σφάλματος <b>ανά bit</b>, θα έπρεπε πρώτα να υπολογιστεί η πιθανότητα σφάλματος πλαισίου από PER ≈ N·BER. Επίσης, αν και τα ACK μπορούσαν να χαθούν με πιθανότητα q, η πιθανότητα επιτυχούς κύκλου θα ήταν (1−p)(1−q).</p>`},
+
+{u:"link", q:"Γραμμή ΑΒ 96 kbps με καθυστέρηση διάδοσης 200 ms από άκρη σε άκρη. Εφαρμόζεται Go-Back-N για πλαίσια 1000 bytes στην κατεύθυνση ΑΒ και ACK 300 bytes στην κατεύθυνση ΒΑ. <b>(i)</b> Αν το παράθυρο και το timeout επιλεγούν ώστε να δίνουν τη μέγιστη απόδοση, ποια βάση αρίθμησης modulo μπορεί να χρησιμοποιηθεί; <b>(ii)</b> Αν εφαρμοζόταν Selective Repeat, πώς θα γινόταν η αρίθμηση για το ίδιο μέγεθος παραθύρου;",
+ a:`<p><b>Βασικοί χρόνοι</b></p>
+<div class="fx block">D_TP = 1000·8 / 96 000 = 8000/96000 = 83,33 ms
+D_TA =  300·8 / 96 000 = 2400/96000 = 25,00 ms
+S = D_TP + D_P + D_TA + D_P = 83,33 + 200 + 25 + 200 = <b>508,33 ms</b></div>
+<p><b>(i)</b> Για πλήρη αξιοποίηση της γραμμής, ο αποστολέας πρέπει να μπορεί να μεταδίδει συνεχώς μέχρι να φτάσει η πρώτη επιβεβαίωση, δηλαδή να χωρά στο παράθυρο τόσα πλαίσια όσα μεταδίδονται σε χρόνο S:</p>
+<div class="fx block">n = S / D_TP = 508,33 / 83,33 = 6,1  ⇒  s = ⌈6,1⌉ = <b>7 πλαίσια</b></div>
+<p>Στο <b>Go-Back-N</b> το παράθυρο του παραλήπτη είναι 1, οπότε αρκεί το εύρος αρίθμησης να είναι κατά ένα μεγαλύτερο από το παράθυρο αποστολής:</p>
+<div class="fx block">MAX_SEQ + 1 ≥ s + 1 = 8  ⇒  αρίθμηση <b>modulo 8</b> (δηλ. 0…7, πεδίο m = 3 bits)</div>
+<p>Αν το εύρος ήταν ίσο με s = 7, ένα πλήρες παράθυρο ακολουθούμενο από απώλεια όλων των ACK θα έκανε τον παραλήπτη να μη διακρίνει την αναμετάδοση του πρώτου πλαισίου από ένα νέο πλαίσιο.</p>
+<p><b>(ii)</b> Στο <b>Selective Repeat</b> ο παραλήπτης έχει κι αυτός παράθυρο r &gt; 1. Για να μην επικαλύπτεται το νέο με το παλιό παράθυρο απαιτείται:</p>
+<div class="fx block">r ≤ (MAX_SEQ+1)/2  και  r ≤ s  ⇒  MAX_SEQ + 1 ≥ 2s = 14
+Με πεδίο m bits: 2^m ≥ 14  ⇒  m = 4  ⇒  αρίθμηση <b>modulo 16</b> (0…15), με s = r = 7 (ή 8)</div>
+<p class="muted">Δηλαδή το Selective Repeat «κοστίζει» ένα επιπλέον bit αρίθμησης στην κεφαλίδα και μνήμη για r πλαίσια στον δέκτη, με αντάλλαγμα να μην αναμεταδίδεται ολόκληρο το παράθυρο σε κάθε απώλεια.</p>`},
+
+{u:"qos", q:"Υπολογιστής επιθυμεί να εισαγάγει 19,5 MBytes σε ένα δίκτυο και τα εκπέμπει σε μία ριπή με ρυθμό 6 Mbps. Η κίνηση ελέγχεται από κουβά κουπονιών που γεμίζει με ρυθμό 4 Mbps. Πόση χωρητικότητα πρέπει να έχει ο κουβάς ώστε να μη συμβεί απώλεια δεδομένων;",
+ a:`<p>Για να μη «φρενάρει» καθόλου η ριπή, πρέπει σε κάθε στιγμή να υπάρχουν διαθέσιμα κουπόνια — δηλαδή ο κουβάς να μπορεί να καλύψει τη διαφορά μεταξύ του ρυθμού εξόδου M και του ρυθμού παραγωγής κουπονιών ρ, για όλη τη διάρκεια T της ριπής.</p>
+<div class="fx block">Όγκος κίνησης = 19,5 MB = 19,5 · 8 = <b>156 Mbits</b>
+Διάρκεια ριπής: T = 156 Mbits / 6 Mbps = <b>26 s</b>
+Κουπόνια που παράγονται στο διάστημα αυτό: ρ·T = 4 · 26 = 104 Mbits
+Απαιτούμενο αρχικό περιεχόμενο: B = 156 − 104 = <b>52 Mbits = 6,5 MB</b></div>
+<p>Ισοδύναμα, με τον γενικό τύπο:</p>
+<div class="fx block">B = T · (M − ρ) = 26 · (6 − 4) = 52 Mbits</div>
+<p><b>Επαλήθευση με τον τύπο της μέγιστης ριπής:</b> S = B/(M−ρ) = 52/2 = 26 s = T ✓ — δηλαδή ολόκληρη η ριπή περνά ανέπαφη.</p>
+<p class="muted">Παγίδα μονάδων: η χωρητικότητα δόθηκε σε MBytes και οι ρυθμοί σε Mbps. Πάντα μετατρέπουμε τα πάντα στην ίδια μονάδα (εδώ bits) πριν τους υπολογισμούς.</p>`},
+
+{u:"qos", q:"Υπολογιστής χρησιμοποιεί κουβά κουπονιών. Ο μέγιστος επιτρεπτός ρυθμός μετάδοσης στο δίκτυο είναι 2 MByte/s και ο ρυθμός μετάδοσης δεδομένων από τον υπολογιστή προς τον κουβά είναι 2,5 MByte/s. Θέλει να στείλει 250 MB σε μία ριπή. Ποια η ελάχιστη χωρητικότητα του κουβά ώστε να μη χαθούν δεδομένα;",
+ a:`<p>Εδώ ο ρυθμός εξόδου της ριπής είναι M = 2,5 MB/s (ο ρυθμός με τον οποίο «σπρώχνει» ο υπολογιστής) και ο ρυθμός κουπονιών ρ = 2 MB/s (ο μέγιστος διατηρήσιμος ρυθμός που επιτρέπει το δίκτυο).</p>
+<div class="fx block">Διάρκεια ριπής: T = 250 MB / 2,5 MB/s = <b>100 s</b>
+B = T · (M − ρ) = 100 · (2,5 − 2) = <b>50 MB</b></div>
+<p><b>Έλεγχος:</b> στα 100 s παράγονται 2 · 100 = 200 MB κουπονιών· μαζί με το αρχικό περιεχόμενο B = 50 MB καλύπτονται ακριβώς τα 250 MB. ✓</p>
+<p class="muted">Παρατήρηση: για να περάσει η ριπή «ανέπαφη» απαιτείται κουβάς 50 MB, που είναι πρακτικά μεγάλος. Αν ο κουβάς είναι μικρότερος, δεν χάνονται απαραιτήτως δεδομένα — απλώς η έξοδος <b>μορφοποιείται</b>: το πρώτο μέρος βγαίνει με 2,5 MB/s για S = B/(M−ρ) και το υπόλοιπο με 2 MB/s (εφόσον υπάρχει ουρά στην είσοδο· αν δεν υπάρχει, τότε πράγματι χάνονται δεδομένα).</p>`},
+
+{u:"qos", q:"Η κίνηση ενός υπολογιστή ρυθμίζεται από κουβά κουπονιών. Ο ρυθμός άφιξης δεδομένων είναι 25 Mbps για 40 ms, ο ρυθμός κουπονιών 2 Mbps, η χωρητικότητα του κουβά 500 kbits και ο μέγιστος ρυθμός εξόδου 25 Mbps. Υπολογίστε <b>(1)</b> τη διάρκεια της μέγιστης δυνατής ριπής και <b>(2)</b> τον συνολικό χρόνο εξόδου των δεδομένων.",
+ a:`<p><b>(1) Διάρκεια μέγιστης ριπής</b></p>
+<div class="fx block">S = B / (M − ρ) = 500 kbits / (25 000 − 2 000) kbps = 500/23 000 s = <b>21,74 ms</b>
+Όγκος που εξέρχεται στη ριπή: M·S = 25 Mbps · 21,74 ms = <b>543,5 kbits</b></div>
+<p><b>(2) Συνολικός χρόνος εξόδου</b></p>
+<div class="fx block">Συνολικός όγκος δεδομένων = 25 Mbps · 40 ms = <b>1000 kbits</b>
+Υπόλοιπο μετά τη μέγιστη ριπή = 1000 − 543,5 = 456,5 kbits
+Χρόνος εξόδου του υπολοίπου με ρυθμό ρ = 456,5 / 2000 kbps = 228,3 ms
+Συνολικός χρόνος = 21,74 + 228,3 ≈ <b>250 ms</b></div>
+<p><b>Επαλήθευση με ισοζύγιο κουπονιών:</b> για να εξέλθουν 1000 kbits χρειάζονται 1000 kbits κουπονιών· υπάρχουν ήδη B = 500 και πρέπει να παραχθούν άλλα 500, πράγμα που απαιτεί 500/2000 = 250 ms. Ο συνολικός χρόνος εξόδου είναι ακριβώς αυτός. ✓</p>
+<p class="muted">Χρήσιμη γενίκευση: συνολικός χρόνος = (Συνολικός όγκος − B)/ρ, όταν ο όγκος υπερβαίνει τη χωρητικότητα του κουβά.</p>`},
+
+{u:"routing", q:"Ο δρομολογητής C έχει μετρήσει καθυστερήσεις προς τους γείτονές του B, D, E ίσες με 6, 3 και 5 αντίστοιχα, και μόλις έλαβε τα διανύσματα: από B το (5, 0, 8, 12, 16, 2), από D το (16, 12, 6, 0, 9, 10) και από E το (7, 6, 3, 9, 0, 4) — αποστάσεις προς (A, B, C, D, E, F). Ποιος είναι ο νέος πίνακας δρομολόγησης του C;",
+ a:`<p>Εφαρμόζουμε τη σχέση Bellman-Ford: <span class="fx">D_C(y) = min<sub>v ∈ {B,D,E}</sub> { c(C,v) + D_v(y) }</span>.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Προς</th><th>μέσω B (+6)</th><th>μέσω D (+3)</th><th>μέσω E (+5)</th><th>Νέα καθυστέρηση</th><th>Γραμμή εξόδου</th></tr>
+<tr><td>A</td><td>6+5 = <b>11</b></td><td>3+16 = 19</td><td>5+7 = 12</td><td><b>11</b></td><td><b>B</b></td></tr>
+<tr><td>B</td><td>6+0 = <b>6</b></td><td>3+12 = 15</td><td>5+6 = 11</td><td><b>6</b></td><td><b>B</b></td></tr>
+<tr><td>C</td><td colspan="3">— (ο ίδιος)</td><td>0</td><td>—</td></tr>
+<tr><td>D</td><td>6+12 = 18</td><td>3+0 = <b>3</b></td><td>5+9 = 14</td><td><b>3</b></td><td><b>D</b></td></tr>
+<tr><td>E</td><td>6+16 = 22</td><td>3+9 = 12</td><td>5+0 = <b>5</b></td><td><b>5</b></td><td><b>E</b></td></tr>
+<tr><td>F</td><td>6+2 = <b>8</b></td><td>3+10 = 13</td><td>5+4 = 9</td><td><b>8</b></td><td><b>B</b></td></tr>
+</table></div>
+<p><b>Νέος πίνακας του C:</b> A → 11 (μέσω B), B → 6 (μέσω B), D → 3 (μέσω D), E → 5 (μέσω E), F → 8 (μέσω B).</p>
+<p class="muted">Κλασικά λάθη: (α) να ξεχάσετε να προσθέσετε το κόστος του συνδέσμου προς τον γείτονα· (β) να θεωρήσετε ότι η απόσταση προς έναν άμεσο γείτονα είναι υποχρεωτικά η μετρημένη — εδώ π.χ. η απόσταση προς τον E βγαίνει 5 μέσω E, αλλά θα μπορούσε ένας άλλος γείτονας να δίνει μικρότερη τιμή· (γ) να μη σημειώσετε τη <b>γραμμή εξόδου</b>, που ζητείται ρητά.</p>`},
+
+{u:"transport", q:"Έστω σύνδεση TCP όπου ο αποστολέας έχει ήδη στείλει 1000 bytes, με αρχικό αριθμό σειράς (ISN) 100. Στη συνέχεια στέλνει τρία διαδοχικά τμήματα: 500, 800 και 200 bytes. <b>(i)</b> Ποιοι είναι οι αριθμοί σειράς τους; <b>(ii)</b> Αν ληφθούν σωστά το 1ο και το 3ο αλλά χαθεί το 2ο, τι ACK στέλνει ο παραλήπτης και γιατί; <b>(iii)</b> Τι συμβαίνει όταν τελικά ληφθεί το 2ο;",
+ a:`<p><b>(i)</b> Έχουν ήδη σταλεί 1000 bytes ξεκινώντας από το 100, δηλαδή τα bytes 100–1099. Επόμενος αριθμός σειράς: 1100.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Τμήμα</th><th>Μέγεθος</th><th>Sequence Number</th><th>Bytes που μεταφέρει</th></tr>
+<tr><td>1</td><td>500</td><td><b>1100</b></td><td>1100 – 1599</td></tr>
+<tr><td>2</td><td>800</td><td><b>1600</b></td><td>1600 – 2399</td></tr>
+<tr><td>3</td><td>200</td><td><b>2400</b></td><td>2400 – 2599</td></tr>
+</table></div>
+<p><b>(ii)</b> Το TCP χρησιμοποιεί <b>αθροιστικές επιβεβαιώσεις</b>: το πεδίο ACK δηλώνει το <b>επόμενο byte που αναμένει</b> ο παραλήπτης στη σωστή σειρά. Αφού χάθηκε το 2ο τμήμα, έχει λάβει σωστά και στη σειρά μόνο μέχρι το byte 1599, άρα:</p>
+<div class="fx block">ACK = <b>1600</b></div>
+<p>Και συνεχίζει να στέλνει ACK = 1600 (διπλά ACK) ακόμη και μετά τη λήψη του 3ου τμήματος — αυτά ακριβώς τα διπλά ACK ενεργοποιούν τον μηχανισμό <b>fast retransmit</b> στο TCP Reno, μετά από τρία διπλά.</p>
+<p><b>(iii)</b> Διακρίνουμε δύο περιπτώσεις:</p>
+<ul>
+<li>Αν ο παραλήπτης διαθέτει <b>ενταμιευτή</b> και έχει κρατήσει το 3ο τμήμα (η συνήθης υλοποίηση), μόλις λάβει το 2ο έχει συνεχή ροή bytes μέχρι το 2599 και στέλνει <b>ACK = 2600</b>.</li>
+<li>Αν <b>δεν</b> διαθέτει ενταμιευτή και είχε απορρίψει τα εκτός σειράς τμήματα, τότε μετά τη λήψη του 2ου ζητά το 3ο με <b>ACK = 2400</b>, και το 3ο θα πρέπει να αναμεταδοθεί.</li>
+</ul>
+<p class="muted">Θυμηθείτε: στο TCP οι αριθμοί σειράς αριθμούν <b>bytes</b>, όχι τμήματα, και ο ISN δεν είναι 0 αλλά επιλέγεται (ψευδο)τυχαία κατά την τριπλή χειραψία.</p>`},
+
+{u:"transport", q:"Σύνδεση TCP με MSS = 1 KB ξεκινά με cwnd = 1 MSS και κατώφλι 8 MSS. Δεν υπάρχει περιορισμός από τον έλεγχο ροής. Στον 8ο γύρο (RTT) συμβαίνει timeout. Παρουσιάστε την εξέλιξη του παραθύρου συμφόρησης.",
+ a:`<div class="tbl-wrap"><table>
+<tr><th>Γύρος (RTT)</th><th>cwnd (MSS)</th><th>Φάση</th></tr>
+<tr><td>1</td><td>1</td><td>Αργή εκκίνηση (διπλασιασμός ανά RTT)</td></tr>
+<tr><td>2</td><td>2</td><td>Αργή εκκίνηση</td></tr>
+<tr><td>3</td><td>4</td><td>Αργή εκκίνηση</td></tr>
+<tr><td>4</td><td>8</td><td>Έφτασε το κατώφλι → μετάβαση σε αποφυγή συμφόρησης</td></tr>
+<tr><td>5</td><td>9</td><td>Αποφυγή συμφόρησης (+1 MSS ανά RTT)</td></tr>
+<tr><td>6</td><td>10</td><td>Αποφυγή συμφόρησης</td></tr>
+<tr><td>7</td><td>11</td><td>Αποφυγή συμφόρησης</td></tr>
+<tr><td>8</td><td>12</td><td><b>TIMEOUT</b></td></tr>
+</table></div>
+<p><b>Ενέργειες στο timeout (TCP Tahoe):</b></p>
+<div class="fx block">νέο κατώφλι = cwnd / 2 = 12 / 2 = <b>6 MSS</b>
+νέο cwnd = <b>1 MSS</b>  → επιστροφή στην αργή εκκίνηση
+RTO ← 2 · RTO (exponential backoff)· αναμετάδοση του παλαιότερου μη επιβεβαιωμένου τμήματος</div>
+<div class="tbl-wrap"><table>
+<tr><th>Γύρος</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th></tr>
+<tr><td>cwnd</td><td>1</td><td>2</td><td>4</td><td>6</td><td>7</td><td>8</td></tr>
+<tr><td>Φάση</td><td colspan="3">Αργή εκκίνηση</td><td>Κατώφλι → αλλαγή φάσης</td><td colspan="2">Αποφυγή συμφόρησης</td></tr>
+</table></div>
+<p><b>Αν αντί για timeout είχαμε τρία διπλά ACK (TCP Reno):</b> κατώφλι = 6 MSS αλλά cwnd = 6 MSS (fast recovery) — δηλαδή <b>δεν</b> επιστρέφουμε σε αργή εκκίνηση, γιατί τα διπλά ACK αποδεικνύουν ότι το δίκτυο εξακολουθεί να παραδίδει πακέτα.</p>
+<p><b>Μέσος ρυθμός διεκπεραίωσης:</b> με W = 12 MSS = 12 KB και RTT π.χ. 50 ms → 3W/(4·RTT) = 3·12 KB/(4·0,05 s) = 180 KB/s.</p>`},
+
+{u:"internet", q:"Ένα αυτοδύναμο πακέτο IP 4000 bytes (με κεφαλίδα 20 bytes) πρέπει να διασχίσει δίκτυο με MTU 1500 bytes. Πόσα θρύμματα προκύπτουν και ποια τα πεδία τους; Τι γίνεται αν στη συνέχεια περάσουν από δίκτυο με MTU 576 bytes;",
+ a:`<p><b>Πρώτο επίπεδο θρυμματισμού (MTU 1500)</b></p>
+<div class="fx block">Ωφέλιμα δεδομένα = 4000 − 20 = 3980 bytes
+Χώρος για δεδομένα ανά θρύμμα = 1500 − 20 = 1480 bytes (ήδη πολλαπλάσιο του 8 ✓)
+3980 = 1480 + 1480 + 1020  ⇒  <b>3 θρύμματα</b></div>
+<div class="tbl-wrap"><table>
+<tr><th>Θρύμμα</th><th>Δεδομένα</th><th>Συνολικό μήκος</th><th>Offset (μονάδες 8 bytes)</th><th>MF</th></tr>
+<tr><td>1</td><td>1480</td><td>1500</td><td>0</td><td>1</td></tr>
+<tr><td>2</td><td>1480</td><td>1500</td><td>1480/8 = <b>185</b></td><td>1</td></tr>
+<tr><td>3</td><td>1020</td><td>1040</td><td>2960/8 = <b>370</b></td><td>0</td></tr>
+</table></div>
+<p>Όλα φέρουν το <b>ίδιο πεδίο Identification</b> με το αρχικό πακέτο.</p>
+<p><b>Δεύτερο επίπεδο (MTU 576)</b> — κάθε θρύμμα 1500 bytes θρυμματίζεται περαιτέρω:</p>
+<div class="fx block">Χώρος δεδομένων = 576 − 20 = 556 → στρογγυλοποίηση προς τα κάτω σε πολλαπλάσιο του 8: <b>552 bytes</b>
+1480 = 552 + 552 + 376  ⇒  κάθε θρύμμα των 1480 bytes δίνει 3 νέα θρύμματα</div>
+<p>Για το πρώτο θρύμμα (offset 0): νέα offsets 0, 69, 138. Για το δεύτερο (offset 185): 185, 254, 323. Για το τρίτο (1020 bytes, offset 370): 1020 = 552 + 468 → offsets 370, 439, με MF = 0 στο τελευταίο.</p>
+<p><b>Παρατηρήσεις:</b></p>
+<ul>
+<li>Η <b>επανασυναρμολόγηση γίνεται μόνο στον τελικό προορισμό</b> — κανένας ενδιάμεσος δρομολογητής δεν «ξαναενώνει» τα θρύμματα.</li>
+<li>Το overhead αυξήθηκε σημαντικά: από 20 bytes κεφαλίδας σε 9 × 20 = 180 bytes.</li>
+<li>Αν χαθεί <b>έστω ένα</b> θρύμμα, χάνεται ολόκληρο το αρχικό πακέτο.</li>
+<li>Γι' αυτό προτιμάται το <b>Path MTU Discovery</b> (DF = 1 + ICMP), και στο <b>IPv6 ο θρυμματισμός εν κινήσει απαγορεύεται</b>.</li>
+</ul>`},
+
+{u:"perf", q:"Σύνδεσμος 10 Mbps με RTT = 40 ms και σύνδεση TCP με παράθυρο 64 KB. <b>(α)</b> Ποιος είναι ο μέγιστος ρυθμός διεκπεραίωσης; <b>(β)</b> Τι αλλάζει αν το RTT γίνει 200 ms; <b>(γ)</b> Πόσο παράθυρο θα χρειαζόταν για πλήρη αξιοποίηση στην περίπτωση (β);",
+ a:`<p><b>(α)</b></p>
+<div class="fx block">Ρυθμός περιοριζόμενος από το παράθυρο = W / RTT = 65 536 · 8 bits / 0,04 s = <b>13,1 Mbps</b>
+Ρυθμός γραμμής = 10 Mbps
+Πραγματικός ρυθμός = min{10 ; 13,1} = <b>10 Mbps</b>  →  η σύνδεση είναι <b>περιοριζόμενη από τη γραμμή</b></div>
+<p><b>(β)</b></p>
+<div class="fx block">W / RTT = 524 288 bits / 0,2 s = <b>2,62 Mbps</b>  <  10 Mbps
+→ η σύνδεση είναι πλέον <b>περιοριζόμενη από το παράθυρο</b>: αξιοποιείται μόλις 26 % της γραμμής</div>
+<p><b>(γ)</b> Το γινόμενο καθυστέρησης × εύρους ζώνης είναι:</p>
+<div class="fx block">BDP = 10·10⁶ bps · 0,2 s = 2·10⁶ bits = <b>250 KB</b></div>
+<p>Άρα χρειάζεται παράθυρο ≥ 250 KB. Επειδή το πεδίο παραθύρου του TCP είναι 16 bits (μέγιστο 64 KB), απαιτείται η επιλογή <b>window scale</b> της κεφαλίδας TCP.</p>
+<p class="muted">Το ίδιο συμπέρασμα εξηγεί γιατί το stop-and-wait (παράθυρο ενός πλαισίου) είναι εντελώς ακατάλληλο για συνδέσμους μεγάλου BDP, και γιατί χρειάζεται επαρκές εύρος αρίθμησης MAX_SEQ ώστε να καλύπτει το παράθυρο.</p>`},
+
+{u:"app", q:"Μια ιστοσελίδα αποτελείται από ένα αρχείο HTML και 8 μικρές εικόνες. Το RTT είναι 100 ms και ο χρόνος μετάδοσης θεωρείται αμελητέος. Υπολογίστε τον χρόνο φόρτωσης με: (α) μη επίμονο HTTP σειριακά, (β) μη επίμονο με 4 παράλληλες συνδέσεις, (γ) επίμονο χωρίς pipelining, (δ) επίμονο με pipelining.",
+ a:`<p>Κάθε αντικείμενο με <b>μη επίμονη</b> σύνδεση κοστίζει 2 RTT: 1 RTT για την τριπλή χειραψία TCP και 1 RTT για αίτηση/απόκριση.</p>
+<div class="tbl-wrap"><table>
+<tr><th>Τρόπος</th><th>Υπολογισμός</th><th>Χρόνος</th></tr>
+<tr><td>(α) Μη επίμονο, σειριακά</td><td>2 RTT (HTML) + 8 × 2 RTT = 18 RTT</td><td><b>1,80 s</b></td></tr>
+<tr><td>(β) Μη επίμονο, 4 παράλληλες</td><td>2 RTT (HTML) + ⌈8/4⌉ × 2 RTT = 2 + 4 = 6 RTT</td><td><b>0,60 s</b></td></tr>
+<tr><td>(γ) Επίμονο, χωρίς pipelining</td><td>1 RTT (χειραψία) + 1 RTT (HTML) + 8 × 1 RTT = 10 RTT</td><td><b>1,00 s</b></td></tr>
+<tr><td>(δ) Επίμονο, με pipelining</td><td>1 RTT (χειραψία) + 1 RTT (HTML) + 1 RTT (όλες οι εικόνες μαζί) = 3 RTT</td><td><b>0,30 s</b></td></tr>
+</table></div>
+<p><b>Συμπεράσματα:</b></p>
+<ul>
+<li>Οι <b>επίμονες συνδέσεις</b> εξοικονομούν την επαναλαμβανόμενη χειραψία — γι' αυτό είναι η προεπιλογή στο HTTP/1.1.</li>
+<li>Το <b>pipelining</b> εξαλείφει και την αναμονή ανά αντικείμενο.</li>
+<li>Ο χρόνος κυριαρχείται από το <b>RTT</b>, όχι από τον ρυθμό της γραμμής — γι' αυτό τα CDN, που φέρνουν το περιεχόμενο κοντά και μειώνουν το RTT, έχουν τόσο μεγάλη επίδραση.</li>
+<li>Σε πραγματικές συνθήκες προστίθεται και η επίδραση της <b>αργής εκκίνησης</b> του TCP, που επιβαρύνει περισσότερο τις πολλές βραχύβιες συνδέσεις — άλλο ένα επιχείρημα υπέρ των επίμονων συνδέσεων.</li>
+</ul>`},
+
+{u:"routing", q:"Σε δίκτυο με 50 δρομολογητές εφαρμόζεται distance vector. Τα κόστη διαδρομών καταγράφονται ως αριθμοί 8 bit, τα διανύσματα ανταλλάσσονται 2 φορές το δευτερόλεπτο και κάθε κόμβος έχει 4 γείτονες. Πόσο εύρος ζώνης ανά γραμμή (διπλής κατεύθυνσης) καταναλώνεται σε κάθε κατεύθυνση και πόσο συνολικά;",
+ a:`<div class="fx block">Μέγεθος ενός διανύσματος = 50 εγγραφές × 8 bits = <b>400 bits</b>
+Συχνότητα αποστολής = 2 φορές/s
+Ανά γραμμή και ανά κατεύθυνση: 400 × 2 = <b>800 bps</b>
+Συνολικά για τη γραμμή διπλής κατεύθυνσης: 2 × 800 = <b>1600 bps</b></div>
+<p><b>Συνολικός φόρτος στο δίκτυο:</b> κάθε κόμβος έχει 4 γείτονες, άρα 50 × 4 / 2 = 100 γραμμές. Συνολικά 100 × 1600 = 160 kbps δαπανώνται μόνο για τη δρομολόγηση.</p>
+<p class="muted">Παρατηρήστε ότι στο distance vector τα μηνύματα είναι <b>μεγάλα</b> (μία εγγραφή ανά προορισμό) αλλά πηγαίνουν <b>μόνο στους γείτονες</b>. Στο link state ισχύει το αντίστροφο: μικρά πακέτα (μία εγγραφή ανά γείτονα) αλλά διαδίδονται με <b>πλημμύρα σε όλο το δίκτυο</b>. Γι' αυτό η σύγκριση του φόρτου εξαρτάται από την πυκνότητα του γράφου.</p>`}
+];
+/* ---------- κατάσταση ---------- */
+const TABS = [
+  {id:"theory", name:"Θεωρία"},
+  {id:"tf",     name:"Σωστό / Λάθος"},
+  {id:"gap",    name:"Συμπλήρωση κενών"},
+  {id:"mcq",    name:"Πολλαπλής επιλογής"},
+  {id:"essay",  name:"Ανάπτυξης"},
+  {id:"ex",     name:"Ασκήσεις"}
+];
+
+TF.forEach((q,i)=>{q.id="tf"+i; q.type="tf";});
+GAPS.forEach((q,i)=>{q.id="gap"+i; q.type="gap";});
+MCQ.forEach((q,i)=>{q.id="mcq"+i; q.type="mcq";});
+ESSAY.forEach((q,i)=>{q.id="es"+i; q.type="essay";});
+EXERCISES.forEach((q,i)=>{q.id="ex"+i; q.type="ex";});
+
+const UNAME = {}; UNITS.forEach(u=>UNAME[u.id]=u.name);
+const state = {
+  tab:"theory",
+  units:new Set(UNITS.map(u=>u.id)),
+  shuffle:false,
+  onlyMarked:false,
+  marked:new Set(),
+  q:"",
+  answers:{},       // id -> {given, ok}
+  order:{}          // tab -> array of ids
+};
+
+/* ---------- βοηθητικά ---------- */
+const $ = (s,r)=> (r||document).querySelector(s);
+const el = (tag,cls,html)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e;};
+
+function norm(s){
+  return (s||"").toString().toLowerCase().trim()
+    .normalize("NFD").replace(/[̀-ͯ]/g,"")
+    .replace(/ς/g,"σ")
+    .replace(/[\s ]+/g," ")
+    .replace(/[.,;:!?'"«»]/g,"");
+}
+/* Δίπλωση χαρακτήρων: πεζά, χωρίς τόνους/διαλυτικά, ς→σ.
+   Κρατά αντιστοιχία 1 προς 1 με το πρωτότυπο, ώστε να γίνεται σωστή επισήμανση. */
+function fold(s){
+  let out="";
+  for(const ch of (s||"")){
+    let d=ch.toLowerCase().normalize("NFD")[0];
+    if(d==="\u03c2") d="\u03c3";
+    out+=d;
+  }
+  return out;
+}
+function stripTags(h){ return (h||"").replace(/<[^>]*>/g," ").replace(/&[a-z]+;/gi," "); }
+const _hay=new WeakMap();
+function haystack(q){
+  if(_hay.has(q)) return _hay.get(q);
+  let parts=[UNAME[q.u], q.q||"", q.t||"", q.e||"", q.a&&q.a.push?q.a.join(" "):"",
+             typeof q.a==="string"?q.a:"", q.o?q.o.join(" "):""];
+  const h=fold(stripTags(parts.join(" ")));
+  _hay.set(q,h); return h;
+}
+function matchesQuery(q){
+  const f=fold(state.q).trim();
+  if(!f) return true;
+  const hs=haystack(q);
+  return f.split(/\s+/).every(w=>hs.includes(w));
+}
+
+/* Επισήμανση των ευρημάτων μέσα στους κόμβους κειμένου (χωρίς να χαλάει η HTML) */
+function highlight(root){
+  const f=fold(state.q).trim();
+  if(!f) return;
+  const words=[...new Set(f.split(/\s+/).filter(w=>w.length>1))];
+  if(!words.length) return;
+  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      if(!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      const p=n.parentNode;
+      if(!p || /^(INPUT|TEXTAREA|SCRIPT|STYLE|MARK|BUTTON)$/.test(p.nodeName)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes=[]; let n;
+  while((n=walker.nextNode())) nodes.push(n);
+  nodes.forEach(node=>{
+    const txt=node.nodeValue, low=fold(txt);
+    const hits=[];
+    words.forEach(w=>{
+      let i=low.indexOf(w);
+      while(i!==-1){ hits.push([i,i+w.length]); i=low.indexOf(w,i+w.length); }
+    });
+    if(!hits.length) return;
+    hits.sort((a,b)=>a[0]-b[0]);
+    const merged=[];
+    hits.forEach(h=>{
+      const last=merged[merged.length-1];
+      if(last && h[0]<=last[1]) last[1]=Math.max(last[1],h[1]);
+      else merged.push(h.slice());
+    });
+    const frag=document.createDocumentFragment();
+    let pos=0;
+    merged.forEach(([a,b])=>{
+      if(a>pos) frag.appendChild(document.createTextNode(txt.slice(pos,a)));
+      const mk=document.createElement("mark"); mk.textContent=txt.slice(a,b);
+      frag.appendChild(mk); pos=b;
+    });
+    if(pos<txt.length) frag.appendChild(document.createTextNode(txt.slice(pos)));
+    node.parentNode.replaceChild(frag,node);
+  });
+}
+
+function shuffled(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function bank(tab){
+  if(tab==="tf")return TF; if(tab==="gap")return GAPS; if(tab==="mcq")return MCQ;
+  if(tab==="essay")return ESSAY; if(tab==="ex")return EXERCISES; return [];
+}
+function visibleItems(tab){
+  let items = bank(tab).filter(q=>state.units.has(q.u));
+  if(state.onlyMarked) items = items.filter(q=>state.marked.has(q.id));
+  items = items.filter(matchesQuery);
+  if(state.shuffle){
+    if(!state.order[tab] || state.order[tab].length!==items.length){
+      state.order[tab]=shuffled(items.map(q=>q.id));
+    }
+    const pos={}; state.order[tab].forEach((id,i)=>pos[id]=i);
+    items = items.slice().sort((a,b)=>(pos[a.id]??0)-(pos[b.id]??0));
+  }
+  return items;
+}
+
+function countIn(tab){
+  if(tab==="theory"){
+    return THEORY.filter(t=>{
+      if(!state.units.has(t.id)) return false;
+      const f=fold(state.q).trim();
+      if(!f) return true;
+      const h=fold(stripTags(t.html)+" "+UNAME[t.id]);
+      return f.split(/\s+/).every(w=>h.includes(w));
+    }).length;
+  }
+  let items=bank(tab).filter(q=>state.units.has(q.u));
+  if(state.onlyMarked) items=items.filter(q=>state.marked.has(q.id));
+  return items.filter(matchesQuery).length;
+}
+
+/* ---------- κεφαλίδα ---------- */
+function renderTabs(){
+  const n=$("#tabs"); n.innerHTML="";
+  const searching = !!state.q.trim();
+  TABS.forEach(t=>{
+    const c = searching ? countIn(t.id) : null;
+    const b=el("button","tab"+(state.tab===t.id?" active":"")+(searching&&c===0?" dim":""),
+      t.name + (searching ? ' <span class="cnt">'+c+'</span>' : ''));
+    b.onclick=()=>{state.tab=t.id; render(); window.scrollTo({top:0,behavior:"smooth"});};
+    n.appendChild(b);
+  });
+}
+
+function renderToolbar(host){
+  const bar = el("div","toolbar");
+
+  const chips = el("div","chips");
+  const all = el("button","chip"+(state.units.size===UNITS.length?" on":""),"Όλες οι ενότητες");
+  all.onclick=()=>{
+    if(state.units.size===UNITS.length) state.units=new Set();
+    else state.units=new Set(UNITS.map(u=>u.id));
+    state.order={}; render();
+  };
+  chips.appendChild(all);
+  UNITS.forEach(u=>{
+    const c=el("button","chip"+(state.units.has(u.id)?" on":""),u.name);
+    c.onclick=()=>{ state.units.has(u.id)?state.units.delete(u.id):state.units.add(u.id); state.order={}; render(); };
+    chips.appendChild(c);
+  });
+
+  if(state.tab!=="theory"){
+    const sh=el("button","btn"+(state.shuffle?" on":""),"🔀 Τυχαία σειρά");
+    sh.onclick=()=>{state.shuffle=!state.shuffle; state.order={}; render();};
+    const mk=el("button","btn"+(state.onlyMarked?" on":""),"⭐ Μόνο σημειωμένα");
+    mk.onclick=()=>{state.onlyMarked=!state.onlyMarked; state.order={}; render();};
+    const rv=el("button","btn","👁 Εμφάνιση όλων των απαντήσεων");
+    rv.onclick=()=>{ host.querySelectorAll("details.ans").forEach(d=>d.open=true); };
+    const rs=el("button","btn","↺ Επαναφορά");
+    rs.onclick=()=>{
+      bank(state.tab).forEach(q=>delete state.answers[q.id]);
+      state.order={}; render();
+    };
+    bar.appendChild(sh); bar.appendChild(mk); bar.appendChild(rv); bar.appendChild(rs);
+  }
+
+  const th=el("button","btn","🌓 Θέμα");
+  th.onclick=()=>{
+    const cur=document.documentElement.getAttribute("data-theme");
+    const dark = cur ? cur==="dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+  };
+  bar.appendChild(th);
+
+  host.appendChild(chips);
+  host.appendChild(bar);
+}
+
+function renderScore(host,items){
+  const scored = items.filter(q=>state.answers[q.id]);
+  const ok = scored.filter(q=>state.answers[q.id].ok).length;
+  const pct = items.length? Math.round(100*scored.length/items.length):0;
+  const s=el("div","scorebar");
+  s.appendChild(el("span","score-num", ok+" / "+scored.length+" σωστά"));
+  s.appendChild(el("span","muted","("+items.length+" ερωτήσεις στο φίλτρο)"));
+  const bar=el("div","bar"); const i=el("i"); i.style.width=pct+"%"; bar.appendChild(i);
+  s.appendChild(bar);
+  s.appendChild(el("span","muted", pct+"% απαντημένες"));
+  host.appendChild(s);
+}
+
+/* ---------- κάρτες ---------- */
+function head(card,q,idx){
+  const h=el("div","q-head");
+  h.appendChild(el("div","q-num","#"+(idx+1)));
+  const t=el("div","q-text");
+  t.innerHTML = '<span class="tag">'+UNAME[q.u]+'</span>'
+    + (q.past?'<span class="tag" style="color:var(--warn);border-color:var(--warn)">παλαιό θέμα</span>':'')
+    + (q.q||q.t);
+  h.appendChild(t);
+  const st=el("button","star"+(state.marked.has(q.id)?" on":""), state.marked.has(q.id)?"★":"☆");
+  st.title="Σήμανση για επανάληψη";
+  st.onclick=()=>{ state.marked.has(q.id)?state.marked.delete(q.id):state.marked.add(q.id);
+    st.className="star"+(state.marked.has(q.id)?" on":""); st.textContent=state.marked.has(q.id)?"★":"☆"; };
+  h.appendChild(st);
+  card.appendChild(h);
+}
+
+function feedback(card,okText,ok,expl){
+  const f=el("div","fb "+(ok?"ok":"no"));
+  f.innerHTML="<b>"+okText+"</b><br>"+expl;
+  card.appendChild(f);
+  return f;
+}
+
+function cardTF(q,idx){
+  const c=el("div","card"); head(c,q,idx);
+  const row=el("div","tf-row");
+  const done=state.answers[q.id];
+  [["Σωστό",true],["Λάθος",false]].forEach(([lbl,val])=>{
+    const b=el("button","tf-btn",lbl);
+    if(done){
+      b.disabled=true;
+      if(val===q.a) b.classList.add("correct");
+      else if(val===done.given) b.classList.add("wrong");
+    } else {
+      b.onclick=()=>{ state.answers[q.id]={given:val, ok:val===q.a}; render(); };
+    }
+    row.appendChild(b);
+  });
+  c.appendChild(row);
+  if(done) feedback(c, done.ok?"✔ Σωστά":"✘ Λάθος — η σωστή απάντηση είναι «"+(q.a?"Σωστό":"Λάθος")+"»", done.ok, q.e);
+  return c;
+}
+
+function cardGap(q,idx){
+  const c=el("div","card");
+  const h=el("div","q-head");
+  h.appendChild(el("div","q-num","#"+(idx+1)));
+  const t=el("div","q-text");
+  t.innerHTML='<span class="tag">'+UNAME[q.u]+'</span>'+q.t.replace("___",'<span class="fx">______</span>');
+  h.appendChild(t);
+  const st=el("button","star"+(state.marked.has(q.id)?" on":""), state.marked.has(q.id)?"★":"☆");
+  st.onclick=()=>{ state.marked.has(q.id)?state.marked.delete(q.id):state.marked.add(q.id);
+    st.className="star"+(state.marked.has(q.id)?" on":""); st.textContent=state.marked.has(q.id)?"★":"☆"; };
+  h.appendChild(st);
+  c.appendChild(h);
+
+  const row=el("div","gap-row");
+  const inp=el("input","gap-in"); inp.type="text"; inp.placeholder="η απάντησή σας…";
+  const btn=el("button","btn","Έλεγχος");
+  const done=state.answers[q.id];
+  if(done){
+    inp.value=done.given; inp.disabled=true; btn.disabled=true;
+    inp.classList.add(done.ok?"correct":"wrong");
+  } else {
+    const check=()=>{
+      const v=norm(inp.value);
+      if(!v) return;
+      const ok=q.a.some(a=>norm(a)===v);
+      state.answers[q.id]={given:inp.value, ok:ok}; render();
+    };
+    btn.onclick=check;
+    inp.onkeydown=e=>{ if(e.key==="Enter") check(); };
+  }
+  row.appendChild(inp); row.appendChild(btn);
+  c.appendChild(row);
+  if(done) feedback(c, done.ok?"✔ Σωστά":"✘ Λάθος — δεκτή απάντηση: «"+q.a[0]+"»", done.ok, q.e);
+  return c;
+}
+
+function cardMCQ(q,idx){
+  const c=el("div","card"); head(c,q,idx);
+  const box=el("div","opts");
+  const done=state.answers[q.id];
+  q.o.forEach((text,i)=>{
+    const lab=el("label","opt");
+    const r=el("input"); r.type="radio"; r.name=q.id;
+    const sp=el("span",null,text);
+    lab.appendChild(r); lab.appendChild(sp);
+    if(done){
+      r.disabled=true; lab.classList.add("locked");
+      if(i===q.c) lab.classList.add("correct");
+      else if(i===done.given) lab.classList.add("wrong");
+      if(i===done.given) r.checked=true;
+    } else {
+      r.onchange=()=>{ state.answers[q.id]={given:i, ok:i===q.c}; render(); };
+    }
+    box.appendChild(lab);
+  });
+  c.appendChild(box);
+  if(done) feedback(c, done.ok?"✔ Σωστά":"✘ Λάθος — σωστή: «"+q.o[q.c]+"»", done.ok, q.e);
+  return c;
+}
+
+function cardLong(q,idx,label){
+  const c=el("div","card"); head(c,q,idx);
+  const d=el("details","ans");
+  const s=el("summary",null,label);
+  const b=el("div","body"); b.innerHTML=q.a;
+  d.appendChild(s); d.appendChild(b);
+  c.appendChild(d);
+  return c;
+}
+
+/* ---------- θεωρία ---------- */
+function theoryMatches(t){
+  const f=fold(state.q).trim();
+  if(!f) return true;
+  const h=fold(stripTags(t.html)+" "+UNAME[t.id]);
+  return f.split(/\s+/).every(w=>h.includes(w));
+}
+function renderTheory(host){
+  let units = UNITS.filter(u=>state.units.has(u.id));
+  if(state.q.trim()){
+    units = units.filter(u=>{ const t=THEORY.find(x=>x.id===u.id); return t && theoryMatches(t); });
+    if(!units.length){ host.appendChild(el("div","empty","Καμία ενότητα θεωρίας δεν περιέχει «"+state.q+"». Δοκιμάστε άλλη καρτέλα — ο αριθμός δίπλα σε κάθε καρτέλα δείχνει πόσα αποτελέσματα έχει.")); return; }
+    units.forEach(u=>{
+      const t=THEORY.find(x=>x.id===u.id);
+      host.appendChild(el("h2","sec",u.name));
+      const c=el("div","card theory"); c.innerHTML=t.html; host.appendChild(c);
+    });
+    return;
+  }
+  if(!units.length){ host.appendChild(el("div","empty","Επιλέξτε τουλάχιστον μία ενότητα.")); return; }
+  const intro = el("div","card","<p><b>Πώς να το χρησιμοποιήσετε:</b> ξεκινήστε από τη θεωρία της ενότητας, "
+   +"περάστε στις ερωτήσεις Σωστό/Λάθος και πολλαπλής επιλογής για γρήγορο έλεγχο, μετά στα κενά για την ορολογία, "
+   +"και τελειώστε με τις ερωτήσεις ανάπτυξης και τις αριθμητικές ασκήσεις — εκεί μοιάζουν περισσότερο τα πραγματικά θέματα. "
+   +"Σημειώστε με το ☆ όσα θέλετε να ξαναδείτε και μετά ενεργοποιήστε το «⭐ Μόνο σημειωμένα».</p>"
+   +"<p class=\"muted\">Το γραπτό της εξέτασης είναι διάρκειας 2:30 ωρών, με 6–7 θέματα ανάπτυξης και υπολογισμών, "
+   +"το καθένα με δική του βαθμολογία. Οι ασκήσεις που ακολουθούν είναι στο ίδιο ύφος.</p>");
+  host.appendChild(intro);
+  units.forEach(u=>{
+    const t = THEORY.find(x=>x.id===u.id);
+    if(!t) return;
+    host.appendChild(el("h2","sec",u.name));
+    const c=el("div","card theory"); c.innerHTML=t.html;
+    host.appendChild(c);
+  });
+}
+
+/* ---------- κύρια απόδοση ---------- */
+function render(){
+  const keepScroll = window.scrollY;
+  renderTabs();
+  const m=$("#main"); m.innerHTML="";
+  renderToolbar(m);
+
+  if(state.tab==="theory"){ renderTheory(m); window.scrollTo(0,keepScroll); afterRender(); return; }
+
+  const items=visibleItems(state.tab);
+  if(state.tab==="tf"||state.tab==="gap"||state.tab==="mcq") renderScore(m,items);
+
+  if(!items.length){
+    window.scrollTo(0,0);
+    m.appendChild(el("div","empty", state.q.trim()
+      ? "Κανένα αποτέλεσμα για «"+state.q+"» σε αυτή την καρτέλα. Ο αριθμός δίπλα σε κάθε καρτέλα δείχνει πού υπάρχουν αποτελέσματα."
+      : (state.onlyMarked
+        ? "Δεν έχετε σημειώσει ακόμη καμία ερώτηση σε αυτή την κατηγορία."
+        : "Δεν υπάρχουν ερωτήσεις με τα τρέχοντα φίλτρα.")));
+    afterRender();
+    return;
+  }
+
+  items.forEach((q,i)=>{
+    let c;
+    if(state.tab==="tf") c=cardTF(q,i);
+    else if(state.tab==="gap") c=cardGap(q,i);
+    else if(state.tab==="mcq") c=cardMCQ(q,i);
+    else if(state.tab==="essay") c=cardLong(q,i,"Υποδειγματική απάντηση");
+    else c=cardLong(q,i,"Λύση");
+    m.appendChild(c);
+  });
+
+  if(state.q.trim()) m.querySelectorAll("details.ans").forEach(d=>d.open=true);
+  window.scrollTo(0,keepScroll);
+
+  const tot=el("p","muted");
+  tot.style.textAlign="center";
+  tot.textContent="Σύνολο: "+items.length+" "+(state.tab==="ex"?"ασκήσεις":"ερωτήσεις");
+  m.appendChild(tot);
+  afterRender();
+}
+
+function afterRender(){
+  const m=$("#main");
+  if(state.q.trim()) highlight(m);
+  const inp=$("#q"), clr=$("#qclear"), cnt=$("#qcount");
+  if(inp && inp.value!==state.q) inp.value=state.q;
+  if(clr) clr.hidden = !state.q;
+  if(cnt){
+    if(!state.q.trim()) cnt.textContent="";
+    else {
+      const here=countIn(state.tab);
+      const total=TABS.reduce((a,t)=>a+countIn(t.id),0);
+      cnt.textContent = here+" εδώ · "+total+" συνολικά";
+    }
+  }
+}
+
+/* ---------- σύνδεση αναζήτησης ---------- */
+(function initSearch(){
+  const inp=$("#q"), clr=$("#qclear");
+  let timer=null;
+  const apply=()=>{ state.q=inp.value; state.order={}; render(); };
+  inp.addEventListener("input",()=>{ clearTimeout(timer); timer=setTimeout(apply,140); });
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ inp.value=""; clearTimeout(timer); apply(); inp.blur(); }
+    if(e.key==="Enter"){ clearTimeout(timer); apply(); }
+  });
+  clr.addEventListener("click",()=>{ inp.value=""; apply(); inp.focus(); });
+  document.addEventListener("keydown",e=>{
+    const tag=(e.target.tagName||"").toUpperCase();
+    if(e.key==="/" && tag!=="INPUT" && tag!=="TEXTAREA"){ e.preventDefault(); inp.focus(); inp.select(); }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); inp.focus(); inp.select(); }
+  });
+})();
+
+render();
+
+</script>
+</body>
+</html>
