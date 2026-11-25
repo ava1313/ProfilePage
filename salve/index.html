@@ -62,11 +62,17 @@ body.loading{overflow:hidden}
 .sheet a{color:var(--off);text-decoration:none;font-size:40px;font-weight:800;padding:8px 0;border-bottom:1px solid rgba(247,248,242,.1)}
 
 /* hero */
-.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;color:var(--off);overflow:hidden;background:var(--forest)}
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;color:var(--off);overflow:hidden;background:var(--forest)}
 .hero-bg{position:absolute;inset:-12% 0 0;height:124%}
 .hero-bg img{width:100%;height:100%;object-fit:cover}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,37,27,.35) 0%,rgba(24,37,27,.25) 35%,rgba(24,37,27,.92) 100%)}
-.hero .wrap{position:relative;z-index:2;width:100%;padding-top:130px;padding-bottom:clamp(40px,7vw,84px)}
+.hero .wrap{position:relative;z-index:2;width:100%;padding-bottom:clamp(40px,7vw,84px)}
+.hero-logo{position:relative;z-index:2;flex:1;display:grid;place-items:center;padding:clamp(110px,14vh,150px) 20px clamp(24px,4vh,48px)}
+.hero-logo .ring{position:relative;width:clamp(170px,min(36vw,34vh),440px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center}
+.hero-logo .ring::before{content:"";position:absolute;inset:-18px;border-radius:50%;border:1.5px solid rgba(213,244,120,.55);box-shadow:0 0 80px rgba(213,244,120,.28)}
+.hero-logo .ring::after{content:"";position:absolute;inset:-40px;border-radius:50%;border:1px dashed rgba(247,248,242,.25);animation:rot 40s linear infinite}
+.hero-logo img{width:100%;height:100%;filter:drop-shadow(0 24px 40px rgba(0,0,0,.45));animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}@keyframes rot{to{transform:rotate(360deg)}}
 .chip{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(247,248,242,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:14px;font-weight:600;border:1px solid rgba(247,248,242,.18)}
 .chip b{color:var(--lime)}
 .hero h1{font-size:clamp(44px,9vw,128px);margin:20px 0 0;max-width:1100px;line-height:.96}
@@ -110,8 +116,8 @@ body.loading{overflow:hidden}
 /* about */
 .about{background:var(--forest);color:var(--off);overflow:hidden}
 .about-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,6vw,80px);align-items:center}
-.about .pic{border-radius:var(--r);overflow:hidden;aspect-ratio:1/1;background:#efe9cf}
-.about .pic img{width:100%;height:110%;object-fit:cover;object-position:center top}
+.about .pic{border-radius:var(--r);overflow:hidden;aspect-ratio:1/1;background:#F5EFD7;padding:clamp(18px,4%,36px);display:grid;place-items:center}
+.about .pic img{width:100%;height:100%;object-fit:contain}
 .about .eyebrow{color:var(--lime)}
 .about p{color:rgba(247,248,242,.8);font-size:clamp(17px,1.5vw,19px);margin:20px 0 0}
 .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
@@ -153,7 +159,7 @@ footer .bigname span{color:var(--lime)}
   body{padding-bottom:calc(84px + var(--safe))}
   .brand small{display:none}.brand{font-size:17px}.brand img{width:36px;height:36px}
   .hero{min-height:92svh}
-  .hero .wrap{padding-top:110px}
+  .hero-logo{padding-top:104px}
   .hero-cta .btn{flex:1 1 100%}
   .bento{grid-template-columns:minmax(0,1fr);grid-auto-rows:auto;gap:12px}
   .tile{min-height:250px}.t1,.t4{grid-column:auto}
@@ -210,6 +216,7 @@ footer .bigname span{color:var(--lime)}
 
 <header class="hero" id="top">
   <div class="hero-bg" data-parallax><img src="img/field.jpg" alt="" fetchpriority="high"></div>
+  <div class="hero-logo"><div class="ring"><img src="img/emblem.png" alt="Έμβλημα ΣΑΛΒΕ"></div></div>
   <div class="wrap">
     <span class="chip reveal"><b>●</b> <span data-i18n="heroChip">Συνεταιρισμός Εργαζομένων Παμφίλων · Λέσβος</span></span>
     <h1 data-split data-i18n-html="heroTitle">Η γη σας θέλει <em>τον σωστό</em> συνεργάτη.</h1>
@@ -436,11 +443,13 @@ const finish=()=>{
   const tl=gsap.timeline();
   tl.to(ld,{yPercent:-100,duration:.9,ease:'power4.inOut',onComplete:()=>ld.remove()})
     .from('.hero-bg img',{scale:1.25,duration:1.6,ease:'power3.out'},'-=.6')
+    .from('.hero-logo .ring',{scale:.6,opacity:0,rotate:-20,duration:1.2,ease:'back.out(1.6)'},'-=1.4')
     .from('.nav',{y:-40,opacity:0,duration:.8,ease:'power3.out'},'-=1.3')
     .from('.hero [data-split] .wi',{yPercent:110,duration:1,ease:'power4.out',stagger:.06},'-=1.2')
     .from('.hero .reveal',{y:24,opacity:0,duration:.8,ease:'power3.out',stagger:.1},'-=.7');
   gsap.to('[data-parallax] img',{yPercent:18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
-  gsap.utils.toArray('[data-parallax-in]').forEach(img=>gsap.fromTo(img,{yPercent:-8},{yPercent:4,ease:'none',scrollTrigger:{trigger:img.parentElement,start:'top bottom',end:'bottom top',scrub:true}}));
+  gsap.to('.hero-logo .ring',{yPercent:-30,scale:.85,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+  gsap.utils.toArray('[data-parallax-in]').forEach(img=>gsap.fromTo(img,{scale:.92},{scale:1,ease:'none',scrollTrigger:{trigger:img.parentElement,start:'top bottom',end:'center center',scrub:true}}));
   gsap.utils.toArray('section [data-split]').forEach(h=>gsap.from(h.querySelectorAll('.wi'),{yPercent:110,duration:.9,ease:'power4.out',stagger:.05,scrollTrigger:{trigger:h,start:'top 85%'}}));
   gsap.utils.toArray('section .reveal').forEach(el=>gsap.from(el,{y:30,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%'}}));
   gsap.set('.rise',{y:60,opacity:0});
