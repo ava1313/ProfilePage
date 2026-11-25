@@ -139,7 +139,7 @@ body.loading{overflow:hidden}
 .contact .lbl{font-size:13px;font-weight:600;opacity:.8}
 .contact .val{font-size:22px;font-weight:700;text-decoration:none}
 .map{grid-column:1/-1;border-radius:var(--r);overflow:hidden;height:clamp(280px,40vw,440px);background:#dfe5d2}
-.map iframe{width:100%;height:100%;border:0;filter:saturate(.8)}
+.map{position:relative}.map iframe{width:100%;height:100%;border:0;filter:saturate(.85)}
 
 footer{background:var(--forest);color:rgba(247,248,242,.88);padding:56px 0 calc(40px + var(--safe));font-size:14px}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:flex-end}
@@ -328,7 +328,7 @@ footer .bigname span{color:var(--lime)}
         </div>
       </div>
       <div class="map rise">
-        <iframe title="Χάρτης ΣΑΛΒΕ" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=39.1550549,26.5241236&z=15&output=embed"></iframe>
+        <iframe title="Χάρτης ΣΑΛΒΕ" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=26.5101%2C39.1470%2C26.5381%2C39.1630&amp;layer=mapnik&amp;marker=39.15505%2C26.52412"></iframe>
       </div>
     </div>
   </div>
