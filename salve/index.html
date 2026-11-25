@@ -139,7 +139,12 @@ body.loading{overflow:hidden}
 .contact .lbl{font-size:13px;font-weight:600;opacity:.8}
 .contact .val{font-size:22px;font-weight:700;text-decoration:none}
 .map{grid-column:1/-1;border-radius:var(--r);overflow:hidden;height:clamp(280px,40vw,440px);background:#dfe5d2}
-.map{position:relative}.map iframe{width:100%;height:100%;border:0;filter:saturate(.85)}
+.map{position:relative}.map-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;color:var(--muted)}.map-ph p{margin:0;max-width:360px}.map.on .map-ph{display:none}
+.ck{position:fixed;z-index:60;left:16px;bottom:calc(16px + var(--safe));width:min(460px,calc(100% - 32px));padding:22px;border-radius:24px;background:rgba(24,37,27,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:var(--off);border:1px solid rgba(247,248,242,.14);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.ck[hidden]{display:none}.ck h3{font-size:20px;margin:0 0 8px}.ck p{margin:0;font-size:15px;color:rgba(247,248,242,.88);line-height:1.5}
+.ck .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.ck .btn{min-height:48px;padding:0 20px;font-size:15px;flex:1 1 auto}
+.ck-link{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+body.ck-open .mcta{display:none}.map iframe{width:100%;height:100%;border:0;filter:saturate(.85)}
 
 footer{background:var(--forest);color:rgba(247,248,242,.88);padding:56px 0 calc(40px + var(--safe));font-size:14px}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:flex-end}
@@ -209,7 +214,7 @@ footer .bigname span{color:var(--lime)}
   <div class="links">
     <a href="#services" data-i18n="navServices">Υπηρεσίες</a>
     <a href="#about" data-i18n="navAbout">Ποιοι είμαστε</a>
-    <a href="#visit" data-i18n="navVisit">Ωράριο & επαφή</a>
+    <a href="#visit" data-i18n="navVisit">Ωράριο & επικοινωνία</a>
   </div>
   <div class="nav-r">
     <div class="lang" role="group" aria-label="Γλώσσα / Language">
@@ -228,7 +233,7 @@ footer .bigname span{color:var(--lime)}
 <div class="sheet" id="sheet">
   <a href="#services" data-i18n="navServices">Υπηρεσίες</a>
   <a href="#about" data-i18n="navAbout">Ποιοι είμαστε</a>
-  <a href="#visit" data-i18n="navVisit">Ωράριο & επαφή</a>
+  <a href="#visit" data-i18n="navVisit">Ωράριο & επικοινωνία</a>
 </div>
 
 <header class="hero" id="top">
@@ -328,7 +333,8 @@ footer .bigname span{color:var(--lime)}
         </div>
       </div>
       <div class="map rise">
-        <iframe title="Χάρτης ΣΑΛΒΕ" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=26.5101%2C39.1470%2C26.5381%2C39.1630&amp;layer=mapnik&amp;marker=39.15505%2C26.52412"></iframe>
+        <div class="map-ph"><p data-i18n="mapPh">Ο χάρτης φορτώνεται από το OpenStreetMap μόνο αν το επιτρέψετε.</p><button type="button" class="btn btn-dark" id="mapLoad" data-i18n="mapLoad">Εμφάνιση χάρτη</button></div>
+        <iframe hidden title="Χάρτης ΣΑΛΒΕ" loading="lazy" data-src="https://www.openstreetmap.org/export/embed.html?bbox=26.5101%2C39.1470%2C26.5381%2C39.1630&amp;layer=mapnik&amp;marker=39.15505%2C26.52412"></iframe>
       </div>
     </div>
   </div>
@@ -338,9 +344,18 @@ footer .bigname span{color:var(--lime)}
   <div class="wrap">
     <div class="bigname">ΣΑΛΒΕ<span>.</span></div>
     <span data-i18n="foot">Συνεταιρισμός Εργαζομένων Παμφίλων · Πάμφιλα Λέσβου · 22510 32304</span>
-    <span data-i18n="photos">Φωτογραφίες: Unsplash</span>
+    <span><span data-i18n="photos">Φωτογραφίες: Unsplash</span> · <button type="button" class="ck-link" id="ckOpen" data-i18n="ckSettings">Ρυθμίσεις cookies</button></span>
   </div>
 </footer>
+
+<div class="ck" id="ck" role="dialog" aria-labelledby="ckT" hidden>
+  <h3 id="ckT" data-i18n="ckTitle">Cookies & απόρρητο</h3>
+  <p data-i18n="ckText">Χρησιμοποιούμε μόνο τα απαραίτητα για να λειτουργεί η σελίδα (π.χ. να θυμάται τη γλώσσα σας). Με την αποδοχή φορτώνεται και ο χάρτης από το OpenStreetMap. Δεν χρησιμοποιούμε cookies διαφήμισης ή παρακολούθησης.</p>
+  <div class="row">
+    <button type="button" class="btn btn-lime" id="ckAll" data-i18n="ckAccept">Αποδοχή όλων</button>
+    <button type="button" class="btn btn-ghost" id="ckNec" data-i18n="ckNecessary">Μόνο απαραίτητα</button>
+  </div>
+</div>
 
 <div class="mcta" id="mcta">
   <a class="btn btn-lime" href="tel:+302251032304" data-i18n="ctaCall">Καλέστε μας</a>
@@ -353,10 +368,10 @@ footer .bigname span{color:var(--lime)}
 <script>
 {
 const T={
- el:{brandSub:'ΓΕΩΠΟΝΙΚΗ ΜΗΧΑΝΙΚΗ',navServices:'Υπηρεσίες',navAbout:'Ποιοι είμαστε',navVisit:'Ωράριο & επαφή',heroChip:'Συνεταιρισμός Εργαζομένων Παμφίλων · Λέσβος',heroTitle:'Η γη σας θέλει <em>τον σωστό</em> συνεργάτη.',heroText:'Γεωργικά εφόδια, ζωοτροφές, μηχανήματα και φυτά — με τη συμβουλή γεωπόνου, στα Πάμφιλα.',ctaCall:'Καλέστε μας',ctaMap:'Οδηγίες στον χάρτη',ctaDir:'Οδηγίες',ctaCallNow:'Κλήση τώρα',ctaGmaps:'Άνοιγμα στο Google Maps',rating:'5,0 στο Google · 10 κριτικές',svcEyebrow:'Τι θα βρείτε',svcTitle:'Όλα σε ένα σημείο.',svcLead:'Για το χωράφι, το ποίμνιο, τα κατοικίδια και τον κήπο — σε καλές τιμές και με ανθρώπους που ξέρουν.',s1t:'Σύμβουλοι αγροτικής ανάπτυξης',s1p:'Γεωπονική καθοδήγηση για τις καλλιέργειες και την εκμετάλλευσή σας.',s2t:'Γεωργικά εφόδια',s2p:'Σπόροι, λιπάσματα, υποστρώματα, εργαλεία.',s3t:'Ζωοτροφές',s3p:'Για ζώα εκτροφής και κατοικίδια.',s4t:'Γεωργικά μηχανήματα',s4p:'Μεγάλη γκάμα εξοπλισμού για κάθε ανάγκη του κτήματος.',s5t:'Καλλωπιστικά φυτά',s5p:'Για σπίτι, μπαλκόνι και κήπο.',statP:'Βαθμολογία στο Google από τους πελάτες μας.',abEyebrow:'Ποιοι είμαστε',abTitle:'Από τα Πάμφιλα, για όλη τη Λέσβο.',abP1:'Η ΣΑΛΒΕ είναι το γεωπονικό κατάστημα του Συνεταιρισμού Εργαζομένων Παμφίλων. Η ελιά, το κριάρι και τα λουλούδια στο έμβλημά μας λένε τι μας ενδιαφέρει: η γη, τα ζώα και ο κήπος της Λέσβου.',abP2:'Ελάτε να μιλήσουμε για ό,τι χρειάζεστε — θα βρείτε φιλική εξυπηρέτηση και σωστή συμβουλή.',p1:'Ελιά',p2:'Κτηνοτροφία',p3:'Κήπος',p4:'Μηχανήματα',viEyebrow:'Επισκεφθείτε μας',viTitle:'Ωράριο & επικοινωνία.',addrL:'Διεύθυνση',addr:'Πάμφιλα, 811 00 Λέσβος',phoneL:'Τηλέφωνο',foot:'Συνεταιρισμός Εργαζομένων Παμφίλων · Πάμφιλα Λέσβου · 22510 32304',photos:'Φωτογραφίες: Unsplash',
+ el:{brandSub:'ΓΕΩΠΟΝΙΚΗ ΜΗΧΑΝΙΚΗ',navServices:'Υπηρεσίες',navAbout:'Ποιοι είμαστε',navVisit:'Ωράριο & επικοινωνία',heroChip:'Συνεταιρισμός Εργαζομένων Παμφίλων · Λέσβος',heroTitle:'Η γη σας θέλει <em>τον σωστό</em> συνεργάτη.',heroText:'Γεωργικά εφόδια, ζωοτροφές, μηχανήματα και φυτά — με τη συμβουλή γεωπόνου, στα Πάμφιλα.',ctaCall:'Καλέστε μας',ctaMap:'Οδηγίες στον χάρτη',ctaDir:'Οδηγίες',ctaCallNow:'Κλήση τώρα',ctaGmaps:'Άνοιγμα στο Google Maps',rating:'5,0 στο Google · 10 κριτικές',svcEyebrow:'Τι θα βρείτε',svcTitle:'Όλα σε ένα σημείο.',svcLead:'Για το χωράφι, το ποίμνιο, τα κατοικίδια και τον κήπο — σε καλές τιμές και με ανθρώπους που ξέρουν.',s1t:'Σύμβουλοι αγροτικής ανάπτυξης',s1p:'Γεωπονική καθοδήγηση για τις καλλιέργειες και την εκμετάλλευσή σας.',s2t:'Γεωργικά εφόδια',s2p:'Σπόροι, λιπάσματα, υποστρώματα, εργαλεία.',s3t:'Ζωοτροφές',s3p:'Για ζώα εκτροφής και κατοικίδια.',s4t:'Γεωργικά μηχανήματα',s4p:'Μεγάλη γκάμα εξοπλισμού για κάθε ανάγκη του κτήματος.',s5t:'Καλλωπιστικά φυτά',s5p:'Για σπίτι, μπαλκόνι και κήπο.',statP:'Βαθμολογία στο Google από τους πελάτες μας.',abEyebrow:'Ποιοι είμαστε',abTitle:'Από τα Πάμφιλα, για όλη τη Λέσβο.',abP1:'Η ΣΑΛΒΕ είναι το γεωπονικό κατάστημα του Συνεταιρισμού Εργαζομένων Παμφίλων. Η ελιά, το κριάρι και τα λουλούδια στο έμβλημά μας λένε τι μας ενδιαφέρει: η γη, τα ζώα και ο κήπος της Λέσβου.',abP2:'Ελάτε να μιλήσουμε για ό,τι χρειάζεστε — θα βρείτε φιλική εξυπηρέτηση και σωστή συμβουλή.',p1:'Ελιά',p2:'Κτηνοτροφία',p3:'Κήπος',p4:'Μηχανήματα',viEyebrow:'Επισκεφθείτε μας',viTitle:'Ωράριο & επικοινωνία.',addrL:'Διεύθυνση',addr:'Πάμφιλα, 811 00 Λέσβος',phoneL:'Τηλέφωνο',foot:'Συνεταιρισμός Εργαζομένων Παμφίλων · Πάμφιλα Λέσβου · 22510 32304',photos:'Φωτογραφίες: Unsplash',ckTitle:'Cookies & απόρρητο',ckText:'Χρησιμοποιούμε μόνο τα απαραίτητα για να λειτουργεί η σελίδα (π.χ. να θυμάται τη γλώσσα σας). Με την αποδοχή φορτώνεται και ο χάρτης από το OpenStreetMap. Δεν χρησιμοποιούμε cookies διαφήμισης ή παρακολούθησης.',ckAccept:'Αποδοχή όλων',ckNecessary:'Μόνο απαραίτητα',ckSettings:'Ρυθμίσεις cookies',mapPh:'Ο χάρτης φορτώνεται από το OpenStreetMap μόνο αν το επιτρέψετε.',mapLoad:'Εμφάνιση χάρτη',
   days:['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'],monfri:'Δευτέρα – Παρασκευή',sat:'Σάββατο',sun:'Κυριακή',closed:'Κλειστά',open:'Ανοιχτά τώρα',closedNow:'Κλειστά τώρα',until:'έως',opens:'ανοίγει',
   mq:['Γεωργικά εφόδια','Ζωοτροφές','Γεωργικά μηχανήματα','Καλλωπιστικά φυτά','Σύμβουλοι αγροτικής ανάπτυξης']},
- en:{brandSub:'AGRICULTURAL SUPPLIES',navServices:'Services',navAbout:'About us',navVisit:'Hours & contact',heroChip:'Pamfila Workers’ Cooperative · Lesvos',heroTitle:'Your land deserves <em>the right</em> partner.',heroText:'Farm supplies, animal feed, machinery and plants — with expert agronomist advice, in Pamfila.',ctaCall:'Call us',ctaMap:'Get directions',ctaDir:'Directions',ctaCallNow:'Call now',ctaGmaps:'Open in Google Maps',rating:'5.0 on Google · 10 reviews',svcEyebrow:'What you’ll find',svcTitle:'Everything in one place.',svcLead:'For the field, the flock, your pets and your garden — at good prices, from people who know.',s1t:'Agricultural advisory',s1p:'Agronomist guidance for your crops and your farm.',s2t:'Farm supplies',s2p:'Seeds, fertilisers, substrates and tools.',s3t:'Animal feed',s3p:'For livestock and pets.',s4t:'Farm machinery',s4p:'A wide range of equipment for every need on the farm.',s5t:'Ornamental plants',s5p:'For home, balcony and garden.',statP:'Google rating from our customers.',abEyebrow:'About us',abTitle:'From Pamfila, for all of Lesvos.',abP1:'SALVE is the agricultural store of the Pamfila Workers’ Cooperative. The olive branch, the ram and the flowers in our emblem say what we care about: the land, the animals and the gardens of Lesvos.',abP2:'Come and tell us what you need — you’ll find friendly service and sound advice.',p1:'Olives',p2:'Livestock',p3:'Garden',p4:'Machinery',viEyebrow:'Visit us',viTitle:'Hours & contact.',addrL:'Address',addr:'Pamfila, 811 00 Lesvos, Greece',phoneL:'Phone',foot:'Pamfila Workers’ Cooperative · Pamfila, Lesvos · +30 22510 32304',photos:'Photos: Unsplash',
+ en:{brandSub:'AGRICULTURAL SUPPLIES',navServices:'Services',navAbout:'About us',navVisit:'Hours & contact',heroChip:'Pamfila Workers’ Cooperative · Lesvos',heroTitle:'Your land deserves <em>the right</em> partner.',heroText:'Farm supplies, animal feed, machinery and plants — with expert agronomist advice, in Pamfila.',ctaCall:'Call us',ctaMap:'Get directions',ctaDir:'Directions',ctaCallNow:'Call now',ctaGmaps:'Open in Google Maps',rating:'5.0 on Google · 10 reviews',svcEyebrow:'What you’ll find',svcTitle:'Everything in one place.',svcLead:'For the field, the flock, your pets and your garden — at good prices, from people who know.',s1t:'Agricultural advisory',s1p:'Agronomist guidance for your crops and your farm.',s2t:'Farm supplies',s2p:'Seeds, fertilisers, substrates and tools.',s3t:'Animal feed',s3p:'For livestock and pets.',s4t:'Farm machinery',s4p:'A wide range of equipment for every need on the farm.',s5t:'Ornamental plants',s5p:'For home, balcony and garden.',statP:'Google rating from our customers.',abEyebrow:'About us',abTitle:'From Pamfila, for all of Lesvos.',abP1:'SALVE is the agricultural store of the Pamfila Workers’ Cooperative. The olive branch, the ram and the flowers in our emblem say what we care about: the land, the animals and the gardens of Lesvos.',abP2:'Come and tell us what you need — you’ll find friendly service and sound advice.',p1:'Olives',p2:'Livestock',p3:'Garden',p4:'Machinery',viEyebrow:'Visit us',viTitle:'Hours & contact.',addrL:'Address',addr:'Pamfila, 811 00 Lesvos, Greece',phoneL:'Phone',foot:'Pamfila Workers’ Cooperative · Pamfila, Lesvos · +30 22510 32304',photos:'Photos: Unsplash',ckTitle:'Cookies & privacy',ckText:'We only use what is essential for the site to work (e.g. remembering your language). If you accept, the map is also loaded from OpenStreetMap. We use no advertising or tracking cookies.',ckAccept:'Accept all',ckNecessary:'Essential only',ckSettings:'Cookie settings',mapPh:'The map is loaded from OpenStreetMap only if you allow it.',mapLoad:'Show map',
   days:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],monfri:'Monday – Friday',sat:'Saturday',sun:'Sunday',closed:'Closed',open:'Open now',closedNow:'Closed now',until:'until',opens:'opens',
   mq:['Farm supplies','Animal feed','Farm machinery','Ornamental plants','Agricultural advisory']}
 };
@@ -426,6 +441,18 @@ document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',
 }));
 applyLang(true);
 setInterval(renderHours,60000);
+
+/* cookies */
+const ck=document.getElementById('ck'),mapBox=document.querySelector('.map'),ifr=mapBox.querySelector('iframe');
+const loadMap=()=>{if(!ifr.src){ifr.src=ifr.dataset.src}ifr.hidden=false;mapBox.classList.add('on')};
+const getC=()=>{try{return localStorage.getItem('salve-consent')}catch(e){return null}};
+const setC=v=>{try{localStorage.setItem('salve-consent',v)}catch(e){}};
+const showCk=o=>{ck.hidden=!o;document.body.classList.toggle('ck-open',o)};
+const c0=getC();if(c0==='all')loadMap();if(!c0)showCk(true);
+document.getElementById('ckAll').addEventListener('click',()=>{setC('all');loadMap();showCk(false)});
+document.getElementById('ckNec').addEventListener('click',()=>{setC('necessary');showCk(false)});
+document.getElementById('ckOpen').addEventListener('click',()=>showCk(true));
+document.getElementById('mapLoad').addEventListener('click',loadMap);
 
 /* menu */
 const sheet=document.getElementById('sheet'),mb=document.querySelector('.menu-btn');
